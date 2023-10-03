@@ -20,9 +20,9 @@ class TestController extends UserController
 
 //        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
         $row = [
-            'images' => '1.jpg,2.jpg,3.jpg,5.jpg,6.jpg,7.jpg,8.jpg,9.jpg,10.jpg,',
+            'images' => '1.png,2.png,3.png,5.png',
             'sound_name' => 'test.mp3',
-            'number' => 'first',
+            'number' => 'newtest',
             'sound_time' => 40,
             'text' => 'Мем (англ. meme [miːm]) — единица значимой для культуры информации.
 
@@ -33,16 +33,17 @@ class TestController extends UserController
 Мемом является любая идея, символ, манера, ситуация или образ действия, осознанно или неосознанно передаваемые от человека к человеку посредством речи, письма, видео, ритуалов, жестов и т. д. Термин «мем» и его понимание были введены эволюционным биологом Ричардом Докинзом в 1976 году в книге «Эгоистичный ген». Докинз предложил идею о том, что вся значимая для культуры информация состоит из базовых единиц — мемов, точно так же как биологическая информация состоит из генов; и так же как гены, мемы подвержены естественному отбору, мутации и искусственной селекции. На основе этой идеи Докинза возникла дисциплина меметика, в настоящее время имеющая спорный научный статус'
         ];
 
-        /** Слайдшоу с музыкой */
-        $ffmpeg = $this->getSlideShowCode($row['images'], $row['sound_name'], $row['number'], $row['sound_time']);
-        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+//        /** Слайдшоу с музыкой */
+//        $ffmpeg = $this->getSlideShowCode($row['images'], $row['sound_name'], $row['number'], $row['sound_time']);
+//        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+//
+//        /** Добавили фон */
+//        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $row['number'] . '.mp4 -i ' . DIRECTORY_MAIN_IMG . 'fon.png -filter_complex "[0:v][1:v]overlay=0:0" -codec:a copy -y ' . DIRECTORY_VIDEO . $row['number'] . '_fon.mp4';
 
-        /** Добавили фон */
-        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $row['number'] . '.mp4 -i ' . DIRECTORY_MAIN_IMG . 'fon.png -filter_complex "[0:v][1:v]overlay=0:0" -codec:a copy -y ' . DIRECTORY_VIDEO . $row['number'] . '1.mp4';
 
-        /** Добавили логотип */
-        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $row['number'] . '1.mp4 -i ' . DIRECTORY_MAIN_IMG . 'logo.png -filter_complex "[1:v][0:v]scale2ref=(450/142)*ih/14/sar:ih/14[wm][base];[base][wm]overlay=main_w-overlay_w-10:10:format=rgb" -pix_fmt yuv420p -c:a copy -y ' . DIRECTORY_VIDEO . $row['number'] . '2.mp4';
-        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+//        /** Добавили логотип */
+//        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $row['number'] . '_fon.mp4 -i ' . DIRECTORY_MAIN_IMG . 'logo.png -filter_complex "[1:v][0:v]scale2ref=(450/142)*ih/14/sar:ih/14[wm][base];[base][wm]overlay=main_w-overlay_w-10:10:format=rgb" -pix_fmt yuv420p -c:a copy -y ' . DIRECTORY_VIDEO . $row['number'] . '_logo.mp4';
+//        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         /** Обработка текста */
         try {
@@ -59,11 +60,13 @@ class TestController extends UserController
             } else {
             }
 
+
+
             $stringDirectory = str_replace('\\', '\\\\', DIRECTORY_TEXT);
             $stringDirectory = str_replace(':', '\\:', $stringDirectory);
-            $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $row['number'] . '2.mp4 -filter_complex "subtitles=\'' . $stringDirectory . $row['number'] . '.ass\':force_style=' .
+            $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $row['number'] . '_logo.mp4 -filter_complex "subtitles=\'' . $stringDirectory . $row['number'] . '.ass\':force_style=' .
                 "'OutlineColour=&H80000000,BorderStyle=3,Outline=1,Shadow=0,MarginV=110'" .
-                '" -y ' . DIRECTORY_VIDEO . $row['number'] . '4.mp4';
+                '" -y ' . DIRECTORY_VIDEO . $row['number'] . '_text.mp4';
 
             var_dump($ffmpeg);
 
@@ -104,10 +107,10 @@ class TestController extends UserController
         return $str;
     }
 
-    private function getSlideShowCode(string $images, string $sound_name, string $number, string $sound_time)
+    private function getSlideShowCode(string $images, string $sound_name, string $number, string $sound_time): string
     {
         #каждые 10 секунд меняем фотогрфию
-        $count_images = ceil($sound_time / 5);
+        $count_images = ceil($sound_time / 10);
         $arr_images = explode(',', $images);
 
 //        $tmp = array_merge($arr_images, $arr_images, $arr_images, $arr_images, $arr_images,
