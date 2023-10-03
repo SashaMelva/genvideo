@@ -9,8 +9,8 @@ class CreateToken
     public static function action(int $user_id, string $secret, string $role, bool $type = false): string
     {
         $conf = [
-            'iss' => 'analytics',
-            'aud' => 'analytics',
+            'iss' => 'genvideo',
+            'aud' => 'genvideo',
             'iat' => time(),
             'exp' => time() + 31536000,
             'user_id' => $user_id,

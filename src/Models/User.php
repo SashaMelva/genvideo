@@ -79,7 +79,7 @@ class User extends Model
      * @return Model|Builder|null
      * Проверка наличия пользователя по Email
      */
-    public static function findByUseremail($email): Model|Builder|null
+    public static function findByUserEmail($email): Model|Builder|null
     {
         return self::query()
             ->where([['email', '=', $email]])
@@ -162,7 +162,7 @@ class User extends Model
         $validator = Validation::createValidator();
 
         $constraint = new Assert\Collection([
-            'name' => new Assert\NotBlank(['message' => 'Не заполнено поле Имя']),
+            'login' => new Assert\NotBlank(['message' => 'Не заполнено поле Логин']),
             'email' => [
                 new Assert\NotBlank(['message' => 'Не заполнено поле Email']),
                 new Assert\Email(['message' => 'Значение {{ value }} не является правильным email адресом'])
@@ -170,13 +170,7 @@ class User extends Model
             'phone' => new Assert\NotBlank(['message' => 'Не заполнено поле Телефон']),
             'role' => new Assert\NotBlank(),
             'password_hash' => new Assert\NotBlank(),
-            'last_activity' => new Assert\NotBlank(),
-            'utm_source_id' => new Assert\NotBlank(),
-            'utm_medium_id' => new Assert\NotBlank(),
-            'utm_campaign_id' => new Assert\NotBlank(),
-            'utm_group_id' => new Assert\NotBlank(),
-            'utm_term_id' => new Assert\NotBlank(),
-            'utm_content_id' => new Assert\NotBlank(),
+            'created_at' => new Assert\NotBlank(),
             'password' => new Assert\NotBlank(['message' => 'Не заполнено поле Пароль']),
             'status' => new Assert\Type(['type' => 'boolean'])
         ]);

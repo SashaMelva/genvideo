@@ -29,4 +29,23 @@ abstract class UserController extends RestController
         preg_match('/\/\/(.*?)\./', $school_header, $output_array);
         return $output_array[1];
     }
+
+    public function checkOfParameters($data): bool
+    {
+        $params = [
+            'name',
+            'email',
+            'phone',
+            'password',
+            'fingerprint',
+            'reg_url',
+            'agreed',
+        ];
+
+        foreach ($params as $param) {
+            if (!array_key_exists($param, $data)) return false;
+        }
+
+        return true;
+    }
 }
