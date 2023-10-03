@@ -1,0 +1,38 @@
+###############################################################################
+#                          Generated on phpdocker.io                          #
+###############################################################################
+version: '3.1'
+services:
+#    postgres:
+#        image: 'postgres:15-alpine'
+#        working_dir: /application
+#        volumes:
+#            - '.:/application'
+#        environment:
+#            - POSTGRES_USER=genvideo
+#            - POSTGRES_PASSWORD=255209
+#            - POSTGRES_DB=genvideo
+#        ports:
+#            - '8092:5432'
+#
+#    webserver:
+#        image: 'nginx:alpine'
+#        working_dir: /application
+#        volumes:
+#            - '.:/application'
+#            - './phpdocker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf'
+#        ports:
+#            - '8088:80'
+
+    postgres:
+        image: postgres:latest
+        restart: always
+        environment:
+            POSTGRES_DB: genvideo
+            POSTGRES_USER: courseup
+            POSTGRES_PASSWORD: de78Y_lcydr
+        ports:
+            - 5432:5432
+        volumes:
+            - ./docker/development/postgres/data:/var/lib/postgresql/data
+            - ./docker/development/postgres/dump.sql:/docker-entrypoint-initdb.d/courseup.sql

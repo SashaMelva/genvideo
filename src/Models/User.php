@@ -1,0 +1,257 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Constraints as Assert;
+
+class User extends Model
+{
+    public mixed $errors;
+    protected $primaryKey = 'id';
+    protected $table = 'users';
+
+
+    /**
+     * @param int $user_id
+     * @param int $school_id
+     * @return bool
+     * Проверка пользователя на право
+     * доступа к данной школе
+     */
+    public static function accessCheck(int $user_id): bool
+    {
+        $access = self::query()
+            ->select(['id'])
+            ->where([['id', '=', $user_id]])
+            ->get()->toArray();
+
+        if (count($access) == 1) return true;
+        return false;
+    }
+
+    /**
+     * @param int $user_id
+     * @return mixed
+     * Получаем id школы
+     * с которой пользователь сейчас работает
+     */
+    public static function currentSchool(int $user_id): mixed
+    {
+        return self::query()->where([['id', '=', $user_id]])->value('school_id');
+    }
+
+    /**
+     * @param int $user_id
+     * @param array $school_all
+     * @return mixed
+     * Получение всех школ пользователя
+     */
+    public static function schoolAll(int $user_id, array $school_all = []): array
+    {
+        $model = self::query()->where([['id', '=', $user_id]])
+            ->value('school_all');
+
+        foreach (json_decode($model, true) as $schools) {
+            foreach ($schools as $key => $school) $school_all[$key] = $school;
+        }
+
+        return $school_all;
+    }
+
+    public static function findOne(int $id): Model|Collection|Builder|array|null
+    {
+        return self::query()->find($id)->getModel();
+    }
+
+    public static function findAll(): array
+    {
+        return self::query()
+            ->select(['id', 'school_id', 'school_all'])
+            ->get()->toArray();
+    }
+
+    /**
+     * @param $email
+     * @return Model|Builder|null
+     * Проверка наличия пользователя по Email
+     */
+    public static function findByUseremail($email): Model|Builder|null
+    {
+        return self::query()
+            ->where([['email', '=', $email]])
+            ->first();
+    }
+
+    /**
+     * @param int $id
+     * @return Model|Builder|null
+     * Проверка наличия пользователя по id
+     */
+    public static function findByUserId(int $id): Model|Builder|null
+    {
+        return self::query()
+            ->where([['id', '=', $id]])
+            ->first();
+    }
+
+    public static function findUsersBySchoolIdAndHathTelegram(int $school_id): array
+    {
+        return self::query()
+            ->select(["user.id", "name", "role", "telegram_chat_id", "telegram_token", "nikname", "username"])
+            ->leftJoin('telegram', 'user.id', '=', 'telegram.user_id')
+            ->where([['school_id', '=', $school_id]])
+            ->get()->toArray();
+    }
+
+    public static function findUsersBySchoolIdAndHathTelegramByUserId(int $school_id, int $user_id): array
+    {
+        return self::query()
+            ->select(["user.id", "name", "role", "telegram_chat_id", "telegram_token", "nikname", "username"])
+            ->leftJoin('telegram', 'user.id', '=', 'telegram.user_id')
+            ->where([['school_id', '=', $school_id], ['user.id', '=', $user_id]])
+            ->get()->toArray();
+    }
+
+    public static function updateEmailAndDateCreatedByUserId(array $data): int
+    {
+        return self::query()
+            ->where([['id', '=', $data['user_id']]])
+            ->update([
+                'email' => $data['email'],
+                'created_at' => $data['created_at'],
+                'reg_date' => $data['created_at'],
+            ]);
+    }
+
+    public static function updateDataForUserCRM($user_id, array $data): void
+    {
+        self::query()
+            ->where([['id', '=', $user_id]])
+            ->update([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'created_at' => $data['reg_date'],
+                'reg_date' => $data['reg_date'],
+            ]);
+    }
+
+    public static function updatePartnerInfo(int $partner_id, array $data)
+    {
+        self::query()
+            ->where([['id', '=', $partner_id]])
+            ->update([
+                'comment' => $data['comment']
+            ]);
+    }
+
+    public function verifyPassword(string $password): bool
+    {
+        if (!password_verify($password, $this->getAttributeValue('password_hash'))) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public function validate(): bool
+    {
+        $validator = Validation::createValidator();
+
+        $constraint = new Assert\Collection([
+            'name' => new Assert\NotBlank(['message' => 'Не заполнено поле Имя']),
+            'email' => [
+                new Assert\NotBlank(['message' => 'Не заполнено поле Email']),
+                new Assert\Email(['message' => 'Значение {{ value }} не является правильным email адресом'])
+            ],
+            'phone' => new Assert\NotBlank(['message' => 'Не заполнено поле Телефон']),
+            'role' => new Assert\NotBlank(),
+            'password_hash' => new Assert\NotBlank(),
+            'last_activity' => new Assert\NotBlank(),
+            'utm_source_id' => new Assert\NotBlank(),
+            'utm_medium_id' => new Assert\NotBlank(),
+            'utm_campaign_id' => new Assert\NotBlank(),
+            'utm_group_id' => new Assert\NotBlank(),
+            'utm_term_id' => new Assert\NotBlank(),
+            'utm_content_id' => new Assert\NotBlank(),
+            'password' => new Assert\NotBlank(['message' => 'Не заполнено поле Пароль']),
+            'status' => new Assert\Type(['type' => 'boolean'])
+        ]);
+
+        $violations = $validator->validate($this->toArray(), $constraint);
+
+        if (0 !== count($violations)) {
+            foreach ($violations as $violation) {
+                $key = str_replace(['[', ']'], '', $violation->getPropertyPath());
+                $this->errors[$key] = $violation->getMessage();
+            }
+            return false;
+        }
+
+        return true;
+    }
+
+    public function validatePassword($data): bool
+    {
+        $validator = Validation::createValidator();
+
+        $constraint = new Assert\Collection([
+            'password' => new Assert\NotBlank(['message' => 'Не заполнено поле Старый пароль']),
+            'new_password' => new Assert\NotBlank(['message' => 'Не заполнено поле Новый пароль']),
+            'new_password2' => new Assert\NotBlank(['message' => 'Не заполнено поле Новый пароль (еще раз)']),
+        ]);
+
+        $violations = $validator->validate($data, $constraint);
+
+        if (0 !== count($violations)) {
+            foreach ($violations as $violation) {
+                $key = str_replace(['[', ']'], '', $violation->getPropertyPath());
+                $this->errors[$key] = $violation->getMessage();
+            }
+            return false;
+        }
+
+        return true;
+    }
+
+    public static function createUser($userName, $userEmail, $password, $schoolId, $schoolAll, $status = true, $role = 'user'): User
+    {
+        $newUser = new User();
+        $newUser->setAttribute('name', $userName);
+        $newUser->setAttribute('email', $userEmail);
+        $newUser->setAttribute('password_hash', password_hash($password, PASSWORD_DEFAULT));
+        $newUser->setAttribute('role', $role);
+        $newUser->setAttribute('status', $status);
+        $newUser->setAttribute('last_activity', new \DateTimeImmutable());
+        $newUser->setAttribute('school_id', $schoolId);
+        $newUser->setAttribute('school_all', json_encode($schoolAll, JSON_UNESCAPED_UNICODE));
+
+        return $newUser;
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->role == 'superadmin';
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role == 'admin';
+    }
+
+    public function isUser(): bool
+    {
+        return $this->role == 'user';
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getValidationErrors(): mixed
+    {
+        return $this->errors;
+    }
+}
