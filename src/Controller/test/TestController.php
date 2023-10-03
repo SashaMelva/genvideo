@@ -12,10 +12,7 @@ use Psr\Http\Message\ResponseInterface;
 
 class TestController extends UserController
 {
-    /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
+
     public function action(): ResponseInterface
     {
         $data = json_decode($this->request->getBody()->getContents(), true);
@@ -27,27 +24,53 @@ class TestController extends UserController
             'sound_name' => 'test.mp3',
             'number' => 'first',
             'sound_time' => 40,
+            'text' => 'Мем (англ. meme [miːm]) — единица значимой для культуры информации.
+
+Мемом является любая идея, символ, манера, ситуация или образ действия, осознанно или неосознанно передаваемые от человека к человеку посредством речи, письма, видео, ритуалов, жестов и т. д. Термин «мем» и его понимание были введены эволюционным биологом Ричардом Докинзом в 1976 году в книге «Эгоистичный ген». Докинз предложил идею о том, что вся значимая для культуры информация состоит из базовых единиц — мемов, точно так же как биологическая информация состоит из генов; и так же как гены, мемы подвержены естественному отбору, мутации и искусственной селекции. На основе этой идеи Докинза возникла дисциплина меметика, в настоящее время имеющая спорный научный статус Мем (англ. meme [miːm]) — единица значимой для культуры информации.
+
+Мемом является любая идея, символ, манера, ситуация или образ действия, осознанно или неосознанно передаваемые от человека к человеку посредством речи, письма, видео, ритуалов, жестов и т. д. Термин «мем» и его понимание были введены эволюционным биологом Ричардом Докинзом в 1976 году в книге «Эгоистичный ген». Докинз предложил идею о том, что вся значимая для культуры информация состоит из базовых единиц — мемов, точно так же как биологическая информация состоит из генов; и так же как гены, мемы подвержены естественному отбору, мутации и искусственной селекции. На основе этой идеи Докинза возникла дисциплина меметика, в настоящее время имеющая спорный научный статус. Мем (англ. meme [miːm]) — единица значимой для культуры информации.
+
+Мемом является любая идея, символ, манера, ситуация или образ действия, осознанно или неосознанно передаваемые от человека к человеку посредством речи, письма, видео, ритуалов, жестов и т. д. Термин «мем» и его понимание были введены эволюционным биологом Ричардом Докинзом в 1976 году в книге «Эгоистичный ген». Докинз предложил идею о том, что вся значимая для культуры информация состоит из базовых единиц — мемов, точно так же как биологическая информация состоит из генов; и так же как гены, мемы подвержены естественному отбору, мутации и искусственной селекции. На основе этой идеи Докинза возникла дисциплина меметика, в настоящее время имеющая спорный научный статус'
         ];
 
         /** Слайдшоу с музыкой */
-//        $ffmpeg = $this->getSlideShowCode($row['images'], $row['sound_name'], $row['number'], $row['sound_time']);
-//        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+        $ffmpeg = $this->getSlideShowCode($row['images'], $row['sound_name'], $row['number'], $row['sound_time']);
+        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         /** Добавили фон */
-//        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $row['number'] . '.mp4 -i ' . DIRECTORY_MAIN_IMG . 'fon.png -filter_complex "[0:v][1:v]overlay=0:0" -codec:a copy -y '. DIRECTORY_VIDEO . $row['number'] . '1.mp4';
+        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $row['number'] . '.mp4 -i ' . DIRECTORY_MAIN_IMG . 'fon.png -filter_complex "[0:v][1:v]overlay=0:0" -codec:a copy -y ' . DIRECTORY_VIDEO . $row['number'] . '1.mp4';
 
         /** Добавили логотип */
         $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $row['number'] . '1.mp4 -i ' . DIRECTORY_MAIN_IMG . 'logo.png -filter_complex "[1:v][0:v]scale2ref=(450/142)*ih/14/sar:ih/14[wm][base];[base][wm]overlay=main_w-overlay_w-10:10:format=rgb" -pix_fmt yuv420p -c:a copy -y ' . DIRECTORY_VIDEO . $row['number'] . '2.mp4';
-//        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
-        /** Добавили текст */
-//            try {
-        var_dump($ffmpeg);
+        /** Обработка текста */
+        try {
+            $textArray = explode(" ", $row['text']);
 
-//            } catch (Exception $e) {
-//                return $this->respondWithError($e->getCode(), $e->getMessage());
-//            }
-//        }
+            // разбиваем текст на строки по ~ 150 символов
+            $shortTextArray = $this->getArrayStr($textArray, 150);
+
+            // формируем, сохраняем файл субтитров .srt и конвертируем в .ass
+            $length = file_put_contents(DIRECTORY_TEXT . $row['number'] . '.srt', $this->getFilesSrt($shortTextArray));
+
+            if ($length !== false) {
+                $ffmpeg = 'ffmpeg -i ' . DIRECTORY_TEXT . $row['number'] . '.srt -y ' . DIRECTORY_TEXT . $row['number'] . '.ass';
+            } else {
+            }
+
+            $stringDirectory = str_replace('\\', '\\\\', DIRECTORY_TEXT);
+            $stringDirectory = str_replace(':', '\\:', $stringDirectory);
+            $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $row['number'] . '2.mp4 -filter_complex "subtitles=\'' . $stringDirectory . $row['number'] . '.ass\':force_style=' .
+                "'OutlineColour=&H80000000,BorderStyle=3,Outline=1,Shadow=0,MarginV=110'" .
+                '" -y ' . DIRECTORY_VIDEO . $row['number'] . '4.mp4';
+
+            var_dump($ffmpeg);
+
+        } catch (Exception $e) {
+            return $this->respondWithError($e->getCode(), $e->getMessage());
+        }
+
 
 //        return $this->respondWithError(215);
     }
@@ -114,4 +137,55 @@ class TestController extends UserController
         $v = $v . 'concat=n=' . count($arr_images) . ':v=1:a=0,format=yuv422p[v]" -map "[v]" -map ' . count($arr_images) . ':a -shortest -y ' . DIRECTORY_VIDEO . $number . '.mp4';
         return 'ffmpeg' . $images . $sound . '-filter_complex "' . $scale . $v;
     }
+
+    private function getArrayStr(array $textArray, int $countChar): array
+    {
+        $result = [];
+        $text = $textArray[0] . ' ';
+        $count = count($textArray);
+
+        for ($i = 1; $i < $count; $i++) {
+            if (strlen($text) + strlen($textArray[$i]) > $countChar) {
+                $result[] = $text;
+                $text = '';
+            }
+
+            $text .= $textArray[$i] . ' ';
+        }
+
+        $result[] = $text;
+        return $result;
+    }
+
+    private function getFilesSrt($shorttext, $arr = [], $ms = 8999): string
+    {
+        foreach ($shorttext as $key => $item) {
+
+            if ($key == 0) {
+                $arr[] = ($key + 1) . "\r\n" . '00:00:00,000 --> '
+                    . str_replace('.', ',', $this->formatMilliseconds($ms)) . "\r\n" . $item . "\r\n";
+                continue;
+            }
+
+            $arr[] = ($key + 1) . "\r\n" . str_replace('.', ',', $this->formatMilliseconds($ms))
+                . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($ms + 8999)) . "\r\n" . $item . "\r\n";
+            $ms = $ms + 8999;
+        }
+        return implode("\r\n", $arr);
+    }
+
+    private function formatMilliseconds($milliseconds): string
+    {
+        $seconds = floor($milliseconds / 1000);
+        $minutes = floor($seconds / 60);
+        $hours = floor($minutes / 60);
+        $milliseconds = $milliseconds % 1000;
+        $seconds = $seconds % 60;
+        $minutes = $minutes % 60;
+
+        $format = '%u:%02u:%02u.%03u';
+        $time = sprintf($format, $hours, $minutes, $seconds, $milliseconds);
+        return rtrim($time, '0');
+    }
 }
+
