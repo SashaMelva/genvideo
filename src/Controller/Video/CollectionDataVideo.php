@@ -5,6 +5,7 @@ namespace App\Controller\Video;
 use App\Controller\UserController;
 use App\Helpers\CheckTokenExpiration;
 use App\Models\ContentVideo;
+use App\Models\ListAdditionalVideo;
 use App\Models\ListImage;
 use App\Models\ListMusic;
 use Exception;
@@ -32,12 +33,22 @@ class CollectionDataVideo extends UserController
 
                 $content = ContentVideo::addContent($data['name'], $data['text'], $data['path'], $data['time_video'], $data['user_id']);
 
-                foreach ($data['musics_ids'] as $musicId) {
-                    ListMusic::addMusic($musicId, $content->id);
+                if (!empty($data['musics_ids'])) {
+                    foreach ($data['musics_ids'] as $musicId) {
+                        ListMusic::addMusic($musicId, $content->id);
+                    }
                 }
 
-                foreach ($data['images_ids'] as $imageId) {
-                    ListImage::addImage($imageId, $content->id);
+                if (!empty($data['images_ids'])) {
+                    foreach ($data['images_ids'] as $imageId) {
+                        ListImage::addImage($imageId, $content->id);
+                    }
+                }
+
+                if (!empty($data['videos_ids'])) {
+                    foreach ($data['videos_ids'] as $videoId) {
+                        ListAdditionalVideo::addVideo($videoId, $content->id);
+                    }
                 }
 
                 return $this->respondWithData('Success');
