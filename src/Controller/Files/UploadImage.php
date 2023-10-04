@@ -38,7 +38,7 @@ class UploadImage extends UserController
 
                     $image = ImageVideo::addImage($filename, $path, $token->user_id);
 
-                    return $this->respondWithData($image->path);
+                    return $this->respondWithData(['path' => $image->path, 'id' => $image->id]);
                 } else {
                     return $this->respondWithData($uploadedFile->getError(), 400);
                 }

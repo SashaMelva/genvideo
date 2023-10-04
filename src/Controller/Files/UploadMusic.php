@@ -13,7 +13,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class UploadMusic  extends UserController
+class UploadMusic extends UserController
 {
     /**
      * @throws ContainerExceptionInterface
@@ -37,9 +37,9 @@ class UploadMusic  extends UserController
                     $filename = UploadFile::action(DIRECTORY_MUSIC, $uploadedFile, $token->user_id);
                     $path = RELATIVE_PATH_MUSIC . DIRECTORY_SEPARATOR . $filename;
 
-                    $music = MusicVideo::addMusic($filename, $path , $data['time'], $token->user_id);
+                    $music = MusicVideo::addMusic($filename, $path, $data['time'], $token->user_id);
 
-                    return $this->respondWithData($music->path);
+                    return $this->respondWithData(['path' => $music->path, 'id' => $music->id]);
                 } else {
                     return $this->respondWithData($uploadedFile->getError(), 400);
                 }

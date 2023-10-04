@@ -23,7 +23,7 @@ class ImageVideo extends Model
         return self::query()->find($id)->getModel();
     }
 
-    public static function addImage($nameFile, $path, $userId, $type = null): ImageVideo
+    public static function addImage(string $nameFile, string $path, int $userId, ?string $type = null): ImageVideo
     {
         $newImage = new ImageVideo();
         $newImage->setAttribute('name', $nameFile);
@@ -34,7 +34,7 @@ class ImageVideo extends Model
         return $newImage;
     }
 
-    public static function deleteImage($imageId): void
+    public static function deleteImage(int $imageId): void
     {
         self::query()
             ->where([['id', '=', $imageId]])
