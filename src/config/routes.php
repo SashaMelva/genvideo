@@ -8,8 +8,8 @@ use App\Controller\Authorization\RegistryUser;
 use App\Controller\test\TestController;
 use App\Controller\Video\CollectionDataVideo;
 use App\Controller\Video\DownloadVideo;
-use App\Controller\Video\ImageDataVideo;
-use App\Controller\Video\MusicDataVideo;
+use App\Controller\Video\UploadImage;
+use App\Controller\Video\UploadMusic;
 use App\Controller\Video\SendVideo;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -35,8 +35,8 @@ return static function(App $app):void
 
         $group->group('/video', function (RouteCollectorProxyInterface $group) {
             $group->post('/collection-data', CollectionDataVideo::class);
-            $group->post('/image-data', ImageDataVideo::class);
-            $group->post('/music-data', MusicDataVideo::class);
+            $group->post('/image-data', UploadImage::class);
+            $group->post('/music-data', UploadMusic::class);
 
             $group->get('/test', TestController::class);
 
