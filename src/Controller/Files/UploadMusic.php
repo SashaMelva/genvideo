@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Controller\Video;
+namespace App\Controller\Files;
 
 use App\Controller\UserController;
 use App\Helpers\CheckTokenExpiration;
 use App\Helpers\UploadFile;
 use App\Models\MusicVideo;
-use App\Models\User;
 use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;

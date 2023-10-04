@@ -35,10 +35,10 @@ class MusicVideo extends Model
         return $newMusic;
     }
 
-    public static function deleteMusic($imageId): void
+    public static function deleteMusic($musicId): void
     {
         self::query()
-            ->where([['id', '=', $imageId]])
+            ->where([['id', '=', $musicId]])
             ->delete();
     }
 }

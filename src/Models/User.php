@@ -33,35 +33,6 @@ class User extends Model
         return false;
     }
 
-    /**
-     * @param int $user_id
-     * @return mixed
-     * Получаем id школы
-     * с которой пользователь сейчас работает
-     */
-    public static function currentSchool(int $user_id): mixed
-    {
-        return self::query()->where([['id', '=', $user_id]])->value('school_id');
-    }
-
-    /**
-     * @param int $user_id
-     * @param array $school_all
-     * @return mixed
-     * Получение всех школ пользователя
-     */
-    public static function schoolAll(int $user_id, array $school_all = []): array
-    {
-        $model = self::query()->where([['id', '=', $user_id]])
-            ->value('school_all');
-
-        foreach (json_decode($model, true) as $schools) {
-            foreach ($schools as $key => $school) $school_all[$key] = $school;
-        }
-
-        return $school_all;
-    }
-
     public static function findOne(int $id): Model|Collection|Builder|array|null
     {
         return self::query()->find($id)->getModel();
@@ -70,7 +41,6 @@ class User extends Model
     public static function findAll(): array
     {
         return self::query()
-            ->select(['id', 'school_id', 'school_all'])
             ->get()->toArray();
     }
 
@@ -96,56 +66,6 @@ class User extends Model
         return self::query()
             ->where([['id', '=', $id]])
             ->first();
-    }
-
-    public static function findUsersBySchoolIdAndHathTelegram(int $school_id): array
-    {
-        return self::query()
-            ->select(["user.id", "name", "role", "telegram_chat_id", "telegram_token", "nikname", "username"])
-            ->leftJoin('telegram', 'user.id', '=', 'telegram.user_id')
-            ->where([['school_id', '=', $school_id]])
-            ->get()->toArray();
-    }
-
-    public static function findUsersBySchoolIdAndHathTelegramByUserId(int $school_id, int $user_id): array
-    {
-        return self::query()
-            ->select(["user.id", "name", "role", "telegram_chat_id", "telegram_token", "nikname", "username"])
-            ->leftJoin('telegram', 'user.id', '=', 'telegram.user_id')
-            ->where([['school_id', '=', $school_id], ['user.id', '=', $user_id]])
-            ->get()->toArray();
-    }
-
-    public static function updateEmailAndDateCreatedByUserId(array $data): int
-    {
-        return self::query()
-            ->where([['id', '=', $data['user_id']]])
-            ->update([
-                'email' => $data['email'],
-                'created_at' => $data['created_at'],
-                'reg_date' => $data['created_at'],
-            ]);
-    }
-
-    public static function updateDataForUserCRM($user_id, array $data): void
-    {
-        self::query()
-            ->where([['id', '=', $user_id]])
-            ->update([
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'created_at' => $data['reg_date'],
-                'reg_date' => $data['reg_date'],
-            ]);
-    }
-
-    public static function updatePartnerInfo(int $partner_id, array $data)
-    {
-        self::query()
-            ->where([['id', '=', $partner_id]])
-            ->update([
-                'comment' => $data['comment']
-            ]);
     }
 
     public function verifyPassword(string $password): bool
@@ -211,24 +131,15 @@ class User extends Model
         return true;
     }
 
-    public static function createUser($userName, $userEmail, $password, $schoolId, $schoolAll, $status = true, $role = 'user'): User
+    public static function createUser($userName, $userEmail, $password, $role = 'user'): User
     {
         $newUser = new User();
         $newUser->setAttribute('name', $userName);
         $newUser->setAttribute('email', $userEmail);
         $newUser->setAttribute('password_hash', password_hash($password, PASSWORD_DEFAULT));
         $newUser->setAttribute('role', $role);
-        $newUser->setAttribute('status', $status);
-        $newUser->setAttribute('last_activity', new \DateTimeImmutable());
-        $newUser->setAttribute('school_id', $schoolId);
-        $newUser->setAttribute('school_all', json_encode($schoolAll, JSON_UNESCAPED_UNICODE));
 
         return $newUser;
-    }
-
-    public function isSuperAdmin(): bool
-    {
-        return $this->role == 'superadmin';
     }
 
     public function isAdmin(): bool

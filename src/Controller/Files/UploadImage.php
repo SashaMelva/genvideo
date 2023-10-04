@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Video;
+namespace App\Controller\Files;
 
 use App\Controller\UserController;
 use App\Helpers\CheckTokenExpiration;
