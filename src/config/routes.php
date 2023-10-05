@@ -67,8 +67,9 @@ return static function(App $app):void
 
         $group->group('/video', function (RouteCollectorProxyInterface $group) {
             $group->post('/collection-data', CollectionDataVideo::class);
+            $group->get('/generate/{id:[0-9]+}', GeneratorVideo::class);
 
-            $group->post('/generate', GeneratorVideo::class);
+
             $group->get('/test', TestController::class);
 
             $group->post('/download', DownloadVideo::class);
