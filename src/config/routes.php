@@ -13,6 +13,9 @@ use App\Controller\Files\UploadAdditionalVideo;
 use App\Controller\Files\UploadImage;
 use App\Controller\Files\UploadMusic;
 use App\Controller\test\TestController;
+use App\Controller\Users\ChangePassword;
+use App\Controller\Users\ChangePasswordViaMail;
+use App\Controller\Users\GetUserInfo;
 use App\Controller\Video\CollectionDataVideo;
 use App\Controller\Video\DownloadVideo;
 use App\Controller\Video\GeneratorVideo;
@@ -37,6 +40,12 @@ return static function(App $app):void
             $group->post('/logout', LogoutUser::class);
             $group->get('/get-token/{id:[0-9]+}', GetUserToken::class);
             $group->post('/refresh-token', RefreshToken::class);
+        });
+
+        $group->group('/user', function (RouteCollectorProxyInterface $group) {
+            $group->post('/password-recovery', ChangePasswordViaMail::class);
+            $group->post('/change-password', ChangePassword::class);
+            $group->get('/get-info', GetUserInfo::class);
         });
         $group->get('/test', TestController::class);
 
