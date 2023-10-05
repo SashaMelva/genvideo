@@ -31,7 +31,19 @@ class CollectionDataVideo extends UserController
 
             try {
 
-                $content = ContentVideo::addContent($data['name'], $data['text'], $data['path'], $data['time_video'], $data['user_id']);
+                $content = ContentVideo::addContent(
+                    $data['name'],
+                    $token->user_id,
+                    null,
+                    null,
+                    $data['project_id'],
+                    $data['type_background'],
+                    $data['voice_id'],
+                    $data['format'],
+                    $data['color_background'],
+                    1,
+                    $data['text_id']
+                );
 
                 if (!empty($data['musics_ids'])) {
                     foreach ($data['musics_ids'] as $musicId) {
