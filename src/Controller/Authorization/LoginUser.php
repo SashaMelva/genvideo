@@ -16,9 +16,9 @@ class LoginUser extends UserController
     public function action(): ResponseInterface
     {
         $data = json_decode($this->request->getBody()->getContents(), true);
-        $user = User::findByUserEmail($data['login']);
+        $user = User::findByUserEmail($data['email']);
 
-        if (empty($data['login']))
+        if (empty($data['email']))
             return $this->respondWithError(400, ['email' => 'Необходимо заполнить поле email']);
 
         if (empty($data['password']))

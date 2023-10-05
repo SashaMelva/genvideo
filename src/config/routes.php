@@ -32,7 +32,7 @@ return static function(App $app):void
 
         $group->group('/auth', function (RouteCollectorProxyInterface $group) {
             $group->post('/registry', RegistryUser::class);
-            $group->get('/login', LoginUser::class);
+            $group->post('/login', LoginUser::class);
             $group->get('/refresh', RefreshToken::class);
             $group->get('/get-token/{id:[0-9]+}', GetUserToken::class);
         });
