@@ -3,6 +3,7 @@
 
 use App\Controller\Authorization\GetUserToken;
 use App\Controller\Authorization\LoginUser;
+use App\Controller\Authorization\LogoutUser;
 use App\Controller\Authorization\RefreshToken;
 use App\Controller\Authorization\RegistryUser;
 use App\Controller\Files\DeleteAdditionalVideo;
@@ -33,6 +34,7 @@ return static function(App $app):void
         $group->group('/auth', function (RouteCollectorProxyInterface $group) {
             $group->post('/registry', RegistryUser::class);
             $group->post('/login', LoginUser::class);
+            $group->post('/logout', LogoutUser::class);
             $group->get('/refresh', RefreshToken::class);
             $group->get('/get-token/{id:[0-9]+}', GetUserToken::class);
         });
