@@ -29,8 +29,8 @@ class GetInfoProject extends UserController
             try {
                 $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
 
-                $projectId = User::findByUserId($this->request->getAttribute('id'));
-                $project = Project::fullInfo((int)$projectId);
+                $projectId = $this->request->getAttribute('id');
+                $project = Project::fullInfo((int)$projectId)[0];
 
                 $users = ListProject::findAllUsersInfoByProjectId((int)$projectId);
                 $project['users'] = $users ?? null;

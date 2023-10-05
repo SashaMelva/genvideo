@@ -46,17 +46,12 @@ class ListProject extends Model
     {
         return self::query()
             ->select([
-                'projects.id AS project_id',
-                'projects.name AS project_name',
-                'projects.creator_id',
-                'projects.created_at AS project_created_at',
-                'projects.updated_at AS project_updated_at',
-                'users.name AS creator_name',
-                'users.email AS creator_email',
-                'users.role AS creator_role',
-                'users.phone AS creator_phone',
+                'users.name',
+                'users.email',
+                'users.role',
+                'users.phone',
             ])
-            ->leftJoin('users', 'projects.creator_id', '=', 'users.id')
+            ->leftJoin('users', 'list_project.user_id', '=', 'users.id')
             ->where([['list_project.project_id', '=', $projectId]])
             ->get()->toArray();
     }

@@ -35,7 +35,7 @@ class Project extends Model
                 'users.phone AS creator_phone',
             ])
             ->leftJoin('users', 'users.id', '=', 'projects.creator_id')
-            ->where([['id', '=', $id]])
+            ->where([['projects.id', '=', $id]])
             ->get()->toArray();
     }
 

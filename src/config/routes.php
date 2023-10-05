@@ -57,7 +57,7 @@ return static function(App $app):void
         });
 
         $group->group('/project', function (RouteCollectorProxyInterface $group) {
-            $group->post('/get-info/{id:[0-9]+}', GetInfoProject::class);
+            $group->get('/get-info/{id:[0-9]+}', GetInfoProject::class);
             $group->post('/create', CreateProject::class);
             $group->post('/update', UpdateProject::class);
             $group->post('/delete', DeleteProject::class);
