@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ListAdditionalVideo extends Model
+class ListVideo extends Model
 {
     public mixed $errors;
     protected $primaryKey = 'id';
@@ -22,9 +22,9 @@ class ListAdditionalVideo extends Model
             ->get()->toArray();
     }
 
-    public static function addVideo(int $videoId, int $contentId): ListAdditionalVideo
+    public static function addVideo(int $videoId, int $contentId): ListVideo
     {
-        $newList = new ListAdditionalVideo();
+        $newList = new ListVideo();
         $newList->setAttribute('video_id', $videoId);
         $newList->setAttribute('content_id', $contentId);
 

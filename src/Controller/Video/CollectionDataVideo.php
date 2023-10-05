@@ -4,10 +4,12 @@ namespace App\Controller\Video;
 
 use App\Controller\UserController;
 use App\Helpers\CheckTokenExpiration;
+use App\Helpers\GeneratorFiles;
 use App\Models\ContentVideo;
-use App\Models\ListAdditionalVideo;
+use App\Models\ListVideo;
 use App\Models\ListImage;
 use App\Models\ListMusic;
+use App\Models\TextVideo;
 use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -31,6 +33,15 @@ class CollectionDataVideo extends UserController
 
             try {
 
+                $dataFileText = (new GeneratorFiles())->generatorTextForTitre($data['text']);
+
+                $text = TextVideo::addText(
+                    $data['project_id'],
+                    $data['text'],
+                    $dataFileText['name'],
+                    $dataFileText['path'],
+                );
+
                 $content = ContentVideo::addContent(
                     $data['name'],
                     $token->user_id,
@@ -42,7 +53,7 @@ class CollectionDataVideo extends UserController
                     $data['format'],
                     $data['color_background'],
                     1,
-                    $data['text_id']
+                    $text['id']
                 );
 
                 if (!empty($data['musics_ids'])) {
@@ -59,7 +70,7 @@ class CollectionDataVideo extends UserController
 
                 if (!empty($data['videos_ids'])) {
                     foreach ($data['videos_ids'] as $videoId) {
-                        ListAdditionalVideo::addVideo($videoId, $content->id);
+                        ListVideo::addVideo($videoId, $content->id);
                     }
                 }
 

@@ -78,11 +78,11 @@ return static function(App $app):void
 
         $group->group('/file', function (RouteCollectorProxyInterface $group) {
             $group->post('/add-image', UploadImage::class);
-            $group->post('/add-music', UploadMusic::class);
+            $group->post('/add-sound', UploadMusic::class);
             $group->post('/add-additional-video', UploadAdditionalVideo::class);
 
             $group->get('/delete-image/{id:[0-9]+}', DeleteImage::class);
-            $group->get('/delete-music/{id:[0-9]+}', DeleteMusic::class);
+            $group->get('/delete-sound/{id:[0-9]+}', DeleteMusic::class);
             $group->get('/delete-additional-video/{id:[0-9]+}', DeleteAdditionalVideo::class);
         });
 

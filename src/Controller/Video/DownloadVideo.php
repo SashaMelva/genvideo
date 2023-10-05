@@ -5,7 +5,7 @@ namespace App\Controller\Video;
 use App\Controller\UserController;
 use App\Helpers\CheckTokenExpiration;
 use App\Models\ContentVideo;
-use App\Models\ListAdditionalVideo;
+use App\Models\ListVideo;
 use App\Models\ListImage;
 use App\Models\ListMusic;
 use Exception;

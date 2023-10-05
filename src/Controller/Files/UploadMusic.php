@@ -31,7 +31,7 @@ class UploadMusic extends UserController
 
                 $uploadedFiles = $this->request->getUploadedFiles();
                 $data = $this->getFormData();
-                $uploadedFile = $uploadedFiles['music'];
+                $uploadedFile = $uploadedFiles['sound'];
 
                 if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
                     $filename = UploadFile::action(DIRECTORY_MUSIC, $uploadedFile, $token->user_id);

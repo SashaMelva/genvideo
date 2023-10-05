@@ -5,7 +5,7 @@ namespace App\Controller\Files;
 use App\Controller\UserController;
 use App\Helpers\CheckTokenExpiration;
 use App\Models\AdditionalVideo;
-use App\Models\ListAdditionalVideo;
+use App\Models\ListVideo;
 use App\Models\User;
 use Exception;
 use Firebase\JWT\JWT;
@@ -29,7 +29,7 @@ class DeleteAdditionalVideo extends UserController
 
                     $video = AdditionalVideo::findOne($videoId);
                     unlink(DIRECTORY_MUSIC . $video->name);
-                    ListAdditionalVideo::deleteVideo($videoId);
+                    ListVideo::deleteVideo($videoId);
                     AdditionalVideo::deleteVideo($videoId);
 
                     return $this->respondWithData('Success');

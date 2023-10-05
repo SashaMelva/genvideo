@@ -10,7 +10,7 @@ class MusicVideo extends Model
 {
     public mixed $errors;
     protected $primaryKey = 'id';
-    protected $table = 'music';
+    protected $table = 'sound';
 
     public static function findAllByUserId(int $userId): array
     {
