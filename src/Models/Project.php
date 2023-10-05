@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validation;
 
 class Project  extends Model
@@ -48,5 +49,34 @@ class Project  extends Model
         $newUser->setAttribute('role', $role);
 
         return $newUser;
+    }
+
+    public function validate(): bool
+    {
+        $validator = Validation::createValidator();
+
+        $constraint = new Assert\Collection([
+            'name' => new Assert\NotBlank(['message' => 'Не заполнено название проекта']),
+            'creator_id' => new Assert\NotBlank(),
+            'created_at' => new Assert\NotBlank(),
+            'updated_at' => new Assert\NotBlank(),
+        ]);
+
+        $violations = $validator->validate($this->toArray(), $constraint);
+
+        if (0 !== count($violations)) {
+            foreach ($violations as $violation) {
+                $key = str_replace(['[', ']'], '', $violation->getPropertyPath());
+                $this->errors[$key] = $violation->getMessage();
+            }
+            return false;
+        }
+
+        return true;
+    }
+
+    public function getValidationErrors(): mixed
+    {
+        return $this->errors;
     }
 }

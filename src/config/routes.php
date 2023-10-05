@@ -12,6 +12,12 @@ use App\Controller\Files\DeleteMusic;
 use App\Controller\Files\UploadAdditionalVideo;
 use App\Controller\Files\UploadImage;
 use App\Controller\Files\UploadMusic;
+use App\Controller\Projects\AddUserProject;
+use App\Controller\Projects\CreateProject;
+use App\Controller\Projects\DeleteProject;
+use App\Controller\Projects\DeleteUserProject;
+use App\Controller\Projects\GetInfoProgect;
+use App\Controller\Projects\UpdateProject;
 use App\Controller\test\TestController;
 use App\Controller\Users\ChangePassword;
 use App\Controller\Users\ChangePasswordViaMail;
@@ -34,6 +40,8 @@ return static function(App $app):void
 
     $app->group('/api', function (RouteCollectorProxyInterface $group) {
 
+        $group->get('/test', TestController::class);
+
         $group->group('/auth', function (RouteCollectorProxyInterface $group) {
             $group->post('/registry', RegistryUser::class);
             $group->post('/login', LoginUser::class);
@@ -47,7 +55,15 @@ return static function(App $app):void
             $group->post('/change-password', ChangePassword::class);
             $group->get('/get-info', GetUserInfo::class);
         });
-        $group->get('/test', TestController::class);
+
+        $group->group('/project', function (RouteCollectorProxyInterface $group) {
+            $group->post('/get-info', GetInfoProgect::class);
+            $group->post('/create', CreateProject::class);
+            $group->post('/update', UpdateProject::class);
+            $group->post('/delete', DeleteProject::class);
+            $group->post('/add-user', AddUserProject::class);
+            $group->post('/delete-user', DeleteUserProject::class);
+        });
 
         $group->group('/video', function (RouteCollectorProxyInterface $group) {
             $group->post('/collection-data', CollectionDataVideo::class);

@@ -42,11 +42,14 @@ class ListProject extends Model
             ->get()->toArray();
     }
 
-    public static function addProject(int $userId, int $projectId): ListMusic
+    public static function addProject(int $userId, int $projectId): ListProject
     {
-        $newList = new ListMusic();
+        var_dump($userId);
+        var_dump($projectId);
+        $newList = new ListProject();
         $newList->setAttribute('user_id', $userId);
         $newList->setAttribute('project_id', $projectId);
+        $newList->save();
 
         return $newList;
     }
@@ -55,6 +58,12 @@ class ListProject extends Model
     {
         self::query()
             ->where([['project_id', '=', $projectId]])
+            ->delete();
+    }
+    public static function deleteUserForProject(int $userId, int $projectId): void
+    {
+        self::query()
+            ->where([['project_id', '=', $projectId], ['user_id', '=', $userId]])
             ->delete();
     }
 }
