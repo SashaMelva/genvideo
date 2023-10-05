@@ -16,7 +16,7 @@ use App\Controller\Projects\AddUserProject;
 use App\Controller\Projects\CreateProject;
 use App\Controller\Projects\DeleteProject;
 use App\Controller\Projects\DeleteUserProject;
-use App\Controller\Projects\GetInfoProgect;
+use App\Controller\Projects\GetInfoProject;
 use App\Controller\Projects\UpdateProject;
 use App\Controller\test\TestController;
 use App\Controller\Users\ChangePassword;
@@ -57,7 +57,7 @@ return static function(App $app):void
         });
 
         $group->group('/project', function (RouteCollectorProxyInterface $group) {
-            $group->post('/get-info', GetInfoProgect::class);
+            $group->post('/get-info/{id:[0-9]+}', GetInfoProject::class);
             $group->post('/create', CreateProject::class);
             $group->post('/update', UpdateProject::class);
             $group->post('/delete', DeleteProject::class);

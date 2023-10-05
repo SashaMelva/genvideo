@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validation;
 
-class Project  extends Model
+class Project extends Model
 {
     public mixed $errors;
     protected $primaryKey = 'id';
@@ -18,6 +18,25 @@ class Project  extends Model
     public static function findOne(int $id): Model|Collection|Builder|array|null
     {
         return self::query()->find($id)->getModel();
+    }
+
+    public static function fullInfo(int $id): array
+    {
+        return self::query()
+            ->select([
+                'projects.id AS project_id',
+                'projects.name AS project_name',
+                'projects.creator_id',
+                'projects.created_at AS project_created_at',
+                'projects.updated_at AS project_updated_at',
+                'users.name AS creator_name',
+                'users.email AS creator_email',
+                'users.role AS creator_role',
+                'users.phone AS creator_phone',
+            ])
+            ->leftJoin('users', 'users.id', '=', 'projects.creator_id')
+            ->where([['id', '=', $id]])
+            ->get()->toArray();
     }
 
     public static function findAll(): array
