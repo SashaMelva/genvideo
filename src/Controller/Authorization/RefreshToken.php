@@ -11,7 +11,6 @@ use App\Models\User;
 use App\Models\UserRefreshToken;
 use Psr\Http\Message\ResponseInterface;
 use Throwable;
-use function Sentry\captureException;
 
 class RefreshToken extends UserController
 {
