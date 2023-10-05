@@ -35,10 +35,9 @@ abstract class UserController extends RestController
         $params = [
             'name',
             'email',
-            'login',
+            'phone',
             'password',
             'fingerprint',
-            'reg_url',
             'agreed',
         ];
 

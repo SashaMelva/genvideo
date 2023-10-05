@@ -82,16 +82,16 @@ class User extends Model
         $validator = Validation::createValidator();
 
         $constraint = new Assert\Collection([
-            'login' => new Assert\NotBlank(['message' => 'Не заполнено поле Логин']),
+            'name' => new Assert\NotBlank(['message' => 'Не заполнено поле Имя']),
             'email' => [
                 new Assert\NotBlank(['message' => 'Не заполнено поле Email']),
                 new Assert\Email(['message' => 'Значение {{ value }} не является правильным email адресом'])
             ],
             'phone' => new Assert\NotBlank(['message' => 'Не заполнено поле Телефон']),
             'role' => new Assert\NotBlank(),
+            'password' => new Assert\NotBlank(['message' => 'Не заполнено поле Пароль']),
             'password_hash' => new Assert\NotBlank(),
             'created_at' => new Assert\NotBlank(),
-            'password' => new Assert\NotBlank(['message' => 'Не заполнено поле Пароль']),
             'status' => new Assert\Type(['type' => 'boolean'])
         ]);
 

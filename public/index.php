@@ -24,6 +24,10 @@ const DIRECTORY_TEXT = PROJECT_DIR . DIRECTORY_SEPARATOR . 'files' . DIRECTORY_S
 
 define('SPEECHKIT_CLOUD_API', 'feca5b7a-f5f8-4bfa-886c-203788aa86c4');
 define('CAPTCHA_KEY', 'f5cf0a7dda3d34321cccd2d584ece075');
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../', '.env');
+$dotenv->load();
+
 try {
 
     $builder = new ContainerBuilder();

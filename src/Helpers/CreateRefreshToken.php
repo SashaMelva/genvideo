@@ -9,11 +9,11 @@ class CreateRefreshToken
     public static function action(int $user_id, string $secret, string $role, string $fingerprint)
     {
         $conf = [
-            "iss" => "analytics",
-            "aud" => "analytics",
-            "iat" => time(),
-            "exp" => time() + 31536000,
-            "user_id" => $user_id,
+            'iss' => 'genvideo',
+            'aud' => 'genvideo',
+            'iat' => time(),
+            'exp' => time() + 31536000,
+            'user_id' => $user_id,
             'user_role' => $role,
             'fingerprint' => $fingerprint,
         ];

@@ -31,7 +31,7 @@ return static function(App $app):void
     $app->group('/api', function (RouteCollectorProxyInterface $group) {
 
         $group->group('/auth', function (RouteCollectorProxyInterface $group) {
-            $group->get('/registry', RegistryUser::class);
+            $group->post('/registry', RegistryUser::class);
             $group->get('/login', LoginUser::class);
             $group->get('/refresh', RefreshToken::class);
             $group->get('/get-token/{id:[0-9]+}', GetUserToken::class);
