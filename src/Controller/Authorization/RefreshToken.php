@@ -17,7 +17,7 @@ class RefreshToken extends UserController
 {
     public function action(): ResponseInterface
     {
-        $data = $this->getFormData();
+        $data = json_decode($this->request->getBody()->getContents(), true);
         $cookies = $this->request->getCookieParams();
 
         if (!array_key_exists('refreshToken', $cookies))
@@ -25,28 +25,28 @@ class RefreshToken extends UserController
 
         try {
 
-            $refrech = UserRefreshToken::findByToken($cookies['refreshToken']);
-            if (is_null($refrech)) return $this->respondWithError(219);
+            $refresh = UserRefreshToken::findByToken($cookies['refreshToken']);
+            if (is_null($refresh)) return $this->respondWithError(219);
 
             UserRefreshToken::query()
-                ->where([['id', '=', $refrech['id']]])
+                ->where([['id', '=', $refresh['id']]])
                 ->delete();
 
-            if (!CheckTokenExpiration::action($this->container->get('jwt-secret'), $refrech['refresh_token'])
-                || $refrech['fingerprint'] != $data['fingerprint']) {
+            if (!CheckTokenExpiration::action($this->container->get('jwt-secret'), $refresh['refresh_token'])
+                || $refresh['fingerprint'] != $data['fingerprint']) {
                 return $this->respondWithError(217);
             }
 
-            $user = User::findOne($refrech['user_id']);
+            $user = User::findOne($refresh['user_id']);
             $token = CreateToken::action($user['id'], $this->container->get('jwt-secret'), $user['role']);
-            $refrech_token = CreateRefreshToken::action($user['id'], $this->container->get('jwt-secret'), $user['role'], $data['fingerprint']);
-            $token_info = DecodeToken::action($this->container->get('jwt-secret'), $refrech_token);
+            $refreshToken = CreateRefreshToken::action($user['id'], $this->container->get('jwt-secret'), $user['role'], $data['fingerprint']);
+            $token_info = DecodeToken::action($this->container->get('jwt-secret'), $refreshToken);
 
             $expires = $token_info['exp'];
-            $cookie[] = "refreshToken=$refrech_token; path=/api/auth; domain=.{$_ENV['HOST']}; maxAge=$expires; expires=$expires; HttpOnly";
+            $cookie[] = "refreshToken=$refreshToken; path=/api/auth; domain=.{$_ENV['HOST']}; maxAge=$expires; expires=$expires; HttpOnly";
             return $this->respondWithData(['access_token' => $token], 200, $cookie);
 
-        }  catch (Throwable $e) {
+        } catch (Throwable $e) {
             return $this->respondWithError(219);
         }
     }

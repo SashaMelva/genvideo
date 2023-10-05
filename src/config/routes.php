@@ -35,8 +35,8 @@ return static function(App $app):void
             $group->post('/registry', RegistryUser::class);
             $group->post('/login', LoginUser::class);
             $group->post('/logout', LogoutUser::class);
-            $group->get('/refresh', RefreshToken::class);
             $group->get('/get-token/{id:[0-9]+}', GetUserToken::class);
+            $group->post('/refresh-token', RefreshToken::class);
         });
         $group->get('/test', TestController::class);
 
