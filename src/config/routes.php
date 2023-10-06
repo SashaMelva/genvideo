@@ -25,6 +25,7 @@ use App\Controller\Users\GetUserInfo;
 use App\Controller\Video\CollectionDataVideo;
 use App\Controller\Video\DownloadVideo;
 use App\Controller\Video\GeneratorVideo;
+use App\Controller\Video\GetCollectionDataSettingVideo;
 use App\Controller\Video\SendVideo;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -66,6 +67,7 @@ return static function(App $app):void
         });
 
         $group->group('/video', function (RouteCollectorProxyInterface $group) {
+            $group->post('/get-content-setting', GetCollectionDataSettingVideo::class);
             $group->post('/collection-data', CollectionDataVideo::class);
             $group->get('/generate/{id:[0-9]+}', GeneratorVideo::class);
 

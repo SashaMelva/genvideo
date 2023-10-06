@@ -12,9 +12,9 @@ class ImageVideo extends Model
     protected $primaryKey = 'id';
     protected $table = 'image';
 
-    public static function findAllByUserId(int $userId): array
+    public static function findAllByProjectId(int $projectId): array
     {
-        return self::query()->where([['user_id', '=', $userId]])
+        return self::query()->where([['project_id', '=', $projectId]])
             ->get()->toArray();
     }
 
