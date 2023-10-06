@@ -22,16 +22,22 @@ class TextVideo extends Model
         return self::query()->where([['content_id', '=', $contentId]])
             ->get()->toArray();
     }
-    public static function addText(int $projectId, string $text, string $fileName, string $filePath): TextVideo
+
+    public static function addText(int $projectId, string $text, ?string $fileName, ?string $filePath, ?string $fileNameVoice, ?string $filePathVoice, bool $statusVoice, bool $statusText): TextVideo
     {
         $textVideo = new TextVideo();
         $textVideo->setAttribute('project_id', $projectId);
         $textVideo->setAttribute('text', $text);
         $textVideo->setAttribute('created_at', new \DateTimeImmutable());
-        $textVideo->setAttribute('status', 'Не озвучено');
-        $textVideo->setAttribute('file_name', $fileName);
-        $textVideo->setAttribute('file_path', $filePath);
+        $textVideo->setAttribute('updated_at', new \DateTimeImmutable());
+        $textVideo->setAttribute('file_name_text', $fileName);
+        $textVideo->setAttribute('file_path_text', $filePath);
+        $textVideo->setAttribute('file_name_voice', $fileNameVoice);
+        $textVideo->setAttribute('file_path_voice', $filePathVoice);
+        $textVideo->setAttribute('status_voice', $statusVoice);
+        $textVideo->setAttribute('status_text', $statusText);
 
+        $textVideo->save();
         return $textVideo;
     }
 

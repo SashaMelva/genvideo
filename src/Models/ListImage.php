@@ -27,7 +27,7 @@ class ListImage  extends Model
         $newList = new ListImage();
         $newList->setAttribute('image_id', $imageId);
         $newList->setAttribute('content_id', $contentId);
-
+        $newList->save();
         return $newList;
     }
 

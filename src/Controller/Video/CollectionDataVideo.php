@@ -25,26 +25,29 @@ class CollectionDataVideo extends UserController
      */
     public function action(): ResponseInterface
     {
-        $access_token = $this->request->getHeaderLine('token');
-        $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
+//        $access_token = $this->request->getHeaderLine('token');
+//        $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
         $data = json_decode($this->request->getBody()->getContents(), true);
+        $userId = 8;//$token->user_id;
 
-        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
+//        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
 
             try {
-
-                $dataFileText = (new GeneratorFiles())->generatorTextForTitre($data['text']);
 
                 $text = TextVideo::addText(
                     $data['project_id'],
                     $data['text'],
-                    $dataFileText['name'],
-                    $dataFileText['path'],
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    false,
                 );
 
                 $content = ContentVideo::addContent(
                     $data['name'],
-                    $token->user_id,
+                    $userId,
                     null,
                     null,
                     $data['project_id'],
@@ -53,24 +56,26 @@ class CollectionDataVideo extends UserController
                     $data['format'],
                     $data['color_background'],
                     1,
-                    $text['id']
+                    $text->id,
+                    $data['ampula_voice'],
                 );
 
+                $contentId = 7;//$content->id;
                 if (!empty($data['musics_ids'])) {
                     foreach ($data['musics_ids'] as $musicId) {
-                        ListMusic::addMusic($musicId, $content->id);
+                        ListMusic::addMusic($musicId, $contentId);
                     }
                 }
 
                 if (!empty($data['images_ids'])) {
                     foreach ($data['images_ids'] as $imageId) {
-                        ListImage::addImage($imageId, $content->id);
+                        ListImage::addImage($imageId, $contentId);
                     }
                 }
 
                 if (!empty($data['videos_ids'])) {
                     foreach ($data['videos_ids'] as $videoId) {
-                        ListVideo::addVideo($videoId, $content->id);
+                        ListVideo::addVideo($videoId, $contentId);
                     }
                 }
 
@@ -79,8 +84,8 @@ class CollectionDataVideo extends UserController
             } catch (Exception $e) {
                 return $this->respondWithError($e->getCode(), $e->getMessage());
             }
-        } else {
-            return $this->respondWithError(215);
-        }
+//        } else {
+//            return $this->respondWithError(215);
+//        }
     }
 }

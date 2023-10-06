@@ -34,7 +34,9 @@ class ContentVideo extends Model
         string $format,
         string $colorBackground,
         string $statusId,
-        string $textId): ContentVideo
+        string $textId,
+        string $ampulaVoice
+    ): ContentVideo
     {
         $newContent = new ContentVideo();
         $newContent->setAttribute('name', $name);
@@ -48,9 +50,11 @@ class ContentVideo extends Model
         $newContent->setAttribute('voice_id', $voiceId);
         $newContent->setAttribute('format', $format);
         $newContent->setAttribute('color_background', $colorBackground);
-        $newContent->setAttribute('status', $statusId);
+        $newContent->setAttribute('status_id', $statusId);
         $newContent->setAttribute('text_id', $textId);
+        $newContent->setAttribute('ampula_voice', $ampulaVoice);
 
+        $newContent->save();
         return $newContent;
     }
 

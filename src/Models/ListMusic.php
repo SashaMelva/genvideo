@@ -28,6 +28,7 @@ class ListMusic  extends Model
         $newList->setAttribute('music_id', $musicId);
         $newList->setAttribute('content_id', $contentId);
 
+        $newList->save();
         return $newList;
     }
 

@@ -3,6 +3,7 @@
 namespace App\Controller\Video;
 
 use App\Controller\UserController;
+use App\Helpers\GeneratorFiles;
 use App\Models\ContentVideo;
 use App\Models\ListVideo;
 use App\Models\ListImage;
@@ -19,13 +20,6 @@ class GeneratorVideo extends UserController
         $access_token = $this->request->getHeaderLine('token');
         $videoId = $this->request->getAttribute('id');
 
-
-        var_dump(RELATIVE_PATH_IMG);
-        var_dump(RELATIVE_PATH_MUSIC);
-        var_dump(RELATIVE_PATH_SPEECHKIT);
-        var_dump(RELATIVE_PATH_VIDEO);
-
-        exit();
         $video = ContentVideo::findAllDataByID($videoId);
 
         $video['text'] = TextVideo::findAllByContentId($video['text_id']);
@@ -33,7 +27,8 @@ class GeneratorVideo extends UserController
         $video['sound'] = ListMusic::findAllByContentId($video['id']);
         $video['video'] = ListVideo::findAllByContentId($video['id']);
 
-
+        var_dump($video);
+//        $dataFileText = (new GeneratorFiles())->generatorTextForTitre($data['text']);
 
     }
 

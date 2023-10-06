@@ -27,7 +27,7 @@ class ListVideo extends Model
         $newList = new ListVideo();
         $newList->setAttribute('video_id', $videoId);
         $newList->setAttribute('content_id', $contentId);
-
+        $newList->save();
         return $newList;
     }
 
