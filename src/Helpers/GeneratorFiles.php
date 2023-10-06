@@ -74,7 +74,7 @@ class GeneratorFiles
     /**Генерируем фон*/
     public function generatorBackground(string $nameFileBackground): bool
     {
-        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $this->contentId . '.mp4 -i ' . DIRECTORY_MAIN_IMG . $nameFileBackground .' -filter_complex "[0:v][1:v]overlay=0:0" -codec:a copy -y ' . DIRECTORY_VIDEO . $this->contentId . '_fon.mp4';
+        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $this->contentId . '.mp4 -i ' . DIRECTORY_LOGO_IMG . $nameFileBackground .' -filter_complex "[0:v][1:v]overlay=0:0" -codec:a copy -y ' . DIRECTORY_VIDEO . $this->contentId . '_fon.mp4';
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         if (!is_null($errors)) {
@@ -87,7 +87,7 @@ class GeneratorFiles
     /**Генерируем логотип*/
     public function generatorLogo(string $nameFileLogo): bool
     {
-        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $this->contentId . '_fon.mp4 -i ' . DIRECTORY_MAIN_IMG . $nameFileLogo .' -filter_complex "[1:v][0:v]scale2ref=(450/142)*ih/14/sar:ih/14[wm][base];[base][wm]overlay=main_w-overlay_w-10:10:format=rgb" -pix_fmt yuv420p -c:a copy -y ' . DIRECTORY_VIDEO . $this->contentId . '_logo.mp4';
+        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $this->contentId . '_fon.mp4 -i ' . DIRECTORY_LOGO_IMG . $nameFileLogo .' -filter_complex "[1:v][0:v]scale2ref=(450/142)*ih/14/sar:ih/14[wm][base];[base][wm]overlay=main_w-overlay_w-10:10:format=rgb" -pix_fmt yuv420p -c:a copy -y ' . DIRECTORY_VIDEO . $this->contentId . '_logo.mp4';
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         if (!is_null($errors)) {

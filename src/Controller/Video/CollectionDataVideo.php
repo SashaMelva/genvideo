@@ -43,6 +43,7 @@ class CollectionDataVideo extends UserController
                     null,
                     false,
                     false,
+                    null
                 );
 
                 $content = ContentVideo::addContent(

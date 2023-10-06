@@ -23,7 +23,7 @@ class TextVideo extends Model
             ->get()->toArray();
     }
 
-    public static function addText(int $projectId, string $text, ?string $fileName, ?string $filePath, ?string $fileNameVoice, ?string $filePathVoice, bool $statusVoice, bool $statusText): TextVideo
+    public static function addText(int $projectId, string $text, ?string $fileName, ?string $filePath, ?string $fileNameVoice, ?string $filePathVoice, bool $statusVoice, bool $statusText, ?string $timeVoice): TextVideo
     {
         $textVideo = new TextVideo();
         $textVideo->setAttribute('project_id', $projectId);
@@ -36,12 +36,27 @@ class TextVideo extends Model
         $textVideo->setAttribute('file_path_voice', $filePathVoice);
         $textVideo->setAttribute('status_voice', $statusVoice);
         $textVideo->setAttribute('status_text', $statusText);
+        $textVideo->setAttribute('time_voice', $timeVoice);
 
         $textVideo->save();
         return $textVideo;
     }
 
-    public static function deleteText($textId): void
+    public static function updateFileText(int $textId, string $fileName, string $filePath, bool $status): void
+    {
+        self::query()
+            ->where([['id', '=', $textId]])
+            ->update(['file_name_text' => $fileName, 'file_path_text' => $filePath, 'status_text' => $status]);
+    }
+
+    public static function updateFileVoice(int $textId, string $fileName, string $filePath, bool $status, string $timeVoice): void
+    {
+        self::query()
+            ->where([['id', '=', $textId]])
+            ->update(['file_name_voice' => $fileName, 'file_path_voice' => $filePath, 'status_voice' => $status, 'time_voice' => $timeVoice]);
+    }
+
+    public static function deleteText(int $textId): void
     {
         self::query()
             ->where([['id', '=', $textId]])
