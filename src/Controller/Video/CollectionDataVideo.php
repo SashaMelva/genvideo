@@ -54,7 +54,7 @@ class CollectionDataVideo extends UserController
                     $data['type_background'],
                     $data['voice_id'],
                     $data['format'],
-                    $data['color_background'],
+                    $data['color_background_id'],
                     1,
                     $text->id,
                     $data['ampula_voice'],

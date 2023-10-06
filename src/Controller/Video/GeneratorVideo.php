@@ -19,13 +19,13 @@ class GeneratorVideo extends UserController
         $data = json_decode($this->request->getBody()->getContents(), true);
         $access_token = $this->request->getHeaderLine('token');
         $videoId = $this->request->getAttribute('id');
-
         $video = ContentVideo::findAllDataByID($videoId);
 
-        $video['text'] = TextVideo::findAllByContentId($video['text_id']);
-        $video['images'] = ListImage::findAllByContentId($video['id']);
-        $video['sound'] = ListMusic::findAllByContentId($video['id']);
-        $video['video'] = ListVideo::findAllByContentId($video['id']);
+        $video['images'] = ListImage::findAllByContentId($video['content_id']);
+        $video['sound'] = ListMusic::findAllByContentId($video['content_id']);
+        $video['video'] = ListVideo::findAllByContentId($video['content_id']);
+
+
 
         var_dump($video);
 //        $dataFileText = (new GeneratorFiles())->generatorTextForTitre($data['text']);

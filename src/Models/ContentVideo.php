@@ -24,18 +24,18 @@ class ContentVideo extends Model
     }
 
     public static function addContent(
-        string $name,
-        int $userId,
+        string  $name,
+        int     $userId,
         ?string $filePath,
         ?string $fileName,
-        int $projectId,
-        string $typeBackground,
-        int $voiceId,
-        string $format,
-        string $colorBackground,
-        string $statusId,
-        string $textId,
-        string $ampulaVoice
+        int     $projectId,
+        string  $typeBackground,
+        int     $voiceId,
+        string  $format,
+        ?int  $colorBackgroundId,
+        string  $statusId,
+        string  $textId,
+        string  $ampulaVoice
     ): ContentVideo
     {
         $newContent = new ContentVideo();
@@ -49,7 +49,7 @@ class ContentVideo extends Model
         $newContent->setAttribute('type_background', $typeBackground);
         $newContent->setAttribute('voice_id', $voiceId);
         $newContent->setAttribute('format', $format);
-        $newContent->setAttribute('color_background', $colorBackground);
+        $newContent->setAttribute('color_background_id', $colorBackgroundId);
         $newContent->setAttribute('status_id', $statusId);
         $newContent->setAttribute('text_id', $textId);
         $newContent->setAttribute('ampula_voice', $ampulaVoice);
@@ -65,15 +65,27 @@ class ContentVideo extends Model
                 'content.id AS content_id',
                 'content.name AS content_name',
                 'content.creator_id AS content_creator_id',
-                'content.type_background AS content_type_background',
-                'content.voice_id AS content_voice_id',
+                'content.type_background',
+                'content.voice_id',
+                'content.ampula_voice',
                 'content.format AS content_format',
-                'content.color_background AS content_color_background',
-                'content.status AS content_status',
+                'content.color_background_id AS color_background_id',
+                'text.id AS text_id',
+                'text.text',
+                'text.file_name_text',
+                'text.file_path_text',
+                'text.file_name_voice',
+                'text.file_path_voice',
+                'text.status_voice',
+                'text.status_text',
+                'status_content.name AS status_content_name',
+                'dictionary_voice.name AS dictionary_voice_name',
+                'dictionary_voice.language',
             )
-            ->leftJoin('text', 'text.id', '=', 'projects.creator_id')
-            ->leftJoin('users', 'users.id', '=', 'projects.creator_id')
-            ->leftJoin('users', 'users.id', '=', 'projects.creator_id')
+            ->leftJoin('text', 'content.text_id', '=', 'text.id')
+            ->leftJoin('status_content', 'content.status_id', '=', 'status_content.id')
+            ->leftJoin('dictionary_voice', 'content.voice_id', '=', 'dictionary_voice.id')
+            ->leftJoin('color_background', 'content.color_background_id', '=', 'color_background.id')
             ->where([['content.id', '=', $id]])
             ->get()->toArray()[0];
     }

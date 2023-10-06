@@ -8,7 +8,7 @@ class ListVideo extends Model
 {
     public mixed $errors;
     protected $primaryKey = 'id';
-    protected $table = 'list_additional_video';
+    protected $table = 'list_video';
 
     public static function findAllByVideoId(int $videoId): array
     {
