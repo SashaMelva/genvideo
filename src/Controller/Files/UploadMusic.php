@@ -49,7 +49,7 @@ class UploadMusic extends UserController
                 return $this->respondWithData(['path' => $music->file_path, 'id' => $music->id]);
 
             } else {
-                return $this->respondWithError(400, 'Ошибка получения музыки');
+                return $this->respondWithError(400, 'Ошибка получения музыки. Код ошибки: ' . $uploadedFile->getError());
             }
 
         } catch (Exception $e) {

@@ -54,7 +54,7 @@ class UploadImage extends UserController
 
                 return $this->respondWithData(['path' => $image->file_path, 'id' => $image->id]);
             } else {
-                return $this->respondWithError(400, 'Ошибка получения избражения');
+                return $this->respondWithError(400, 'Ошибка получения избражения. Код ошибки: ' . $uploadedFile->getError());
             }
 
         } catch (Exception $e) {
