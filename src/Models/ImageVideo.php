@@ -23,13 +23,15 @@ class ImageVideo extends Model
         return self::query()->find($id)->getModel();
     }
 
-    public static function addImage(string $nameFile, string $path, int $userId, ?string $type = null): ImageVideo
+    public static function addImage(string $nameFile, string $path, int $projectId, ?string $type = null): ImageVideo
     {
         $newImage = new ImageVideo();
-        $newImage->setAttribute('name', $nameFile);
-        $newImage->setAttribute('path', $path);
-        $newImage->setAttribute('user_id', $userId);
+        $newImage->setAttribute('file_name', $nameFile);
+        $newImage->setAttribute('file_path', $path);
+        $newImage->setAttribute('project_id', $projectId);
         $newImage->setAttribute('type', $type);
+
+        $newImage->save();
 
         return $newImage;
     }
