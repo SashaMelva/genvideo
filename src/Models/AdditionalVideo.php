@@ -23,19 +23,20 @@ class AdditionalVideo extends Model
         return self::query()->find($id)->getModel();
     }
 
-    public static function addVideo(string $nameFile, string $path, string $time, int $userId, ?string $type = null): AdditionalVideo
+    public static function addVideo(string $fileName, string $filePath, string $time, int $projectId, ?string $type = null): AdditionalVideo
     {
         $newVideo = new AdditionalVideo();
-        $newVideo->setAttribute('name', $nameFile);
-        $newVideo->setAttribute('path', $path);
+        $newVideo->setAttribute('file_name', $fileName);
+        $newVideo->setAttribute('file_path', $filePath);
         $newVideo->setAttribute('time', $time);
-        $newVideo->setAttribute('user_id', $userId);
+        $newVideo->setAttribute('project_id', $projectId);
         $newVideo->setAttribute('type', $type);
+        $newVideo->save();
 
         return $newVideo;
     }
 
-    public static function deleteVideo($videoId): void
+    public static function deleteVideo(int $videoId): void
     {
         self::query()
             ->where([['id', '=', $videoId]])

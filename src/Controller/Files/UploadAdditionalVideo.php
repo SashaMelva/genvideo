@@ -22,33 +22,39 @@ class UploadAdditionalVideo extends UserController
     public function action(): ResponseInterface
     {
         header('Access-Control-Allow-Origin: *');
-        $access_token = $this->request->getHeaderLine('token');
-        $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
+        $data = $this->getFormData();
+//        $access_token = $this->request->getHeaderLine('token');
+//        $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
+//
+//        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
 
-        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
+        try {
 
-            try {
+            $uploadedFiles = $this->request->getUploadedFiles();
+            $uploadedFile = $uploadedFiles['video'];
+            $fileNameMusic = $data['project_id'] . '-' . date('Y_m_d_H_i_s');
 
-                $uploadedFiles = $this->request->getUploadedFiles();
-                $data = $this->getFormData();
-                $uploadedFile = $uploadedFiles['video'];
+            if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
 
-                if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
-                    $filename = UploadFile::action(DIRECTORY_ADDITIONAL_VIDEO, $uploadedFile, $token->user_id);
-                    $path = RELATIVE_PATH_ADDITIONAL_VIDEO . DIRECTORY_SEPARATOR . $filename;
+                $filename = UploadFile::action(DIRECTORY_ADDITIONAL_VIDEO, $uploadedFile, $fileNameMusic);
+                $filePath = RELATIVE_PATH_ADDITIONAL_VIDEO . $filename;
 
-                    $video = AdditionalVideo::addVideo($filename, $path, $data['time'], $token->user_id);
-
-                    return $this->respondWithData(['path' => $video->path, 'id' => $video->id]);
-                } else {
-                    return $this->respondWithData($uploadedFile->getError(), 400);
+                if (empty($filename) || empty($filePath)) {
+                    return $this->respondWithError(400, 'Ошибка загрузки видео');
                 }
 
-            } catch (Exception $e) {
-                return $this->respondWithError($e->getCode(), $e->getMessage());
+                $video = AdditionalVideo::addVideo($filename, $filePath, '00:00', $data['project_id'], $data['type_video']);
+                return $this->respondWithData(['path' => $video->file_path, 'id' => $video->id]);
+
+            } else {
+                return $this->respondWithError(400, 'Ошибка получения видео. Код ошибки: ' . $uploadedFile->getError());
             }
-        } else {
-            return $this->respondWithError(215);
+
+        } catch (Exception $e) {
+            return $this->respondWithError($e->getCode(), $e->getMessage());
         }
+//        } else {
+//            return $this->respondWithError(215);
+//        }
     }
 }

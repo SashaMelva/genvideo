@@ -38,19 +38,19 @@ class UploadImage extends UserController
 
                 if ($data['type_image'] == 'slide') {
                     $filename = UploadFile::action(DIRECTORY_IMG, $uploadedFile, $fileNameImage);
-                    $path = RELATIVE_PATH_IMG . $filename;
+                    $filePath = RELATIVE_PATH_IMG . $filename;
                 }
 
                 if ($data['type_image'] == 'logo') {
                     $filename = UploadFile::action(DIRECTORY_LOGO_IMG, $uploadedFile, $fileNameImage);
-                    $path = RELATIVE_PATH_LOGO_IMG . $filename;
+                    $filePath = RELATIVE_PATH_LOGO_IMG . $filename;
                 }
 
-                if (empty($filename) || empty($path)) {
+                if (empty($filename) || empty($filePath)) {
                     return $this->respondWithError(400, 'Ошибка загрузки изображения');
                 }
 
-                $image = ImageVideo::addImage($filename, $path, $data['project_id'], $data['type_image']);
+                $image = ImageVideo::addImage($filename, $filePath, $data['project_id'], $data['type_image']);
 
                 return $this->respondWithData(['path' => $image->file_path, 'id' => $image->id]);
             } else {

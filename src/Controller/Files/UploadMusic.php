@@ -37,15 +37,15 @@ class UploadMusic extends UserController
             if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
 
                 if ($data['type_music'] == 'sound') {
-                    $filename = UploadFile::action(DIRECTORY_MUSIC, $uploadedFile, $fileNameMusic);
-                    $path = RELATIVE_PATH_MUSIC . $filename;
+                    $fileName = UploadFile::action(DIRECTORY_MUSIC, $uploadedFile, $fileNameMusic);
+                    $filePath = RELATIVE_PATH_MUSIC . $fileName;
                 }
 
-                if (empty($filename) || empty($path)) {
+                if (empty($fileName) || empty($filePath)) {
                     return $this->respondWithError(400, 'Ошибка загрузки музыки');
                 }
 
-                $music = MusicVideo::addMusic($filename, $path, '00:00', $data['project_id'], $data['type_music']);
+                $music = MusicVideo::addMusic($fileName, $filePath, '00:00', $data['project_id'], $data['type_music']);
                 return $this->respondWithData(['path' => $music->file_path, 'id' => $music->id]);
 
             } else {
