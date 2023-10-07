@@ -32,17 +32,17 @@ class UploadImage extends UserController
 
             $uploadedFiles = $this->request->getUploadedFiles();
             $uploadedFile = $uploadedFiles['image'];
-            $filenameImage = $data['project_id'] . date('Y_m_d_H_i_s');
+            $fileNameImage = $data['project_id'] . '-' . date('Y_m_d_H_i_s');
 
             if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
 
                 if ($data['type_image'] == 'slide') {
-                    $filename = UploadFile::action(DIRECTORY_IMG, $uploadedFile, $filenameImage);
+                    $filename = UploadFile::action(DIRECTORY_IMG, $uploadedFile, $fileNameImage);
                     $path = RELATIVE_PATH_IMG . $filename;
                 }
 
                 if ($data['type_image'] == 'logo') {
-                    $filename = UploadFile::action(DIRECTORY_LOGO_IMG, $uploadedFile, $filenameImage);
+                    $filename = UploadFile::action(DIRECTORY_LOGO_IMG, $uploadedFile, $fileNameImage);
                     $path = RELATIVE_PATH_LOGO_IMG . $filename;
                 }
 
@@ -54,7 +54,7 @@ class UploadImage extends UserController
 
                 return $this->respondWithData(['path' => $image->file_path, 'id' => $image->id]);
             } else {
-                return $this->respondWithData($uploadedFile->getError(), 400);
+                return $this->respondWithError(400, 'Ошибка получения избражения');
             }
 
         } catch (Exception $e) {

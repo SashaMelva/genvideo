@@ -22,33 +22,41 @@ class UploadMusic extends UserController
     public function action(): ResponseInterface
     {
         header('Access-Control-Allow-Origin: *');
-        $access_token = $this->request->getHeaderLine('token');
-        $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
+        $data = $this->getFormData();
+//        $access_token = $this->request->getHeaderLine('token');
+//        $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
+//
+//        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
 
-        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
+        try {
 
-            try {
+            $uploadedFiles = $this->request->getUploadedFiles();
+            $uploadedFile = $uploadedFiles['music'];
+            $fileNameMusic = $data['project_id'] . '-' . date('Y_m_d_H_i_s');
 
-                $uploadedFiles = $this->request->getUploadedFiles();
-                $data = $this->getFormData();
-                $uploadedFile = $uploadedFiles['sound'];
+            if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
 
-                if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
-                    $filename = UploadFile::action(DIRECTORY_MUSIC, $uploadedFile, $token->user_id);
-                    $path = RELATIVE_PATH_MUSIC . DIRECTORY_SEPARATOR . $filename;
-
-                    $music = MusicVideo::addMusic($filename, $path, $data['time'], $token->user_id);
-
-                    return $this->respondWithData(['path' => $music->path, 'id' => $music->id]);
-                } else {
-                    return $this->respondWithData($uploadedFile->getError(), 400);
+                if ($data['type_music'] == 'sound') {
+                    $filename = UploadFile::action(DIRECTORY_MUSIC, $uploadedFile, $fileNameMusic);
+                    $path = RELATIVE_PATH_MUSIC . $filename;
                 }
 
-            } catch (Exception $e) {
-                return $this->respondWithError($e->getCode(), $e->getMessage());
+                if (empty($filename) || empty($path)) {
+                    return $this->respondWithError(400, 'Ошибка загрузки музыки');
+                }
+
+                $music = MusicVideo::addMusic($filename, $path, '00:00', $data['project_id'], $data['type_music']);
+                return $this->respondWithData(['path' => $music->file_path, 'id' => $music->id]);
+
+            } else {
+                return $this->respondWithError(400, 'Ошибка получения музыки');
             }
-        } else {
-            return $this->respondWithError(215);
+
+        } catch (Exception $e) {
+            return $this->respondWithError($e->getCode(), $e->getMessage());
         }
+//        } else {
+//            return $this->respondWithError(215);
+//        }
     }
 }
