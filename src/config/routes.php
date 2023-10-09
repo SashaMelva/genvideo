@@ -85,7 +85,7 @@ return static function(App $app):void
 
             $group->get('/delete-image/{id:[0-9]+}', DeleteImage::class);
             $group->get('/delete-sound/{id:[0-9]+}', DeleteMusic::class);
-            $group->get('/delete-additional-video/{id:[0-9]+}', DeleteAdditionalVideo::class);
+            $group->get('/delete-video/{id:[0-9]+}', DeleteAdditionalVideo::class);
         });
 
     });
