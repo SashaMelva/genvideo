@@ -63,9 +63,10 @@ class GeneratorFiles
     }
 
     /**Генерируем cлайдшоу с фоновой музыкой*/
-    public function generatorSladeShow(array $images, string $sound_name, string $sound_time): bool
+    public function generatorSladeShow(array $images, string $sound_name, string $time): bool
     {
-        $ffmpeg = $this->getSlideShowCode($images, $sound_name, $this->contentId, $sound_time);
+        $ffmpeg = $this->getSlideShowCode($images, $sound_name, $this->contentId, $time);
+        var_dump($ffmpeg);
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         if (!is_null($errors)) {
@@ -147,7 +148,7 @@ class GeneratorFiles
             $v .= "[v{$i}]";
         }
 
-        $v = $v . 'concat=n=' . count($arr_images) . ':v=1:a=0,format=yuv422p[v]" -map "[v]" -map ' . count($arr_images) . ':a -shortest -y video/rambler_' . $number . '.mp4';
+        $v = $v . 'concat=n=' . count($arr_images) . ':v=1:a=0,format=yuv422p[v]" -map "[v]" -map ' . count($arr_images) . ':a -shortest -y ' . DIRECTORY_VIDEO . $number . '.mp4';
         return 'ffmpeg' . $images . $sound . '-filter_complex "' . $scale . $v;
     }
 

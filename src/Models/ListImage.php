@@ -18,7 +18,10 @@ class ListImage  extends Model
 
     public static function findAllByContentId(int $contentId): array
     {
-        return self::query()->where([['content_id', '=', $contentId]])
+        return self::query()
+            ->select('content_id', 'image.id', 'image.file_name', 'image.file_path', 'image.type', 'image.project_id')
+            ->leftJoin('image', 'list_image.image_id', 'image.id')
+            ->where([['content_id', '=', $contentId]])
             ->get()->toArray();
     }
 

@@ -23,6 +23,13 @@ class ContentVideo extends Model
         return self::query()->find($id)->getModel();
     }
 
+    public static function changeStatus(int $contentId, string $statusId): void
+    {
+        self::query()
+            ->where([['id', '=', $contentId]])
+            ->update(['status_id' => $statusId]);
+    }
+
     public static function addContent(
         string  $name,
         int     $userId,

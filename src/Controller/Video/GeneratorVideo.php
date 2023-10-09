@@ -32,8 +32,22 @@ class GeneratorVideo extends UserController
 
             $video = ContentVideo::findAllDataByID($videoId);
 
-            $video['images'] = ListImage::findAllByContentId($video['content_id']);
-            $video['sound'] = ListMusic::findAllByContentId($video['content_id']);
+            $images = ListImage::findAllByContentId($video['content_id']);
+
+            $logo = [];
+            $slides = [];
+
+            foreach ($images as $image) {
+                if ($image['type'] == 'logo'){
+                    $logo[] = $image['file_name'];
+                }
+
+                if ($image['type'] == 'slide'){
+                    $slides[] = $image['file_name'];
+                }
+            }
+
+            $sound = ListMusic::findAllByContentId($video['content_id']);
             $video['video'] = ListVideo::findAllByContentId($video['content_id']);
 
             $generatorFiles = new GeneratorFiles($video['content_id']);
@@ -72,22 +86,29 @@ class GeneratorVideo extends UserController
 //                }
            // }
 
-            var_dump($video['type_background']);
+            $timeVoice = '54.64';
+
+
             if ($video['type_background'] == 'slide_show') {
+                $slideshow = $generatorFiles->generatorSladeShow($slides, $sound[0]['file_name'], $timeVoice);
 
+                var_dump($slideshow);
+                if (!$slideshow) {
+                    return $this->respondWithError(400, 'Ошибка генерации слайдшоу');
+                }
             }
 
-            if ($video['type_background'] == 'video') {
-
-            }
-
+//            if ($video['type_background'] == 'video') {
+//
+//            }
+//
             if (!is_null($video['color_background_id'])) {
 
             }
-
-            if ($video['images'] == 'video') {
-
-            }
+//
+//            if (!empty($logo)) {
+//                $generatorFiles->generatorSladeShow();
+//            }
         } catch (Exception $e) {
             return $this->respondWithError($e->getCode(), $e->getMessage());
         }
