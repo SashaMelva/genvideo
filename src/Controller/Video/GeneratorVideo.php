@@ -23,11 +23,8 @@ class GeneratorVideo extends UserController
      */
     public function action(): ResponseInterface
     {
-        $data = json_decode($this->request->getBody()->getContents(), true);
-        $access_token = $this->request->getHeaderLine('token');
+//        $access_token = $this->request->getHeaderLine('token');
 
-        var_dump($data);
-        exit();
         $videoId = $this->request->getAttribute('id');
 
         try {
