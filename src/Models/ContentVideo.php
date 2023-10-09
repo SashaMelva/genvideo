@@ -97,6 +97,13 @@ class ContentVideo extends Model
             ->get()->toArray()[0];
     }
 
+    public static function updateContent(int $contentId, string $fileName, string $filePath): void
+    {
+        self::query()
+            ->where([['id', '=', $contentId]])
+            ->update(['file_path' => $filePath, 'file_name' => $fileName]);
+    }
+
     public static function deleteContent(int $contentId): void
     {
         self::query()

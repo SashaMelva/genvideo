@@ -26,6 +26,7 @@ class GeneratorVideo extends UserController
 //        $access_token = $this->request->getHeaderLine('token');
 
         $videoId = $this->request->getAttribute('id');
+        return $this->respondWithData('Метод генерации');
 
         try {
             $resultName = '';
@@ -180,7 +181,9 @@ class GeneratorVideo extends UserController
                 $resultName = $titers['fileName'];
             }
 
-            return $this->respondWithError($e->getCode(), $e->getMessage());
+            $resultName = '7_result1';
+            ContentVideo::updateContent($videoId, $resultName . '.mp4', RELATIVE_PATH_VIDEO . $resultName . '.mp4');
+            return $this->respondWithData(['file_path' => RELATIVE_PATH_VIDEO . $resultName . '.mp4']);
 
         } catch (Exception $e) {
             return $this->respondWithError($e->getCode(), $e->getMessage());
