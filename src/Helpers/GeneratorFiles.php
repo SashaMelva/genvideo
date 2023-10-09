@@ -12,29 +12,33 @@ class GeneratorFiles
     }
 
     /**Генерируем текст для субтитров*/
-    public function generatorTextForTitre(string $text): array
+    public function generatorTextForTitre(string $text, int $text_id): array
     {
+        $nameFiles = $this->contentId . '_' . $text_id;
         $data = [
-            'name' => $this->contentId . '.ass',
-            'path' => RELATIVE_PATH_TEXT  . $this->contentId . '.ass',
+            'name' => $nameFiles . '.ass',
+            'path' => RELATIVE_PATH_TEXT . $this->contentId . $text_id . '.ass',
+            'status' => false
         ];
 
+        $text = str_replace(' ', ' ', $text);
         $textArray = explode(' ', $text);
 
         // разбиваем текст на строки по ~ 150 символов
         $shortTextArray = $this->getArrayStr($textArray, 150);
 
         // формируем, сохраняем файл субтитров .srt и конвертируем в .ass
-        $length = file_put_contents(DIRECTORY_TEXT  . $this->contentId . '.srt', $this->getFilesSrt($shortTextArray));
+        $length = file_put_contents(DIRECTORY_TEXT . $nameFiles . '.srt', $this->getFilesSrt($shortTextArray));
 
         if ($length !== false) {
-            $ffmpeg = 'ffmpeg -i ' . DIRECTORY_TEXT  . $this->contentId . '.srt -y ' . DIRECTORY_TEXT  . $this->contentId . '.ass';
+            $ffmpeg = 'ffmpeg -i ' . DIRECTORY_TEXT . $nameFiles . '.srt -y ' . DIRECTORY_TEXT . $nameFiles . '.ass';
         }
 
+        var_dump($ffmpeg);
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
-        if (!is_null($errors)) {
-            #TODO
+        if (is_null($errors)) {
+            $data['status'] = true;
         }
 
         return $data;
@@ -45,7 +49,7 @@ class GeneratorFiles
     {
         $stringDirectory = str_replace('\\', '\\\\', DIRECTORY_TEXT);
         $stringDirectory = str_replace(':', '\\:', $stringDirectory);
-       
+
         $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $this->contentId . '_logo.mp4 -filter_complex "subtitles=\'' . $stringDirectory . $this->contentId . '.ass\':force_style=' .
             "'OutlineColour=&H80000000,BorderStyle=3,Outline=1,Shadow=0,MarginV=110'" .
             '" -y ' . DIRECTORY_VIDEO . $this->contentId . '_text.mp4';
@@ -74,7 +78,7 @@ class GeneratorFiles
     /**Генерируем фон*/
     public function generatorBackground(string $nameFileBackground): bool
     {
-        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $this->contentId . '.mp4 -i ' . DIRECTORY_LOGO_IMG . $nameFileBackground .' -filter_complex "[0:v][1:v]overlay=0:0" -codec:a copy -y ' . DIRECTORY_VIDEO . $this->contentId . '_fon.mp4';
+        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $this->contentId . '.mp4 -i ' . DIRECTORY_LOGO_IMG . $nameFileBackground . ' -filter_complex "[0:v][1:v]overlay=0:0" -codec:a copy -y ' . DIRECTORY_VIDEO . $this->contentId . '_fon.mp4';
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         if (!is_null($errors)) {
@@ -87,7 +91,7 @@ class GeneratorFiles
     /**Генерируем логотип*/
     public function generatorLogo(string $nameFileLogo): bool
     {
-        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $this->contentId . '_fon.mp4 -i ' . DIRECTORY_LOGO_IMG . $nameFileLogo .' -filter_complex "[1:v][0:v]scale2ref=(450/142)*ih/14/sar:ih/14[wm][base];[base][wm]overlay=main_w-overlay_w-10:10:format=rgb" -pix_fmt yuv420p -c:a copy -y ' . DIRECTORY_VIDEO . $this->contentId . '_logo.mp4';
+        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $this->contentId . '_fon.mp4 -i ' . DIRECTORY_LOGO_IMG . $nameFileLogo . ' -filter_complex "[1:v][0:v]scale2ref=(450/142)*ih/14/sar:ih/14[wm][base];[base][wm]overlay=main_w-overlay_w-10:10:format=rgb" -pix_fmt yuv420p -c:a copy -y ' . DIRECTORY_VIDEO . $this->contentId . '_logo.mp4';
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         if (!is_null($errors)) {

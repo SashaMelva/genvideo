@@ -49,6 +49,20 @@ class TextVideo extends Model
             ->update(['file_name_text' => $fileName, 'file_path_text' => $filePath, 'status_text' => $status]);
     }
 
+    public static function changeTextStatus(int $textId, string $status): void
+    {
+        self::query()
+            ->where([['id', '=', $textId]])
+            ->update(['status_text' => $status]);
+    }
+
+    public static function changeVoiceStatus(int $textId, string $status): void
+    {
+        self::query()
+            ->where([['id', '=', $textId]])
+            ->update(['status_voice' => $status]);
+    }
+
     public static function updateFileVoice(int $textId, string $fileName, string $filePath, bool $status, string $timeVoice): void
     {
         self::query()

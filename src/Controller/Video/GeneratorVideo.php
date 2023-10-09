@@ -38,35 +38,54 @@ class GeneratorVideo extends UserController
 
             $generatorFiles = new GeneratorFiles($video['content_id']);
 
-            var_dump($video['status_voice']);
-            if ($video['status_voice']) {
+//            if ($video['status_voice']) {
+//
+//                $fileName = $video['content_id'] . $video['text_id'];
+//                $voiceSetting = [
+//                    'format' => 'mp3',
+//                    'lang' => $video['language'],
+//                    'voice' => $video['dictionary_voice_name'],
+//                    'emotion' => $video['ampula_voice'],
+//                ];
+//
+//                $timeVoice = (new Speechkit())->generator($video['text'], $fileName, $voiceSetting);
+//
+//                if ($timeVoice == 0) {
+//                    return $this->respondWithError(400, 'Ошибка генерации аудио озвучки');
+//                } else {
+//                    TextVideo::updateFileVoice($video['text_id'], $fileName, RELATIVE_PATH_SPEECHKIT . $fileName . '.' . $voiceSetting['format'], true, $timeVoice);
+//                }
+//            }
 
-                $fileName = $video['content_id'] . $video['text_id'];
-                $voiceSetting = [
-                    'format' => 'mp3',
-                    'lang' => $video['language'],
-                    'voice' => $video['dictionary_voice_name'],
-                    'emotion' => $video['ampula_voice'],
-                ];
+//            var_dump($video['status_text']);
+//            var_dump($video['status_text'] == 'false');
 
-                $timeVoice = (new Speechkit())->generator($video['text'], $fileName, $voiceSetting);
+           // if ($video['status_text'] == 'false' || $video['status_text'] == 'создано') {
+//                TextVideo::changeTextStatus($video['text_id'], 'в обработке');
+//                $textData = $generatorFiles->generatorTextForTitre($video['text'], $video['text_id']);
+//
+//                if ($textData['status']) {
+//                    TextVideo::changeTextStatus($video['text_id'], 'обработано');
+//                } else {
+//                    $this->respondWithError(400, 'Ошибка генерации субтитров');
+//                    TextVideo::changeTextStatus($video['text_id'], 'ошибка');
+//                }
+           // }
 
-                if ($timeVoice == 0) {
-                    return $this->respondWithError(400, 'Ошибка получения аудио озвучки');
-                } else {
-                    TextVideo::updateFileVoice($video['text_id'], $fileName, RELATIVE_PATH_SPEECHKIT . $fileName . '.' . $voiceSetting['format'], true, $timeVoice);
-                }
-            }
-
-            if (!$video['status_text']) {
-                $textData = $generatorFiles->generatorTextForTitre($video['text']);
-            }
-
-            if ($video['type_background'] == 'slide') {
+            var_dump($video['type_background']);
+            if ($video['type_background'] == 'slide_show') {
 
             }
 
             if ($video['type_background'] == 'video') {
+
+            }
+
+            if (!is_null($video['color_background_id'])) {
+
+            }
+
+            if ($video['images'] == 'video') {
 
             }
         } catch (Exception $e) {
