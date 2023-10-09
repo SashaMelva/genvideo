@@ -16,4 +16,11 @@ class ColorBackground extends Model
     {
         return self::query()->get()->toArray();
     }
+
+    public static function findById(int $colorBackground): array
+    {
+        return self::query()
+            ->where('id', '=', $colorBackground)
+            ->get()->toArray()[0];
+    }
 }

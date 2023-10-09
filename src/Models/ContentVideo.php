@@ -88,11 +88,11 @@ class ContentVideo extends Model
                 'status_content.name AS status_content_name',
                 'dictionary_voice.name AS dictionary_voice_name',
                 'dictionary_voice.language',
+                'color_background_id'
             )
             ->leftJoin('text', 'content.text_id', '=', 'text.id')
             ->leftJoin('status_content', 'content.status_id', '=', 'status_content.id')
             ->leftJoin('dictionary_voice', 'content.voice_id', '=', 'dictionary_voice.id')
-            ->leftJoin('color_background', 'content.color_background_id', '=', 'color_background.id')
             ->where([['content.id', '=', $id]])
             ->get()->toArray()[0];
     }

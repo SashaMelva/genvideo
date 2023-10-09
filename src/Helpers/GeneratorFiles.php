@@ -63,36 +63,116 @@ class GeneratorFiles
     }
 
     /**Генерируем cлайдшоу с фоновой музыкой*/
-    public function generatorSladeShow(array $images, string $sound_name, string $time): bool
+    public function generatorSladeShow(array $images, string $sound_name, string $time): array
     {
-        $ffmpeg = $this->getSlideShowCode($images, $sound_name, $this->contentId, $time);
+        $ffmpeg = $this->getSlideShowCode($images, $sound_name, $time);
         var_dump($ffmpeg);
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         if (!is_null($errors)) {
-            return false;
+            return ['status' => false];
         }
 
-        return true;
+        return ['fileName' => $this->contentId, 'status' => true];
     }
 
-    /**Генерируем фон*/
-    public function generatorBackground(string $nameFileBackground): bool
+    /**Генерируем видео с фоновой музыкой*/
+    public function generatorBackgroundVideoAndMusic(string $nameVideo, string $sound_name, string $time): array
     {
-        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $this->contentId . '.mp4 -i ' . DIRECTORY_LOGO_IMG . $nameFileBackground . ' -filter_complex "[0:v][1:v]overlay=0:0" -codec:a copy -y ' . DIRECTORY_VIDEO . $this->contentId . '_fon.mp4';
+        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 ' . DIRECTORY_VIDEO . $this->contentId . '_1.mp4';
+        var_dump($ffmpeg);
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         if (!is_null($errors)) {
-            return false;
+            return ['status' => false];
         }
 
-        return true;
+        return ['fileName' => $this->contentId, 'status' => true];
+    }
+
+    /**Генерируем фон*/
+    public function generatorBackground(string $nameFileBackground, string $videoName): array
+    {
+        $resultName = $this->contentId . '_fon';
+        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -i ' . DIRECTORY_BACKGROUND . $nameFileBackground . ' -filter_complex "[0:v][1:v]overlay=0:0" -codec:a copy -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
+        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+
+        var_dump($ffmpeg);
+        if (!is_null($errors)) {
+            return ['status' => false];
+        }
+
+        return ['fileName' => $resultName, 'status' => true];
     }
 
     /**Генерируем логотип*/
-    public function generatorLogo(string $nameFileLogo): bool
+    public function generatorLogo(string $nameFileLogo, string $videoName): array
     {
-        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $this->contentId . '_fon.mp4 -i ' . DIRECTORY_LOGO_IMG . $nameFileLogo . ' -filter_complex "[1:v][0:v]scale2ref=(450/142)*ih/14/sar:ih/14[wm][base];[base][wm]overlay=main_w-overlay_w-10:10:format=rgb" -pix_fmt yuv420p -c:a copy -y ' . DIRECTORY_VIDEO . $this->contentId . '_logo.mp4';
+        $resultName = $this->contentId . '_logo';
+        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -i ' . DIRECTORY_LOGO_IMG . $nameFileLogo . ' -filter_complex "[1:v][0:v]scale2ref=(450/142)*ih/14/sar:ih/14[wm][base];[base][wm]overlay=main_w-overlay_w-10:10:format=rgb" -pix_fmt yuv420p -c:a copy -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
+        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+
+        var_dump($ffmpeg);
+        if (!is_null($errors)) {
+            return ['status' => false];
+        }
+
+        return ['fileName' => $resultName, 'status' => true];
+    }
+
+    /**Склеиваем начальное видео*/
+    public function mergeVideo(string $nameVideoContent, ?string $nameVideoStart = null, ?string $nameVideoEnd = null): array
+    {
+        $fileName = $this->contentId . '_result1';
+        $ffmpeg = 'ffmpeg -i "concat:';
+
+        if (!is_null($nameVideoStart)) {
+            $fileNameStart = str_replace('.mp4', '', $nameVideoStart);
+            if ($this->mpegtsFiles($fileNameStart, DIRECTORY_ADDITIONAL_VIDEO)) {
+
+            }
+            $ffmpeg .= DIRECTORY_ADDITIONAL_VIDEO . $fileNameStart . '.ts' . '|';
+//            else {
+//                return ['status' => false];
+//            }
+        }
+
+//        $fileNameVideoContent = str_replace('.mp4', '', $nameVideoStart);
+        if ($this->mpegtsFiles($nameVideoContent, DIRECTORY_VIDEO)) {
+
+        }
+        $ffmpeg .= DIRECTORY_VIDEO . $nameVideoContent . '.ts';
+//        else {
+//            return ['status' => false];
+//        }
+
+
+        if (!is_null($nameVideoEnd)) {
+            $fileNameEnd = str_replace('.mp4', '', $nameVideoEnd);
+            if ($this->mpegtsFiles($fileNameEnd, DIRECTORY_ADDITIONAL_VIDEO)) {
+                $ffmpeg .= '|' . DIRECTORY_ADDITIONAL_VIDEO . $fileNameEnd;
+            }
+//            else {
+//                return ['status' => false];
+//            }
+        }
+
+        $ffmpeg .= '" -vcodec copy -acodec copy ' . DIRECTORY_VIDEO . $fileName . '.mp4';
+        var_dump($ffmpeg);
+        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+
+        if (!is_null($errors)) {
+            return ['status' => false];
+        }
+
+        return ['fileName' => $this->contentId, 'status' => true];
+    }
+
+    private function mpegtsFiles(string $fileName, string $directory): bool
+    {
+
+        $ffmpeg = 'ffmpeg -i ' . $directory . $fileName . '.mp4' . ' -acodec copy -vcodec copy -vbsf h264_mp4toannexb -f mpegts ' . $directory . $fileName . '.ts';
+        var_dump($ffmpeg);
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         if (!is_null($errors)) {
@@ -122,8 +202,9 @@ class GeneratorFiles
         return $result;
     }
 
-    private function getSlideShowCode(array $arr_images, string $sound_name, string $number, string $sound_time): string
+    private function getSlideShowCode(array $arr_images, string $sound_name, string $sound_time): string
     {
+        $number = $this->contentId;
         #каждые 10 секунд меняем фотогрфию
         $count_images = ceil($sound_time / 10);
 

@@ -18,7 +18,10 @@ class ListVideo extends Model
 
     public static function findAllByContentId(int $contentId): array
     {
-        return self::query()->where([['content_id', '=', $contentId]])
+        return self::query()
+            ->select('content_id', 'video.id', 'video.file_name', 'video.file_path', 'video.type', 'video.project_id')
+            ->leftJoin('video', 'list_video.video_id', 'video.id')
+            ->where([['content_id', '=', $contentId]])
             ->get()->toArray();
     }
 
