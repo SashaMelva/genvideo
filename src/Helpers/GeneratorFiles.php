@@ -17,7 +17,7 @@ class GeneratorFiles
         $nameFiles = $this->contentId . '_' . $text_id;
         $data = [
             'name' => $nameFiles . '.ass',
-            'path' => RELATIVE_PATH_TEXT . $this->contentId . $text_id . '.ass',
+            'path' => RELATIVE_PATH_TEXT . $nameFiles . '.ass',
             'status' => false
         ];
 
@@ -45,21 +45,24 @@ class GeneratorFiles
     }
 
     /**Генерируем субтитры*/
-    public function generatorText(): bool
+    public function generatorText(string $videoName, string $titerName): array
     {
+        $resultName = $this->contentId . '_text';
         $stringDirectory = str_replace('\\', '\\\\', DIRECTORY_TEXT);
         $stringDirectory = str_replace(':', '\\:', $stringDirectory);
 
-        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $this->contentId . '_logo.mp4 -filter_complex "subtitles=\'' . $stringDirectory . $this->contentId . '.ass\':force_style=' .
+        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -filter_complex "subtitles=\'' . $stringDirectory . $titerName . '.ass' . '\':force_style=' .
             "'OutlineColour=&H80000000,BorderStyle=3,Outline=1,Shadow=0,MarginV=110'" .
-            '" -y ' . DIRECTORY_VIDEO . $this->contentId . '_text.mp4';
+            '" -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
+
+        var_dump($ffmpeg);
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         if (!is_null($errors)) {
-            return false;
+            return ['status' => false];
         }
 
-        return true;
+        return ['fileName' => $resultName, 'status' => true];
     }
 
     /**Генерируем cлайдшоу с фоновой музыкой*/
@@ -120,7 +123,24 @@ class GeneratorFiles
         return ['fileName' => $resultName, 'status' => true];
     }
 
-    /**Склеиваем начальное видео*/
+    /**Накладываем озвучку на видео*/
+    public function generatorMusic(string $nameFileVoice, string $videoName, string $time): array
+    {
+        $resultName = $this->contentId . '_sound';
+
+        $ffmpeg = 'ffmpeg -y -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -i ' . DIRECTORY_SPEECHKIT . $nameFileVoice . ' -filter_complex "[0]volume=0.4[a];[1]volume=1.8[b];[a][b]amix=inputs=2:duration=longest" -c:a libmp3lame ' . DIRECTORY_VIDEO . $resultName . '.mp4';
+        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+
+        var_dump($ffmpeg);
+        if (!is_null($errors)) {
+            return ['status' => false];
+        }
+
+        return ['fileName' => $resultName, 'status' => true];
+    }
+
+
+    /**Склеиваем видео*/
     public function mergeVideo(string $nameVideoContent, ?string $nameVideoStart = null, ?string $nameVideoEnd = null): array
     {
         $fileName = $this->contentId . '_result1';
@@ -129,32 +149,26 @@ class GeneratorFiles
         if (!is_null($nameVideoStart)) {
             $fileNameStart = str_replace('.mp4', '', $nameVideoStart);
             if ($this->mpegtsFiles($fileNameStart, DIRECTORY_ADDITIONAL_VIDEO)) {
-
+                $ffmpeg .= DIRECTORY_ADDITIONAL_VIDEO . $fileNameStart . '.ts' . '|';
+            } else {
+                return ['status' => false];
             }
-            $ffmpeg .= DIRECTORY_ADDITIONAL_VIDEO . $fileNameStart . '.ts' . '|';
-//            else {
-//                return ['status' => false];
-//            }
         }
 
-//        $fileNameVideoContent = str_replace('.mp4', '', $nameVideoStart);
         if ($this->mpegtsFiles($nameVideoContent, DIRECTORY_VIDEO)) {
-
+            $ffmpeg .= DIRECTORY_VIDEO . $nameVideoContent . '.ts';
+        } else {
+            return ['status' => false];
         }
-        $ffmpeg .= DIRECTORY_VIDEO . $nameVideoContent . '.ts';
-//        else {
-//            return ['status' => false];
-//        }
 
 
         if (!is_null($nameVideoEnd)) {
             $fileNameEnd = str_replace('.mp4', '', $nameVideoEnd);
             if ($this->mpegtsFiles($fileNameEnd, DIRECTORY_ADDITIONAL_VIDEO)) {
                 $ffmpeg .= '|' . DIRECTORY_ADDITIONAL_VIDEO . $fileNameEnd;
+            } else {
+                return ['status' => false];
             }
-//            else {
-//                return ['status' => false];
-//            }
         }
 
         $ffmpeg .= '" -vcodec copy -acodec copy ' . DIRECTORY_VIDEO . $fileName . '.mp4';
@@ -233,21 +247,39 @@ class GeneratorFiles
         return 'ffmpeg' . $images . $sound . '-filter_complex "' . $scale . $v;
     }
 
-    private function getFilesSrt($shorttext, $arr = [], $ms = 8999): string
+    private function getFilesSrt($shorttext, $arr = [], $ms = 4999): string
     {
         foreach ($shorttext as $key => $item) {
 
             if ($key == 0) {
-                $arr[] = ($key + 1) . '\r\n' . '00:00:00,000 --> '
-                    . str_replace('.', ',', $this->formatMilliseconds($ms)) . '\r\n' . $item . '\r\n';
+                $arr[] = ($key + 1) . "\r\n" . '00:00:00,000 --> '
+                    . str_replace('.', ',', $this->formatMilliseconds($ms)) . "\r\n" . $item . "\r\n";
                 continue;
             }
 
-            $arr[] = ($key + 1) . '\r\n' . str_replace('.', ',', $this->formatMilliseconds($ms))
-                . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($ms + 8999)) . '\r\n' . $item . '\r\n';
+            $arr[] = ($key + 1) . "\r\n" . str_replace('.', ',', $this->formatMilliseconds($ms))
+                . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($ms + 4999)) . "\r\n" . $item . "\r\n";
+            $ms = $ms + 4999;
+        }
+        return implode("\r\n", $arr);
+    }
+
+    private function getFilesSrtTest($shorttext, $arr = [], $ms = 8999)
+    {
+
+        foreach ($shorttext as $key => $item) {
+
+            if ($key == 0) {
+                $arr[] = ($key + 1) . "\r\n" . '00:00:03,099 --> '
+                    . str_replace('.', ',', $this->formatMilliseconds($ms + 3099)) . "\r\n" . $item . "\r\n";
+                continue;
+            }
+
+            $arr[] = ($key + 1) . "\r\n" . str_replace('.', ',', $this->formatMilliseconds($ms + 3099))
+                . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($ms + 8999 + 3099)) . "\r\n" . $item . "\r\n";
             $ms = $ms + 8999;
         }
-        return implode('\r\n', $arr);
+        return implode("\r\n", $arr);
     }
 
     private function formatMilliseconds($milliseconds): string

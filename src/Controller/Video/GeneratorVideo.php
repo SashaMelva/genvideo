@@ -26,6 +26,8 @@ class GeneratorVideo extends UserController
         $data = json_decode($this->request->getBody()->getContents(), true);
         $access_token = $this->request->getHeaderLine('token');
 
+        var_dump($data);
+        exit();
         $videoId = $this->request->getAttribute('id');
 
         try {
@@ -70,95 +72,85 @@ class GeneratorVideo extends UserController
 
             $generatorFiles = new GeneratorFiles($video['content_id']);
 
-//            if ($video['status_voice']) {
-//
-//                $fileName = $video['content_id'] . $video['text_id'];
-//                $voiceSetting = [
-//                    'format' => 'mp3',
-//                    'lang' => $video['language'],
-//                    'voice' => $video['dictionary_voice_name'],
-//                    'emotion' => $video['ampula_voice'],
-//                ];
-//
-//                $timeVoice = (new Speechkit())->generator($video['text'], $fileName, $voiceSetting);
-//
-//                if ($timeVoice == 0) {
-//                    return $this->respondWithError(400, 'Ошибка генерации аудио озвучки');
-//                } else {
-//                    TextVideo::updateFileVoice($video['text_id'], $fileName, RELATIVE_PATH_SPEECHKIT . $fileName . '.' . $voiceSetting['format'], true, $timeVoice);
-//                }
-//            }
+            if ($video['status_voice']) {
 
-//            var_dump($video['status_text']);
-//            var_dump($video['status_text'] == 'false');
+                $fileNameVoice = $video['content_id'] . $video['text_id'];
+                $voiceSetting = [
+                    'format' => 'mp3',
+                    'lang' => $video['language'],
+                    'voice' => $video['dictionary_voice_name'],
+                    'emotion' => $video['ampula_voice'],
+                ];
 
-            // if ($video['status_text'] == 'false' || $video['status_text'] == 'создано') {
-//                TextVideo::changeTextStatus($video['text_id'], 'в обработке');
-//                $textData = $generatorFiles->generatorTextForTitre($video['text'], $video['text_id']);
-//
-//                if ($textData['status']) {
-//                    TextVideo::changeTextStatus($video['text_id'], 'обработано');
-//                } else {
-//                    $this->respondWithError(400, 'Ошибка генерации субтитров');
-//                    TextVideo::changeTextStatus($video['text_id'], 'ошибка');
-//                }
-            // }
+                $timeVoice = (new Speechkit())->generator($video['text'], $fileNameVoice, $voiceSetting);
 
+                if ($timeVoice == 0) {
+                    return $this->respondWithError(400, 'Ошибка генерации аудио озвучки');
+                } else {
+                    TextVideo::updateFileVoice($video['text_id'], $fileNameVoice, RELATIVE_PATH_SPEECHKIT . $fileNameVoice . '.' . $voiceSetting['format'], true, $timeVoice);
+                }
+            }
 
-//            if ($video['type_background'] == 'slide_show') {
-//                $slideshow = $generatorFiles->generatorSladeShow($slides, $sound[0]['file_name'], $timeVoice);
-//
-//                var_dump($slideshow);
-//                if (!$slideshow['status']) {
-//                    return $this->respondWithError(400, 'Ошибка генерации слайдшоу');
-//                }
-//
-//                $resultName = $slideshow['fileName'];
-//            }
+            if ($video['status_text'] == 'false' || $video['status_text'] == 'создано') {
 
-            $timeVoice = '54.64';
+                TextVideo::changeTextStatus($video['text_id'], 'в обработке');
+                $textData = $generatorFiles->generatorTextForTitre($video['text'], $video['text_id']);
 
+                if ($textData['status']) {
+                    TextVideo::changeTextStatus($video['text_id'], 'обработано');
+                } else {
+                    TextVideo::changeTextStatus($video['text_id'], 'ошибка');
+                    $this->respondWithError(400, 'Ошибка генерации субтитров');
+                }
+            }
 
-//            if ($video['type_background'] == 'video') {
-//
-//                if (!empty($videoBackground)) {
-//                    $backgroundVideo = $generatorFiles->generatorBackgroundVideoAndMusic($videoBackground[0], $sound[0]['file_name'], $timeVoice);
-//
-//                    var_dump($backgroundVideo);
-//                    if (!$backgroundVideo['status']) {
-//                        return $this->respondWithError(400, 'Ошибка генерации фонового видео');
-//                    }
-//
-//                    $resultName = $backgroundVideo['fileName'];
-//                } else {
-//                    return $this->respondWithError(400, 'Видео не загружено');
-//                }
-//            }
-//
-//            if (!is_null($video['color_background_id'])) {
-//                $colorBackground = ColorBackground::findById((int)$video['color_background_id']);
-//                $background = $generatorFiles->generatorBackground($colorBackground['file_name'], $resultName);
-//
-//                var_dump($background['status']);
-//                if (!$background['status']) {
-//                    return $this->respondWithError(400, 'Ошибка наложения фона видео');
-//                }
-//
-//                $resultName = $background['fileName'];
-//            }
+            if ($video['type_background'] == 'slide_show') {
+                $slideshow = $generatorFiles->generatorSladeShow($slides, $sound[0]['file_name'], $timeVoice);
 
+                var_dump($slideshow);
+                if (!$slideshow['status']) {
+                    return $this->respondWithError(400, 'Ошибка генерации слайдшоу');
+                }
 
-//
-//            if (!empty($logo)) {
-//                $logoForVideo = $generatorFiles->generatorLogo($logo[0], $resultName);
-//
-//                var_dump($logoForVideo);
-//                if (!$logoForVideo) {
-//                    return $this->respondWithError(400, 'Ошибка прикрепления логотипа');
-//                }
-//            }
+                $resultName = $slideshow['fileName'];
+            }
 
-            $resultName = '7';
+            if ($video['type_background'] == 'video') {
+
+                if (!empty($videoBackground)) {
+                    $backgroundVideo = $generatorFiles->generatorBackgroundVideoAndMusic($videoBackground[0], $sound[0]['file_name'], $timeVoice);
+
+                    var_dump($backgroundVideo);
+                    if (!$backgroundVideo['status']) {
+                        return $this->respondWithError(400, 'Ошибка генерации фонового видео');
+                    }
+
+                    $resultName = $backgroundVideo['fileName'];
+                } else {
+                    return $this->respondWithError(400, 'Видео не загружено');
+                }
+            }
+
+            if (!is_null($video['color_background_id'])) {
+                $colorBackground = ColorBackground::findById((int)$video['color_background_id']);
+                $background = $generatorFiles->generatorBackground($colorBackground['file_name'], $resultName);
+
+                var_dump($background['status']);
+                if (!$background['status']) {
+                    return $this->respondWithError(400, 'Ошибка наложения фона видео');
+                }
+
+                $resultName = $background['fileName'];
+            }
+
+            if (!empty($logo)) {
+                $logoForVideo = $generatorFiles->generatorLogo($logo[0], $resultName);
+
+                var_dump($logoForVideo);
+                if (!$logoForVideo) {
+                    return $this->respondWithError(400, 'Ошибка прикрепления логотипа');
+                }
+            }
 
             if (!empty($videoEnd) || !empty($videoStart)) {
                 $backgroundVideo = $generatorFiles->mergeVideo($resultName, $videoStart[0] ?? null, $videoEnd[0] ?? null);
@@ -171,21 +163,30 @@ class GeneratorVideo extends UserController
                 $resultName = $backgroundVideo['fileName'];
             }
 
+            if (isset($sound[0])) {
+                $voice = $generatorFiles->generatorMusic($fileNameVoice, $resultName, $timeVoice);
 
-//            if ($textData['status']) {
-//                $titers = $generatorFiles->generatorText();
-//
-//                if (!$titers) {
-//                    return $this->respondWithError(400, 'Ошибка наложения субтитров');
-//                }
-//            }
+                if (!$voice['status']) {
+                    return $this->respondWithError(400, 'Ошибка наложения фоновой музыки');
+                }
+
+                $resultName = $voice['fileName'];
+            }
+
+            if ($textData['status']) {
+                $titers = $generatorFiles->generatorText($resultName, '7_10');
+
+                if (!$titers['status']) {
+                    return $this->respondWithError(400, 'Ошибка наложения субтитров');
+                }
+
+                $resultName = $titers['fileName'];
+            }
+
+            return $this->respondWithError($e->getCode(), $e->getMessage());
 
         } catch (Exception $e) {
             return $this->respondWithError($e->getCode(), $e->getMessage());
         }
-
-//        $dataFileText = (new GeneratorFiles())->generatorTextForTitre($data['text']);
-
     }
-
 }
