@@ -67,7 +67,7 @@ class TestController extends UserController
         $generatorFiles = new GeneratorFiles($video['content_id']);
 
         $timeVoice = '54.648010530935';
-        if ($video['status_text'] == 'false' || $video['status_text'] == 'создано') {
+       // if ($video['status_text'] == 'false' || $video['status_text'] == 'создано') {
 
             TextVideo::changeTextStatus($video['text_id'], 'в обработке');
             $textData = $generatorFiles->generatorTextForTitre($video['text'], $video['text_id']);
@@ -78,7 +78,7 @@ class TestController extends UserController
                 TextVideo::changeTextStatus($video['text_id'], 'ошибка');
                 $this->respondWithError(400, 'Ошибка генерации субтитров');
             }
-        }
+       // }
 
         if ($video['type_background'] == 'slide_show') {
             $slideshow = $generatorFiles->generatorSladeShow($slides, $sound[0]['file_name'], $timeVoice);
