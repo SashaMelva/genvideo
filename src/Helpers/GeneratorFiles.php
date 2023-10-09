@@ -30,6 +30,7 @@ class GeneratorFiles
         // формируем, сохраняем файл субтитров .srt и конвертируем в .ass
         $length = file_put_contents(DIRECTORY_TEXT . $nameFiles . '.srt', $this->getFilesSrt($shortTextArray));
 
+        var_dump(DIRECTORY_TEXT);
         var_dump($length);
         if ($length !== false) {
             $ffmpeg = 'ffmpeg -i ' . DIRECTORY_TEXT . $nameFiles . '.srt -y ' . DIRECTORY_TEXT . $nameFiles . '.ass';
