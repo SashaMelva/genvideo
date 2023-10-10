@@ -2,13 +2,14 @@
 
 use Slim\Factory\AppFactory;
 use DI\ContainerBuilder;
-use Symfony\Component\Console\Input\ArgvInput;
 
 require __DIR__ . '/../vendor/autoload.php';
 
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../', '.env');
 $dotenv->load();
+
+
 define('PROJECT_DIR', dirname(__DIR__));
 const DIRECTORY_IMG = PROJECT_DIR .  DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'img' . DIRECTORY_SEPARATOR;
 define("RELATIVE_PATH_IMG", $_ENV['HOST'] . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'img' . DIRECTORY_SEPARATOR);
@@ -28,10 +29,6 @@ define("RELATIVE_PATH_ADDITIONAL_VIDEO", $_ENV['HOST'] . DIRECTORY_SEPARATOR . '
 
 const DIRECTORY_TEXT = PROJECT_DIR .  DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'subtitles' . DIRECTORY_SEPARATOR;
 define("RELATIVE_PATH_TEXT", $_ENV['HOST'] . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'subtitles' . DIRECTORY_SEPARATOR);
-
-//define('SPEECHKIT_CLOUD_API', 'feca5b7a-f5f8-4bfa-886c-203788aa86c4');
-//define('CAPTCHA_KEY', 'f5cf0a7dda3d34321cccd2d584ece075');
-
 
 try {
 

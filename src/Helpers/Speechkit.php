@@ -19,7 +19,7 @@ class Speechkit
     /**Генерируем Speechkit
      * @throws Exception|GuzzleException
      */
-    public function generator(string $text, string $fileName, array $voiceSetting)
+    public function generator(string $text, string $fileName, array $voiceSetting): array
     {
         try {
             $byte = mb_strlen($text, '8bit');
@@ -59,14 +59,15 @@ class Speechkit
                         unlink($item);
                     }
                 }
-                return $file['playtime_seconds'];
+
+                return ['status' => true, 'time' => $file['playtime_seconds']];
 
             } elseif (!empty($filesName)) {
                 foreach ($filesName as $item) {
                     unlink($item);
                 }
             }
-            return false;
+            return ['status' => false];
 
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
