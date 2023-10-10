@@ -80,8 +80,7 @@ class CollectionDataVideo extends UserController
                 }
             }
 
-            return $this->response->withHeader('Location', '/api/video/generate/' . $contentId);
-            // return $this->respondWithData('Success');
+             return $this->respondWithData('Success');
 
         } catch (Exception $e) {
             return $this->respondWithError($e->getCode(), $e->getMessage());
