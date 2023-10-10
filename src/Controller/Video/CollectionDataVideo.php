@@ -80,7 +80,7 @@ class CollectionDataVideo extends UserController
                 }
             }
 
-            return $this->response->withHeader('Location', '/api/video/generate/' . $contentId);
+            return $this->response->withHeader('Location', 'https://api.genvi.pro/api/video/generate/' . $contentId);
             // return $this->respondWithData('Success');
 
         } catch (Exception $e) {
