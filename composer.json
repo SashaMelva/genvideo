@@ -31,6 +31,7 @@
         "symfony/validator": "^5.4",
         "tuupola/slim-jwt-auth": "^3.7",
         "monolog/monolog": "^2.9",
+        "james-heinrich/getid3": "^1.9",
         "vlucas/phpdotenv": "^5.5"
     }
 }
