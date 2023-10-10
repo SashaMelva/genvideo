@@ -38,7 +38,7 @@ class LogoutUser extends UserController
                 $refrech_token = $cookies['refreshToken'];
                 $expires = time() - 3600;
                 $cookie[] = "refreshToken=$refrech_token; path=/api/auth; domain=.{$_ENV['HOST']}; maxAge=-3600; expires=$expires; HttpOnly";
-                return $this->respondWithData('Success', 200, $cookie);
+                return $this->respondWithData(['refresh_token' => $refrech_token], 200, $cookie);
 
             } catch (Exception $e) {
                 return $this->respondWithError($e->getCode(), $e->getMessage());

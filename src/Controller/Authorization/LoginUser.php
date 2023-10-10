@@ -47,7 +47,7 @@ class LoginUser extends UserController
 
                 $expires = $token_info['exp'];
                 $cookie[] = "refreshToken=$refrech_token; path=/api/auth; domain=.{$_ENV['HOST']}; maxAge=$expires; expires=$expires; HttpOnly";
-                return $this->respondWithData(['access_token' => $token], 200, $cookie);
+                return $this->respondWithData(['access_token' => $token, 'refresh_token' => $refrech_token], 200, $cookie);
 
             } else {
                 return $this->respondWithData(['password' => 'Не верно указан пароль'],400);

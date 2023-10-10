@@ -43,7 +43,7 @@ class RefreshToken extends UserController
 
             $expires = $token_info['exp'];
             $cookie[] = "refreshToken=$refreshToken; path=/api/auth; domain=.{$_ENV['HOST']}; maxAge=$expires; expires=$expires; HttpOnly";
-            return $this->respondWithData(['access_token' => $token], 200, $cookie);
+            return $this->respondWithData(['access_token' => $token, 'refresh_token' => $refreshToken], 200, $cookie);
 
         } catch (Throwable $e) {
             return $this->respondWithError(219);
