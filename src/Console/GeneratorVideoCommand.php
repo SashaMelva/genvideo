@@ -238,8 +238,9 @@ class GeneratorVideoCommand extends Command
                 $this->log->info('Видое склеились, имя файла ' . $resultName);
             }
 
-            if (!empty($fileNameVoice) && !empty($voiceData['time'])) {
-                $voice = $generatorFiles->generatorMusic($fileNameVoice, $resultName, $voiceData['time']);
+            if (!empty($fileNameVoice)) {
+
+                $voice = $generatorFiles->generatorMusic($fileNameVoice, $resultName);
 
                 if (!$voice['status']) {
                     ContentVideo::changeStatus($videoId, 5);
@@ -253,6 +254,7 @@ class GeneratorVideoCommand extends Command
             }
 
             if ($textData['status']) {
+
                 $titers = $generatorFiles->generatorText($resultName, '7_10');
 
                 if (!$titers['status']) {
