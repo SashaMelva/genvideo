@@ -56,7 +56,12 @@ class GeneratorVideoCommand extends Command
             $this->log->info('Задачи на генерацию: ' . json_encode($contentIds));
         }
 
-        var_dump($contentIds);
+        if (empty($contentIds)) {
+            $this->log->info('Нет задач на генерацию');
+            exec($cmd);
+            return 0;
+        }
+
         $videoId = $contentIds[0]->id;
 //        foreach ($contentIds as $videoId) {
 
