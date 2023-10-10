@@ -29,12 +29,18 @@ class GetInfoProject extends UserController
             try {
                 $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
 
+//                if ($token->user_id) {
+
                 $projectId = $this->request->getAttribute('id');
                 $project = Project::fullInfo((int)$projectId)[0];
 
                 $users = ListProject::findAllUsersInfoByProjectId((int)$projectId);
                 $project['users'] = $users ?? null;
                 return $this->respondWithData($project);
+
+//                } else {
+//                    return $this->respondWithError(215);
+//                }
 
             } catch (Throwable $e) {
                 return $this->respondWithError($e->getCode(), $e->getMessage());

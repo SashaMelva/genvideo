@@ -69,7 +69,7 @@ return static function(App $app):void
         $group->group('/video', function (RouteCollectorProxyInterface $group) {
             $group->post('/get-content-setting', GetCollectionDataSettingVideo::class);
             $group->post('/collection-data', CollectionDataVideo::class);
-            $group->get('/generate/{id:[0-9]+}', GeneratorVideo::class);
+            //$group->get('/generate/{id:[0-9]+}', GeneratorVideo::class);
 
 
             $group->get('/test', TestController::class);
@@ -83,9 +83,9 @@ return static function(App $app):void
             $group->post('/add-music', UploadMusic::class);
             $group->post('/add-video', UploadAdditionalVideo::class);
 
-            $group->get('/delete-image/{id:[0-9]+}', DeleteImage::class);
-            $group->get('/delete-sound/{id:[0-9]+}', DeleteMusic::class);
-            $group->get('/delete-video/{id:[0-9]+}', DeleteAdditionalVideo::class);
+//            $group->get('/delete-image/{id:[0-9]+}', DeleteImage::class);
+//            $group->get('/delete-sound/{id:[0-9]+}', DeleteMusic::class);
+//            $group->get('/delete-video/{id:[0-9]+}', DeleteAdditionalVideo::class);
         });
 
     });

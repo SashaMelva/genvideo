@@ -23,45 +23,45 @@ class UploadImage extends UserController
     {
         header('Access-Control-Allow-Origin: *');
         $data = $this->getFormData();
-//        $access_token = $this->request->getHeaderLine('token');
-//        $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
-//
-//        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
+        $access_token = $this->request->getHeaderLine('token');
+        $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
 
-        try {
+        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
 
-            $uploadedFiles = $this->request->getUploadedFiles();
-            $uploadedFile = $uploadedFiles['image'];
-            $fileNameImage = $data['project_id'] . '-' . date('Y_m_d_H_i_s');
+            try {
 
-            if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
+                $uploadedFiles = $this->request->getUploadedFiles();
+                $uploadedFile = $uploadedFiles['image'];
+                $fileNameImage = $data['project_id'] . '-' . date('Y_m_d_H_i_s');
 
-                if ($data['type_image'] == 'slide') {
-                    $filename = UploadFile::action(DIRECTORY_IMG, $uploadedFile, $fileNameImage);
-                    $filePath = RELATIVE_PATH_IMG . $filename;
+                if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
+
+                    if ($data['type_image'] == 'slide') {
+                        $filename = UploadFile::action(DIRECTORY_IMG, $uploadedFile, $fileNameImage);
+                        $filePath = RELATIVE_PATH_IMG . $filename;
+                    }
+
+                    if ($data['type_image'] == 'logo') {
+                        $filename = UploadFile::action(DIRECTORY_LOGO_IMG, $uploadedFile, $fileNameImage);
+                        $filePath = RELATIVE_PATH_LOGO_IMG . $filename;
+                    }
+
+                    if (empty($filename) || empty($filePath)) {
+                        return $this->respondWithError(400, 'Ошибка загрузки изображения');
+                    }
+
+                    $image = ImageVideo::addImage($filename, $filePath, $data['project_id'], $data['type_image']);
+
+                    return $this->respondWithData(['path' => $image->file_path, 'id' => $image->id]);
+                } else {
+                    return $this->respondWithError(400, 'Ошибка получения избражения. Код ошибки: ' . $uploadedFile->getError());
                 }
 
-                if ($data['type_image'] == 'logo') {
-                    $filename = UploadFile::action(DIRECTORY_LOGO_IMG, $uploadedFile, $fileNameImage);
-                    $filePath = RELATIVE_PATH_LOGO_IMG . $filename;
-                }
-
-                if (empty($filename) || empty($filePath)) {
-                    return $this->respondWithError(400, 'Ошибка загрузки изображения');
-                }
-
-                $image = ImageVideo::addImage($filename, $filePath, $data['project_id'], $data['type_image']);
-
-                return $this->respondWithData(['path' => $image->file_path, 'id' => $image->id]);
-            } else {
-                return $this->respondWithError(400, 'Ошибка получения избражения. Код ошибки: ' . $uploadedFile->getError());
+            } catch (Exception $e) {
+                return $this->respondWithError($e->getCode(), $e->getMessage());
             }
-
-        } catch (Exception $e) {
-            return $this->respondWithError($e->getCode(), $e->getMessage());
+        } else {
+            return $this->respondWithError(215);
         }
-//        } else {
-//            return $this->respondWithError(215);
-//        }
     }
 }

@@ -31,10 +31,10 @@ define("RELATIVE_PATH_TEXT", $_ENV['HOST'] . DIRECTORY_SEPARATOR . 'var' . DIREC
 try {
 
     /** @var ContainerInterface $container */
-    $container = require __DIR__ . '/../src/Config/container.php';
+    $container = require __DIR__ . '/../src/config/container.php';
 
     $cli = new Application('Console');
-    (require __DIR__ . '/../src/Config/eloquent_console.php')($cli, $container);
+    (require __DIR__ . '/../src/config/eloquent_console.php')($cli, $container);
 
     $cli->add(new GeneratorVideoCommand());
 
