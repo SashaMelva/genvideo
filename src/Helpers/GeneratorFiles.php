@@ -57,7 +57,7 @@ class GeneratorFiles
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         if (!is_null($errors)) {
-            return ['status' => false];
+            return ['status' => false, 'command' => $ffmpeg];
         }
 
         unlink(DIRECTORY_VIDEO . $videoName . '.mp4');
@@ -70,6 +70,7 @@ class GeneratorFiles
         $ffmpeg = $this->getSlideShowCode($images, $sound_name, $time);
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
+        var_dump($ffmpeg);
         if (!is_null($errors)) {
             return ['status' => false, 'command' => $ffmpeg];
         }
@@ -94,10 +95,9 @@ class GeneratorFiles
     public function generatorFormat(string $nameVideo, string $format): array
     {
         $resultName = $this->contentId . '_format';
-        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $nameVideo . '.mp4' . ' -vf "scale=100:-1,setdar=' . $format . '" ' . DIRECTORY_VIDEO . $resultName . '.mp4';
+        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $nameVideo . '.mp4' . ' -vf "scale=700:-1,setdar=' . $format . '" ' . DIRECTORY_VIDEO . $resultName . '.mp4';
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
-        var_dump($ffmpeg);
         if (!is_null($errors)) {
             return ['status' => false];
         }
@@ -113,6 +113,7 @@ class GeneratorFiles
         $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -i ' . DIRECTORY_BACKGROUND . $nameFileBackground . ' -filter_complex "[0:v][1:v]overlay=0:0" -codec:a copy -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
+        var_dump($ffmpeg);
         if (!is_null($errors)) {
             return ['status' => false];
         }
@@ -145,7 +146,7 @@ class GeneratorFiles
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         if (!is_null($errors)) {
-            return ['status' => false];
+            return ['status' => false, 'command' => $ffmpeg];
         }
 
         unlink(DIRECTORY_VIDEO . $videoName . '.mp4');

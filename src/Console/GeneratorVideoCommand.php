@@ -274,6 +274,7 @@ class GeneratorVideoCommand extends Command
 
                 if (!$voice['status']) {
                     ContentVideo::changeStatus($videoId, 5);
+                    $this->log->error($voice['command']);
                     $this->log->error('Ошибка наложения озвучки текста');
                     exec($cmd);
                     return 0;
