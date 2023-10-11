@@ -31,25 +31,24 @@ class UploadAdditionalVideo extends UserController
             try {
 
                 $uploadedFiles = $this->request->getUploadedFiles();
+                $uploadedFile = $uploadedFiles['video'];
+                $fileNameMusic = $data['project_id'] . '-' . date('Y_m_d_H_i_s');
 
-                foreach ($uploadedFiles['video'] as $key => $uploadedFile) {
+                if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
 
-                    if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
 
-                        $fileNameMusic = $data['project_id'] . '-' . $key . '_' .date('Y_m_d_H_i_s');
-                        $filename = UploadFile::action(DIRECTORY_ADDITIONAL_VIDEO, $uploadedFile, $fileNameMusic);
-                        $filePath = RELATIVE_PATH_ADDITIONAL_VIDEO . $filename;
+                    $filename = UploadFile::action(DIRECTORY_ADDITIONAL_VIDEO, $uploadedFile, $fileNameMusic);
+                    $filePath = RELATIVE_PATH_ADDITIONAL_VIDEO . $filename;
 
-                        if (empty($filename) || empty($filePath)) {
-                            return $this->respondWithError(400, 'Ошибка загрузки видео');
-                        }
-
-                        $video = AdditionalVideo::addVideo($filename, $filePath, '00:00', $data['project_id'], $data['type_video']);
-                        return $this->respondWithData(['path' => $video->file_path, 'id' => $video->id]);
-
-                    } else {
-                        return $this->respondWithError(400, 'Ошибка получения видео. Код ошибки: ' . $uploadedFile->getError());
+                    if (empty($filename) || empty($filePath)) {
+                        return $this->respondWithError(400, 'Ошибка загрузки видео');
                     }
+
+                    $video = AdditionalVideo::addVideo($filename, $filePath, '00:00', $data['project_id'], $data['type_video']);
+                    return $this->respondWithData(['path' => $video->file_path, 'id' => $video->id]);
+
+                } else {
+                    return $this->respondWithError(400, 'Ошибка получения видео. Код ошибки: ' . $uploadedFile->getError());
                 }
 
             } catch (Exception $e) {
