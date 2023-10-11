@@ -254,7 +254,7 @@ class GeneratorFiles
             $v .= "[v{$i}]";
         }
 
-        $v = $v . 'concat=n=' . count($arr_images) . ':v=1:a=0,format=yuv422p[v]" -map "[v]" -map ' . count($arr_images) . ':a -shortest -y ' . DIRECTORY_VIDEO . $number . '.mp4';
+        $v = $v . ' concat=n=' . count($arr_images) . ':v=1:a=0,format=yuv422p[v]" -map "[v]" -map ' . count($arr_images) . ':a -shortest -y ' . DIRECTORY_VIDEO . $number . '.mp4';
 
         return 'ffmpeg' . $images . $sound . '-filter_complex "' . $scale . $v;
     }
