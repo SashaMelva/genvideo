@@ -33,8 +33,8 @@ class UploadImage extends UserController
                 $uploadedFiles = $this->request->getUploadedFiles();
                 $fileNameImage = $data['project_id'] . '_' . date('Y_m_d_H_i_s') . '_' . floor(microtime(true) * 1000);
 
-                var_dump($uploadedFiles);
-                exit();
+                return $this->respondWithData($uploadedFiles);
+
                 foreach ($uploadedFiles['image'] as $uploadedFile) {
                     if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
 
