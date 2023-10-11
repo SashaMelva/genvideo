@@ -68,6 +68,7 @@ class GeneratorFiles
     public function generatorSladeShow(array $images, string $sound_name, string $time): array
     {
         $ffmpeg = $this->getSlideShowCode($images, $sound_name, $time);
+        var_dump($ffmpeg);
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         if (!is_null($errors)) {
