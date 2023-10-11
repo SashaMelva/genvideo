@@ -126,7 +126,6 @@ class GeneratorVideoCommand extends Command
 
                 $voiceData = (new Speechkit())->generator($video['text'], $fileNameVoice, $voiceSetting);
 
-                var_dump($voiceData);
                 if ($voiceData['status']) {
 
                     TextVideo::changeTextStatus($video['text_id'], 'обработано');
@@ -150,7 +149,7 @@ class GeneratorVideoCommand extends Command
 
                 if ($textData['status']) {
 
-                    TextVideo::updateFileText($video['text_id'], $textData['name'], $textData['path'],'успех');
+                    TextVideo::updateFileText($video['text_id'], $textData['name'], $textData['path'], 'успех');
                     $this->log->info('Успех генерации субтитров, id текста ' . $video['text_id']);
 
                 } else {
@@ -164,19 +163,33 @@ class GeneratorVideoCommand extends Command
             }
 
             $voiceData['time'] = '77.232007453416';
-            if ($video['type_background'] == 'slide_show' && !empty($voiceData['time'])) {
-                var_dump($slides);
-                $slideshow = $generatorFiles->generatorSladeShow($slides, $sound[0]['file_name'], $voiceData['time']);
+            var_dump($slides);
+            var_dump($logo);
+            var_dump($videoBackground);
+            var_dump($videoStart);
+            var_dump($videoEnd);
 
-                if (!$slideshow['status']) {
+            if ($video['type_background'] == 'slide_show' && !empty($voiceData['time'])) {
+
+                if (!empty($slides)) {
+
+                    $slideshow = $generatorFiles->generatorSladeShow($slides, $sound[0]['file_name'], $voiceData['time']);
+
+                    if (!$slideshow['status']) {
+                        ContentVideo::changeStatus($videoId, 5);
+                        $this->log->error('Ошибка генерации слайдшоу');
+                        exec($cmd);
+                        return 0;
+                    }
+
+                    $resultName = $slideshow['fileName'];
+                    $this->log->info('Сдайдшоу сгенерировано, имя файла ' . $resultName);
+                } else {
                     ContentVideo::changeStatus($videoId, 5);
-                    $this->log->error('Ошибка генерации слайдшоу');
+                    $this->log->error('Изображения не загружены');
                     exec($cmd);
                     return 0;
                 }
-
-                $resultName = $slideshow['fileName'];
-                $this->log->info('Сдайдшоу сгенерировано, имя файла ' . $resultName);
             }
 
             if ($video['type_background'] == 'video' && !empty($voiceData['time'])) {
