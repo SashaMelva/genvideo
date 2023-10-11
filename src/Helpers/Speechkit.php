@@ -85,19 +85,20 @@ class Speechkit
 
             foreach ($Mp3Files as $key => $item) {
 
-                $response = $this->response($item, $voiceSetting);
-                var_dump(DIRECTORY_SPEECHKIT);
-                $length = file_put_contents(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3', $response);
+//                $response = $this->response($item, $voiceSetting);
+//                $length = file_put_contents(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3', $response);
 
-                if (!$length) {
-                    return ['status' => false, 'files' => []];
-                }
+//                if (!$length) {
+//                    return ['status' => false, 'files' => []];
+//                }
 
                 $tmp_array[] = DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3';
             }
 
             $voices = implode('|', $tmp_array);
 
+            $errors = shell_exec('chown -R www-data:www-data /var/www/genvideo/api/var/resources/music/speechkit');
+            var_dump($errors);
             $ffmpeg = 'ffmpeg -i "concat:' . $voices . '" -acodec copy -c:a libmp3lame ' . DIRECTORY_SPEECHKIT . $number . '.mp3';
             $errors = shell_exec('-hide_banner -loglevel error 2>&1');
 
