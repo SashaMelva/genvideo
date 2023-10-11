@@ -161,6 +161,7 @@ class GeneratorVideoCommand extends Command
                     return 0;
                 }
             }
+            $voiceData['time'] = '33.264017291066';
 
             if ($video['type_background'] == 'slide_show' && !empty($voiceData['time'])) {
 
