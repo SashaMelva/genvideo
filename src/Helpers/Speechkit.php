@@ -27,7 +27,7 @@ class Speechkit
             $result = false;
             $filesName = [];
 
-           #TODO разбить текст по словам, а не по битам
+            #TODO разбить текст по словам, а не по битам
             if ($byte <= 250) {
                 $response = $this->response($byte, $voiceSetting);
                 $length = file_put_contents($filePath, $response);
@@ -57,17 +57,17 @@ class Speechkit
                 $seconds = $file['playtime_seconds'];
 
                 if (isset($seconds) && !empty($filesName)) {
-                    foreach ($filesName as $item) {
-                        unlink($item);
-                    }
+//                    foreach ($filesName as $item) {
+//                        unlink($item);
+//                    }
                 }
 
                 return ['status' => true, 'time' => $file['playtime_seconds']];
 
             } elseif (!empty($filesName)) {
-                foreach ($filesName as $item) {
-                    unlink($item);
-                }
+//                foreach ($filesName as $item) {
+//                    unlink($item);
+//                }
             }
             return ['status' => false];
 
@@ -98,10 +98,10 @@ class Speechkit
 
             $voices = implode('|', $tmp_array);
 
-            $errors = shell_exec('chown -R www-data:www-data /var/www/genvideo/api/var/resources/music/speechkit');
-            var_dump($errors);
+//            $errors = shell_exec('chown -R www-data:www-data /var/www/genvideo/api/var/resources/music/speechkit');
+//            var_dump($errors);
             $ffmpeg = 'ffmpeg -i "concat:' . $voices . '" -acodec copy -c:a libmp3lame ' . DIRECTORY_SPEECHKIT . $number . '.mp3';
-            $errors = shell_exec(' -hide_banner -loglevel error 2>&1');
+            $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
             var_dump($ffmpeg);
             var_dump($errors);

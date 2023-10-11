@@ -150,14 +150,14 @@ class GeneratorFiles
 
         if (!is_null($nameVideoStart)) {
             $fileNameStart = str_replace('.mp4', '', $nameVideoStart);
-            if ($this->mpegtsFiles($fileNameStart, DIRECTORY_ADDITIONAL_VIDEO)) {
+            if ($this->mergeFiles($fileNameStart, DIRECTORY_ADDITIONAL_VIDEO)) {
                 $ffmpeg .= DIRECTORY_ADDITIONAL_VIDEO . $fileNameStart . '.ts' . '|';
             } else {
                 return ['status' => false];
             }
         }
 
-        if ($this->mpegtsFiles($nameVideoContent, DIRECTORY_VIDEO)) {
+        if ($this->mergeFiles($nameVideoContent, DIRECTORY_VIDEO)) {
             $ffmpeg .= DIRECTORY_VIDEO . $nameVideoContent . '.ts';
         } else {
             return ['status' => false];
@@ -166,7 +166,7 @@ class GeneratorFiles
 
         if (!is_null($nameVideoEnd)) {
             $fileNameEnd = str_replace('.mp4', '', $nameVideoEnd);
-            if ($this->mpegtsFiles($fileNameEnd, DIRECTORY_ADDITIONAL_VIDEO)) {
+            if ($this->mergeFiles($fileNameEnd, DIRECTORY_ADDITIONAL_VIDEO)) {
                 $ffmpeg .= '|' . DIRECTORY_ADDITIONAL_VIDEO . $fileNameEnd;
             } else {
                 return ['status' => false];
@@ -183,7 +183,7 @@ class GeneratorFiles
         return ['fileName' => $this->contentId, 'status' => true];
     }
 
-    private function mpegtsFiles(string $fileName, string $directory): bool
+    private function mergeFiles(string $fileName, string $directory): bool
     {
 
         $ffmpeg = 'ffmpeg -i ' . $directory . $fileName . '.mp4' . ' -acodec copy -vcodec copy -vbsf h264_mp4toannexb -f mpegts ' . $directory . $fileName . '.ts';
