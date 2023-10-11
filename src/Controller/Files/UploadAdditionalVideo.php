@@ -32,7 +32,7 @@ class UploadAdditionalVideo extends UserController
 
                 $uploadedFiles = $this->request->getUploadedFiles();
                 $uploadedFile = $uploadedFiles['video'];
-                $fileNameMusic = $data['project_id'] . '_' . date('Y_m_d_H_i_s') . '_' . floor(microtime(true) * 1000);
+                $fileNameMusic = password_hash(date('Y_m_d_H_i_s'), PASSWORD_DEFAULT) . '_' . $data['project_id'] . '_' . date('Y_m_d_H_i_s') . '_' . floor(microtime(true) * 1000);
 
                 if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
 
