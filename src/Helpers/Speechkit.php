@@ -50,11 +50,9 @@ class Speechkit
                 $filePath = DIRECTORY_SPEECHKIT . $fileName . '.mp3';
             }
             if ($result) {
-                var_dump($filePath);
                 // узнать длину звуковой дорожки
                 $getID3 = new getID3;
                 $file = $getID3->analyze($filePath);
-                var_dump($file);
                 $seconds = $file['playtime_seconds'];
 
                 if (isset($seconds) && !empty($filesName)) {
