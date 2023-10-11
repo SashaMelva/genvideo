@@ -163,6 +163,7 @@ class GeneratorVideoCommand extends Command
                 }
             }
 
+            $voiceData['time'] = '77.232007453416';
             if ($video['type_background'] == 'slide_show' && !empty($voiceData['time'])) {
                 var_dump($slides);
                 $slideshow = $generatorFiles->generatorSladeShow($slides, $sound[0]['file_name'], $voiceData['time']);
