@@ -27,15 +27,22 @@ class TestController extends UserController
 
     public function action(): ResponseInterface
     {
-        $getID3 = new getID3;
-        $file = $getID3->analyze($filePath);
-        $seconds = $file['playtime_seconds'];
+        $data = [];
 
-        var_dump($file);
-        var_dump($seconds);
+        $videoName = '7_result1';
+        $resultName = 7 . '_mobile';
 
-//        $videoId = 7;
-//        $video = ContentVideo::findAllDataByID($videoId);
+
+        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4' . ' -vf "scale=100:-1,setdar=9/16" ' . DIRECTORY_VIDEO . $resultName . '1.mp4';
+        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+
+        var_dump($ffmpeg);
+        if (is_null($errors)) {
+            $data['status'] = true;
+        }
+
+        var_dump($data);
+
 //        $images = ListImage::findAllByContentId($video['content_id']);
 //
 //        $logo = [];

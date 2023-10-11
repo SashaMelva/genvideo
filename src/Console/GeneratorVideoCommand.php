@@ -177,6 +177,7 @@ class GeneratorVideoCommand extends Command
 
                     $resultName = $slideshow['fileName'];
                     $this->log->info('Сдайдшоу сгенерировано, имя файла ' . $resultName);
+
                 } else {
                     ContentVideo::changeStatus($videoId, 5);
                     $this->log->error('Изображения не загружены');
@@ -208,7 +209,18 @@ class GeneratorVideoCommand extends Command
                 }
             }
 
-            if (!is_null($video['color_background_id'])) {
+            if ($video['content_format'] == '9/16' && !empty($resultName)) {
+                $formatVideo = $generatorFiles->generatorFormat($resultName, $video['content_format']);
+
+                if (!$formatVideo['status']) {
+                    ContentVideo::changeStatus($videoId, 5);
+                    $this->log->error('Ошибка преобразования формата видео');
+                    exec($cmd);
+                    return 0;
+                }
+            }
+
+            if (!is_null($video['color_background_id']) && !empty($resultName)) {
 
                 $colorBackground = ColorBackground::findById((int)$video['color_background_id']);
                 $background = $generatorFiles->generatorBackground($colorBackground['file_name'], $resultName);

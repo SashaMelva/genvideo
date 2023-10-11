@@ -60,7 +60,7 @@ class GeneratorFiles
             return ['status' => false];
         }
 
-        unlink( DIRECTORY_VIDEO . $videoName . '.mp4');
+        unlink(DIRECTORY_VIDEO . $videoName . '.mp4');
         return ['fileName' => $resultName, 'status' => true];
     }
 
@@ -70,6 +70,8 @@ class GeneratorFiles
         $ffmpeg = $this->getSlideShowCode($images, $sound_name, $time);
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
+
+        var_dump($ffmpeg);
         if (!is_null($errors)) {
             return ['status' => false];
         }
@@ -90,6 +92,22 @@ class GeneratorFiles
         return ['fileName' => $this->contentId, 'status' => true];
     }
 
+    /**Генерируем видео с нужного формата*/
+    public function generatorFormat(string $nameVideo, string $format): array
+    {
+        $resultName = $this->contentId . '_format';
+        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $nameVideo . '.mp4' . ' -vf "scale=100:-1,setdar=' . $format . '" ' . DIRECTORY_VIDEO . $resultName . '.mp4';
+        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+
+        var_dump($ffmpeg);
+        if (!is_null($errors)) {
+            return ['status' => false];
+        }
+
+        unlink(DIRECTORY_VIDEO . $nameVideo . '.mp4');
+        return ['fileName' => $resultName, 'status' => true];
+    }
+
     /**Генерируем фон*/
     public function generatorBackground(string $nameFileBackground, string $videoName): array
     {
@@ -101,7 +119,7 @@ class GeneratorFiles
             return ['status' => false];
         }
 
-        unlink( DIRECTORY_VIDEO . $videoName . '.mp4');
+        unlink(DIRECTORY_VIDEO . $videoName . '.mp4');
         return ['fileName' => $resultName, 'status' => true];
     }
 
@@ -116,7 +134,7 @@ class GeneratorFiles
             return ['status' => false];
         }
 
-        unlink( DIRECTORY_VIDEO . $videoName . '.mp4');
+        unlink(DIRECTORY_VIDEO . $videoName . '.mp4');
         return ['fileName' => $resultName, 'status' => true];
     }
 
@@ -132,7 +150,7 @@ class GeneratorFiles
             return ['status' => false];
         }
 
-        unlink( DIRECTORY_VIDEO . $videoName . '.mp4');
+        unlink(DIRECTORY_VIDEO . $videoName . '.mp4');
         return ['fileName' => $resultName, 'status' => true];
     }
 
@@ -239,6 +257,7 @@ class GeneratorFiles
         }
 
         $v = $v . 'concat=n=' . count($arr_images) . ':v=1:a=0,format=yuv422p[v]" -map "[v]" -map ' . count($arr_images) . ':a -shortest -y ' . DIRECTORY_VIDEO . $number . '.mp4';
+
         return 'ffmpeg' . $images . $sound . '-filter_complex "' . $scale . $v;
     }
 
