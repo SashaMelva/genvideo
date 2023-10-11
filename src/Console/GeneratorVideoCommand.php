@@ -130,7 +130,7 @@ class GeneratorVideoCommand extends Command
                 if ($voiceData['status']) {
 
                     TextVideo::changeTextStatus($video['text_id'], 'обработано');
-                    TextVideo::updateFileVoice($video['text_id'], $fileNameVoice, RELATIVE_PATH_SPEECHKIT . $fileNameVoice . '.' . $voiceSetting['format'], true, $voiceData['time']);
+                    TextVideo::updateFileVoice($video['text_id'], $fileNameVoice, RELATIVE_PATH_SPEECHKIT . $fileNameVoice . '.' . $voiceSetting['format'], 'успех', $voiceData['time']);
                     $this->log->info('Успех генерации аудио озвучки, id текста ' . $video['text_id']);
 
                 } else {
@@ -150,7 +150,7 @@ class GeneratorVideoCommand extends Command
 
                 if ($textData['status']) {
 
-                    TextVideo::changeTextStatus($video['text_id'], 'обработано');
+                    TextVideo::updateFileText($video['text_id'], $textData['name'], $textData['path'],'успех');
                     $this->log->info('Успех генерации субтитров, id текста ' . $video['text_id']);
 
                 } else {
@@ -164,6 +164,7 @@ class GeneratorVideoCommand extends Command
             }
 
             if ($video['type_background'] == 'slide_show' && !empty($voiceData['time'])) {
+                var_dump($slides);
                 $slideshow = $generatorFiles->generatorSladeShow($slides, $sound[0]['file_name'], $voiceData['time']);
 
                 if (!$slideshow['status']) {
