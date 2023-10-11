@@ -209,17 +209,6 @@ class GeneratorVideoCommand extends Command
                 }
             }
 
-            if ($video['content_format'] == '9/16' && !empty($resultName)) {
-                $formatVideo = $generatorFiles->generatorFormat($resultName, $video['content_format']);
-
-                if (!$formatVideo['status']) {
-                    ContentVideo::changeStatus($videoId, 5);
-                    $this->log->error('Ошибка преобразования формата видео');
-                    exec($cmd);
-                    return 0;
-                }
-            }
-
             if (!is_null($video['color_background_id']) && !empty($resultName)) {
 
                 $colorBackground = ColorBackground::findById((int)$video['color_background_id']);
@@ -234,6 +223,20 @@ class GeneratorVideoCommand extends Command
 
                 $resultName = $background['fileName'];
                 $this->log->info('Фоновое изображение наложено, имя файла ' . $resultName);
+            }
+
+            if ($video['content_format'] == '9/16' && !empty($resultName)) {
+                $formatVideo = $generatorFiles->generatorFormat($resultName, $video['content_format']);
+
+                if (!$formatVideo['status']) {
+                    ContentVideo::changeStatus($videoId, 5);
+                    $this->log->error('Ошибка преобразования формата видео');
+                    exec($cmd);
+                    return 0;
+                }
+
+                $resultName = $formatVideo['fileName'];
+                $this->log->info('Успех преобразования формата видео, имя файла ' . $resultName);
             }
 
             if (!empty($logo)) {
