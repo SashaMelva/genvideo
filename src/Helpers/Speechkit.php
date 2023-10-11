@@ -58,17 +58,17 @@ class Speechkit
                 $seconds = $file['playtime_seconds'];
 
                 if (isset($seconds) && !empty($filesName)) {
-//                    foreach ($filesName as $item) {
-//                        unlink($item);
-//                    }
+                    foreach ($filesName as $item) {
+                        unlink($item);
+                    }
                 }
 
                 return ['status' => true, 'time' => $file['playtime_seconds']];
 
             } elseif (!empty($filesName)) {
-//                foreach ($filesName as $item) {
-//                    unlink($item);
-//                }
+                foreach ($filesName as $item) {
+                    unlink($item);
+                }
             }
             return ['status' => false];
 
@@ -101,10 +101,6 @@ class Speechkit
 
             $ffmpeg = 'ffmpeg -i "concat:' . $voices . '" -acodec copy -c:a libmp3lame ' . DIRECTORY_SPEECHKIT . $number . '.mp3';
             $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
-
-            if (!is_null($errors)) {
-                return ['status' => false, 'files' => $tmp_array];
-            }
 
             return ['status' => true, 'files' => $tmp_array];
         } catch (Exception $e) {
