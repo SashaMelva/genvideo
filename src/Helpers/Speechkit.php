@@ -86,12 +86,12 @@ class Speechkit
 
             foreach ($Mp3Files as $key => $item) {
 
-//                $response = $this->response($item, $voiceSetting);
-//                $length = file_put_contents(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3', $response);
+                $response = $this->response($item, $voiceSetting);
+                $length = file_put_contents(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3', $response);
 
-//                if (!$length) {
-//                    return ['status' => false, 'files' => []];
-//                }
+                if (!$length) {
+                    return ['status' => false, 'files' => []];
+                }
 
                 $tmp_array[] = DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3';
             }
