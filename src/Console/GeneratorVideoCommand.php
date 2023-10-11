@@ -286,11 +286,12 @@ class GeneratorVideoCommand extends Command
 
             if ($textData['status']) {
 
-                $titers = $generatorFiles->generatorText($resultName, '7_10');
+                $titers = $generatorFiles->generatorText($resultName,  $textData['name']);
 
                 if (!$titers['status']) {
                     ContentVideo::changeStatus($videoId, 5);
                     $this->log->error('Ошибка наложения субтитров');
+                    $this->log->error($titers['command']);
                     exec($cmd);
                     return 0;
                 }
