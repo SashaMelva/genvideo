@@ -168,6 +168,7 @@ class GeneratorVideoCommand extends Command
                 if (!empty($slides)) {
 
                     $slideshow = $generatorFiles->generatorSladeShow($slides, $sound[0]['file_name'], $voiceData['time']);
+                    $this->log->error($slideshow['command']);
 
                     if (!$slideshow['status']) {
                         ContentVideo::changeStatus($videoId, 5);
