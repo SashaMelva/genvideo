@@ -162,13 +162,6 @@ class GeneratorVideoCommand extends Command
                 }
             }
 
-            $voiceData['time'] = '77.232007453416';
-            var_dump($slides);
-            var_dump($logo);
-            var_dump($videoBackground);
-            var_dump($videoStart);
-            var_dump($videoEnd);
-
             if ($video['type_background'] == 'slide_show' && !empty($voiceData['time'])) {
 
                 if (!empty($slides)) {

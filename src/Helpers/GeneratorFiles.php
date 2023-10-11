@@ -68,7 +68,6 @@ class GeneratorFiles
     public function generatorSladeShow(array $images, string $sound_name, string $time): array
     {
         $ffmpeg = $this->getSlideShowCode($images, $sound_name, $time);
-        var_dump($ffmpeg);
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         if (!is_null($errors)) {
@@ -82,7 +81,6 @@ class GeneratorFiles
     public function generatorBackgroundVideoAndMusic(string $nameVideo, string $sound_name, string $time): array
     {
         $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 ' . DIRECTORY_VIDEO . $this->contentId . '_1.mp4';
-        var_dump($ffmpeg);
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         if (!is_null($errors)) {
@@ -184,7 +182,6 @@ class GeneratorFiles
     {
 
         $ffmpeg = 'ffmpeg -i ' . $directory . $fileName . '.mp4' . ' -acodec copy -vcodec copy -vbsf h264_mp4toannexb -f mpegts ' . $directory . $fileName . '.ts';
-        var_dump($ffmpeg);
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         if (!is_null($errors)) {
