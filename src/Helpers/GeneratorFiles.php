@@ -74,7 +74,6 @@ class GeneratorFiles
         var_dump($ffmpeg);
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
-        var_dump($errors);
         if (!is_null($errors)) {
             return ['status' => false];
         }

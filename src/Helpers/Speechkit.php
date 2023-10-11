@@ -47,6 +47,7 @@ class Speechkit
                 $data = $this->SplitMp3($descArray[0], $fileName, $voiceSetting);
                 $filesName = $data['files'];
                 $result = $data['status'];
+                $filePath = DIRECTORY_SPEECHKIT . $fileName . '.mp3';
             }
             if ($result) {
                 // узнать длину звуковой дорожки
@@ -85,9 +86,10 @@ class Speechkit
             foreach ($Mp3Files as $key => $item) {
 
                 $response = $this->response($item, $voiceSetting);
-
+                var_dump(DIRECTORY_SPEECHKIT);
                 $length = file_put_contents(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3', $response);
-                if ($length == false) {
+
+                if (!$length) {
                     return ['status' => false, 'files' => []];
                 }
 
@@ -115,7 +117,7 @@ class Speechkit
      * @throws GuzzleException
      * @throws Exception
      */
-    private function response(string $text, array $voiceSetting): bool|string
+    private function response(string $text, array $voiceSetting)
     {
         try {
             $token = 't1.9euelZrJkZ2ZlMePko_PyJvHkJGcyO3rnpWamJiTmpbNnImPnZPPjMbHnJDl8_dnYWZW-e9HSyRW_d3z9ycQZFb570dLJFb9zef1656VmpqWjJDPzZDNz46bjciTnJjG7_zF656VmpqWjJDPzZDNz46bjciTnJjG.8Bw36tFLWHySeXQFiHG7HORpLG-I5wdR2el2uDGVJgM0DJ_Hbf1NuiaWcoyXL9gmAVcJiRImyFWkQOJGSmWXCg';
@@ -136,6 +138,7 @@ class Speechkit
                     ]
                 ]);
 
+            var_dump($response->getStatusCode());
             if ($response->getStatusCode() !== 200) {
                 return false;
             }
