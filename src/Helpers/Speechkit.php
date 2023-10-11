@@ -54,20 +54,21 @@ class Speechkit
                 // узнать длину звуковой дорожки
                 $getID3 = new getID3;
                 $file = $getID3->analyze($filePath);
+                var_dump($file);
                 $seconds = $file['playtime_seconds'];
 
                 if (isset($seconds) && !empty($filesName)) {
-                    foreach ($filesName as $item) {
-                        unlink($item);
-                    }
+//                    foreach ($filesName as $item) {
+//                        unlink($item);
+//                    }
                 }
 
                 return ['status' => true, 'time' => $file['playtime_seconds']];
 
             } elseif (!empty($filesName)) {
-                foreach ($filesName as $item) {
-                    unlink($item);
-                }
+//                foreach ($filesName as $item) {
+//                    unlink($item);
+//                }
             }
             return ['status' => false];
 
