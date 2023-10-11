@@ -113,7 +113,7 @@ class Speechkit
     private function response(string $text, array $voiceSetting)
     {
         try {
-            $token = 't1.9euelZrJkZ2ZlMePko_PyJvHkJGcyO3rnpWamJiTmpbNnImPnZPPjMbHnJDl8_dnYWZW-e9HSyRW_d3z9ycQZFb570dLJFb9zef1656VmpqWjJDPzZDNz46bjciTnJjG7_zF656VmpqWjJDPzZDNz46bjciTnJjG.8Bw36tFLWHySeXQFiHG7HORpLG-I5wdR2el2uDGVJgM0DJ_Hbf1NuiaWcoyXL9gmAVcJiRImyFWkQOJGSmWXCg';
+            $token = 't1.9euelZqOlcbOlJeRx5XHiZyaypaZyu3rnpWamJiTmpbNnImPnZPPjMbHnJDl9PcqdmNW-e8QdEyl3fT3aiRhVvnvEHRMpc3n9euelZqeiY-VyY-ZlpaPzJuLx4uQnu_8xeuelZqeiY-VyY-ZlpaPzJuLx4uQng.htlvdfBTaHG5ejRlpNNIv_Uso9JUgRki0QkD_FOfks0gXlkL0TjrBpRA_8iL1nNbGEvVW94_9c5A92lM8tLsCQ';
             $response = $this->client->post('https://tts.api.cloud.yandex.net/speech/v1/tts:synthesize',
                 [
                     'headers' => [
