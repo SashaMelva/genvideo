@@ -32,7 +32,7 @@ class UploadImage extends UserController
 
                 $uploadedFiles = $this->request->getUploadedFiles();
                 $uploadedFile = $uploadedFiles['image'];
-                $fileNameImage = password_hash(date('Y_m_d_H_i_s'), PASSWORD_DEFAULT) . '_' . $data['project_id'] . '_' . date('Y_m_d_H_i_s') . '_' . floor(microtime(true) * 1000);
+                $fileNameImage = $data['project_id'] . '_' . date('Y_m_d_H_i_s') . '_' . floor(microtime(true) * 1000);
 
                 if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
 
