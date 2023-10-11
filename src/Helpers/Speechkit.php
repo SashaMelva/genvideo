@@ -87,24 +87,24 @@ class Speechkit
 
             foreach ($Mp3Files as $key => $item) {
 
-//                $response = $this->response($item, $voiceSetting);
-//                $length = file_put_contents(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3', $response);
-//
-//                if (!$length) {
-//                    return ['status' => false, 'files' => []];
-//                }
+                $response = $this->response($item, $voiceSetting);
+                $length = file_put_contents(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3', $response);
+
+                if (!$length) {
+                    return ['status' => false, 'files' => []];
+                }
 
                 $tmp_array[] = DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3';
             }
 
-//            $voices = implode('|', $tmp_array);
-//
-//            $ffmpeg = 'ffmpeg -i "concat:' . $voices . '" -acodec copy -c:a libmp3lame ' . DIRECTORY_SPEECHKIT . $number . '.mp3';
-//            $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+            $voices = implode('|', $tmp_array);
 
-//            if (!is_null($errors)) {
-//                return ['status' => false, 'files' => $tmp_array];
-//            }
+            $ffmpeg = 'ffmpeg -i "concat:' . $voices . '" -acodec copy -c:a libmp3lame ' . DIRECTORY_SPEECHKIT . $number . '.mp3';
+            $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+
+            if (!is_null($errors)) {
+                return ['status' => false, 'files' => $tmp_array];
+            }
 
             return ['status' => true, 'files' => $tmp_array];
         } catch (Exception $e) {
