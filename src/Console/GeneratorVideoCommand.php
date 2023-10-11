@@ -126,6 +126,7 @@ class GeneratorVideoCommand extends Command
 
                 $voiceData = (new Speechkit())->generator($video['text'], $fileNameVoice, $voiceSetting);
 
+                var_dump($voiceData);
                 if ($voiceData['status']) {
 
                     TextVideo::changeTextStatus($video['text_id'], 'обработано');

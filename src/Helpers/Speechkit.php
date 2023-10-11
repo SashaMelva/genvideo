@@ -45,11 +45,13 @@ class Speechkit
                 preg_match_all("/(.{1,$l})[ \n\r\t]+/", $desc, $descArray);
 
                 $data = $this->SplitMp3($descArray[0], $fileName, $voiceSetting);
+                var_dump($data);
                 $filesName = $data['files'];
                 $result = $data['status'];
                 $filePath = DIRECTORY_SPEECHKIT . $fileName . '.mp3';
             }
             if ($result) {
+                var_dump($filePath);
                 // узнать длину звуковой дорожки
                 $getID3 = new getID3;
                 $file = $getID3->analyze($filePath);
@@ -103,7 +105,7 @@ class Speechkit
             $errors = shell_exec('-hide_banner -loglevel error 2>&1');
 
             var_dump($ffmpeg);
-
+            var_dump($errors);
             if (!is_null($errors)) {
                 return ['status' => false, 'files' => $tmp_array];
             }
