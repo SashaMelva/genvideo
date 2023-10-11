@@ -45,7 +45,6 @@ class Speechkit
                 preg_match_all("/(.{1,$l})[ \n\r\t]+/", $desc, $descArray);
 
                 $data = $this->SplitMp3($descArray[0], $fileName, $voiceSetting);
-                var_dump($data);
                 $filesName = $data['files'];
                 $result = $data['status'];
                 $filePath = DIRECTORY_SPEECHKIT . $fileName . '.mp3';
@@ -102,7 +101,7 @@ class Speechkit
             $errors = shell_exec('chown -R www-data:www-data /var/www/genvideo/api/var/resources/music/speechkit');
             var_dump($errors);
             $ffmpeg = 'ffmpeg -i "concat:' . $voices . '" -acodec copy -c:a libmp3lame ' . DIRECTORY_SPEECHKIT . $number . '.mp3';
-            $errors = shell_exec('-hide_banner -loglevel error 2>&1');
+            $errors = shell_exec(' -hide_banner -loglevel error 2>&1');
 
             var_dump($ffmpeg);
             var_dump($errors);
