@@ -90,11 +90,43 @@ class GeneratorFiles
         return ['fileName' => $this->contentId, 'status' => true];
     }
 
+    public function generatorImageFormat(string $nameImage, string $format): array
+    {
+        $infoImage = pathinfo(DIRECTORY_IMG . $nameImage);
+        $resultName = $infoImage['filename'] . '_format.'. $infoImage['extension'];
+        $sizeImage = getimagesize( DIRECTORY_IMG . $nameImage);
+        $proportion = $sizeImage[0] / $sizeImage[1];
+
+        if ($format == '9/16') {
+            $width = $sizeImage[1] * 9 / 16;
+            $ffmpeg = 'ffmpeg -i ' . DIRECTORY_IMG . $nameImage . ' -vf crop=' . (int)$width .':' . $sizeImage[1] .':0:0 ' . DIRECTORY_IMG . $resultName;
+        }
+
+        if ($format == '16/9') {
+            if ($proportion <= 1) {
+                $height = $sizeImage[0] * 9 / 16;
+                $ffmpeg = 'ffmpeg -i ' . DIRECTORY_IMG . $nameImage . ' -vf crop=' . $sizeImage[0] . ':' . (int)$height . ' ' . DIRECTORY_IMG . $resultName;
+            } else {
+                $width = $sizeImage[1] * 16 / 9;
+                $ffmpeg = 'ffmpeg -i ' . DIRECTORY_IMG . $nameImage . ' -vf crop=' . (int)$width . ':' . $sizeImage[1] . ' ' . DIRECTORY_IMG . $resultName;
+            }
+        }
+
+        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+
+        if (!is_null($errors)) {
+            return ['status' => false, 'fileName' => $resultName, 'command' => $ffmpeg];
+        }
+
+        unlink(DIRECTORY_IMG . $nameImage);
+        return ['fileName' => $resultName, 'status' => true];
+    }
+
     /**Генерируем видео с нужного формата*/
-    public function generatorFormat(string $nameVideo, string $format): array
+    public function generatorVideoFormat(string $nameVideo, string $format): array
     {
         $resultName = $this->contentId . '_format';
-        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $nameVideo . '.mp4' . ' -vf "scale=1080:-1,setdar=' . $format . '" ' . DIRECTORY_VIDEO . $resultName . '.mp4';
+        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . ' -vf "scale=1080:-1,setdar=' . $format . '" ' . DIRECTORY_ADDITIONAL_VIDEO . $resultName . '.mp4';
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         var_dump($ffmpeg);
@@ -102,7 +134,7 @@ class GeneratorFiles
             return ['status' => false];
         }
 
-        unlink(DIRECTORY_VIDEO . $nameVideo . '.mp4');
+        unlink(DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . '.mp4');
         return ['fileName' => $resultName, 'status' => true];
     }
 

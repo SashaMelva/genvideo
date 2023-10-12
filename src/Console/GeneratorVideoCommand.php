@@ -172,8 +172,24 @@ class GeneratorVideoCommand extends Command
             if ($video['type_background'] == 'slide_show' && !empty($voiceData['time'])) {
 
                 if (!empty($slides)) {
+                    /**Подгоняем картинки под формат*/
+                    $slidesName = [];
 
-                    $slideshow = $generatorFiles->generatorSladeShow($slides, $sound[0]['file_name'], $voiceData['time']);
+                    foreach ($slides as $slide) {
+                        $formatImage = $generatorFiles->generatorImageFormat($slide, $video['content_format']);
+
+                        if (!$formatImage['status']) {
+                            $this->log->error('Ошибка преобразования формата изображения ' . $slide . ' => ' . $formatImage['fileName']);
+                            $slidesName[] = $formatImage['fileName'];
+                            continue;
+                        }
+
+                        $slidesName[] = $formatImage['fileName'];
+                        $this->log->info('Успех преобразования формата изображения, имя файла ' . $formatImage['fileName']);
+                    }
+
+
+                    $slideshow = $generatorFiles->generatorSladeShow($slidesName, $sound[0]['file_name'], $voiceData['time']);
 
                     if (!$slideshow['status']) {
                         ContentVideo::changeStatus($videoId, 5);
@@ -196,9 +212,25 @@ class GeneratorVideoCommand extends Command
 
 
             if ($video['type_background'] == 'video' && !empty($voiceData['time'])) {
-
                 if (!empty($videoBackground)) {
-                    $backgroundVideo = $generatorFiles->generatorBackgroundVideoAndMusic($videoBackground[0], $sound[0]['file_name'], $voiceData['time']);
+
+                    $additionalVideoName = $videoBackground[0];
+                    /**Подгоняем видео под формат*/
+                    if ($video['content_format'] == '9/16') {
+                        $formatVideo = $generatorFiles->generatorVideoFormat($additionalVideoName, $video['content_format']);
+
+                        if (!$formatVideo['status']) {
+                            ContentVideo::changeStatus($videoId, 5);
+                            $this->log->error('Ошибка преобразования формата видео');
+                            exec($cmd);
+                            return 0;
+                        }
+
+                        $additionalVideoName = $formatVideo['fileName'];
+                        $this->log->info('Успех преобразования формата видео, имя файла ' . $resultName);
+                    }
+
+                    $backgroundVideo = $generatorFiles->generatorBackgroundVideoAndMusic($additionalVideoName, $sound[0]['file_name'], $voiceData['time']);
 
                     if (!$backgroundVideo['status']) {
                         ContentVideo::changeStatus($videoId, 5);
@@ -232,20 +264,6 @@ class GeneratorVideoCommand extends Command
 
                 $resultName = $background['fileName'];
                 $this->log->info('Фоновое изображение наложено, имя файла ' . $resultName);
-            }
-
-            if ($video['content_format'] == '9/16' && !empty($resultName)) {
-                $formatVideo = $generatorFiles->generatorFormat($resultName, $video['content_format']);
-
-                if (!$formatVideo['status']) {
-                    ContentVideo::changeStatus($videoId, 5);
-                    $this->log->error('Ошибка преобразования формата видео');
-                    exec($cmd);
-                    return 0;
-                }
-
-                $resultName = $formatVideo['fileName'];
-                $this->log->info('Успех преобразования формата видео, имя файла ' . $resultName);
             }
 
             if (!empty($logo)) {
@@ -294,7 +312,7 @@ class GeneratorVideoCommand extends Command
 
             if ($textData['status']) {
 
-                $titers = $generatorFiles->generatorText($resultName,  $textData['name']);
+                $titers = $generatorFiles->generatorText($resultName, $textData['name']);
 
                 if (!$titers['status']) {
                     ContentVideo::changeStatus($videoId, 5);
