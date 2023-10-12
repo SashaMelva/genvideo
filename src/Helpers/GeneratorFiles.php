@@ -123,6 +123,22 @@ class GeneratorFiles
     }
 
     /**Генерируем видео с нужного формата*/
+    public function generatorVideoFormatForSlideShow(string $nameVideo, string $format): array
+    {
+        $resultName = $this->contentId . '_format';
+        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $nameVideo . ' -vf "scale=1080:-1,setdar=' . $format . '" ' . DIRECTORY_VIDEO . $resultName . '.mp4';
+        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+
+        var_dump($ffmpeg);
+        if (!is_null($errors)) {
+            return ['status' => false];
+        }
+
+        unlink(DIRECTORY_VIDEO . $nameVideo . '.mp4');
+        return ['fileName' => $resultName, 'status' => true];
+    }
+
+    /**Генерируем видео с нужного формата*/
     public function generatorVideoFormat(string $nameVideo, string $format): array
     {
         $resultName = $this->contentId . '_format';

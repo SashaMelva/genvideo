@@ -162,11 +162,11 @@ class GeneratorVideoCommand extends Command
                 }
             }
 
-//#TODO
-//            $voiceData['time'] = '78.696007314843';
-//            $fileNameVoice = '62_65';
-//            $textData['status'] = true;
-//            $textData['name'] = '62_65';
+#TODO
+            $voiceData['time'] = '38.160015075377';
+            $fileNameVoice = '63_66';
+            $textData['status'] = true;
+            $textData['name'] = '63_66';
 
 
             if ($video['type_background'] == 'slide_show' && !empty($voiceData['time'])) {
@@ -201,6 +201,20 @@ class GeneratorVideoCommand extends Command
 
                     $resultName = $slideshow['fileName'];
                     $this->log->info('Сдайдшоу сгенерировано, имя файла ' . $resultName);
+
+                    if ($video['content_format'] == '9/16') {
+                        $formatVideo = $generatorFiles->generatorVideoFormatForSlideShow($resultName, $video['content_format']);
+
+                        if (!$formatVideo['status']) {
+                            ContentVideo::changeStatus($videoId, 5);
+                            $this->log->error('Ошибка преобразования формата видео');
+                            exec($cmd);
+                            return 0;
+                        }
+
+                        $additionalVideoName = $formatVideo['fileName'];
+                        $this->log->info('Успех преобразования формата видео, имя файла ' . $resultName);
+                    }
 
                 } else {
                     ContentVideo::changeStatus($videoId, 5);
