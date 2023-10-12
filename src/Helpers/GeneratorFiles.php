@@ -118,7 +118,7 @@ class GeneratorFiles
             return ['status' => false, 'fileName' => $resultName, 'command' => $ffmpeg];
         }
 
-        unlink(DIRECTORY_IMG . $nameImage);
+//        unlink(DIRECTORY_IMG . $nameImage);
         return ['fileName' => $resultName, 'status' => true];
     }
 
@@ -129,12 +129,11 @@ class GeneratorFiles
         $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $nameVideo . ' -vf "scale=1080:-1,setdar=' . $format . '" ' . DIRECTORY_VIDEO . $resultName . '.mp4';
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
-        var_dump($ffmpeg);
         if (!is_null($errors)) {
             return ['status' => false];
         }
 
-        unlink(DIRECTORY_VIDEO . $nameVideo . '.mp4');
+//        unlink(DIRECTORY_VIDEO . $nameVideo . '.mp4');
         return ['fileName' => $resultName, 'status' => true];
     }
 

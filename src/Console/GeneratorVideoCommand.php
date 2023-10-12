@@ -163,10 +163,10 @@ class GeneratorVideoCommand extends Command
             }
 
 #TODO
-            $voiceData['time'] = '38.160015075377';
-            $fileNameVoice = '63_66';
-            $textData['status'] = true;
-            $textData['name'] = '63_66';
+//            $voiceData['time'] = '38.160015075377';
+//            $fileNameVoice = '63_66';
+//            $textData['status'] = true;
+//            $textData['name'] = '63_66';
 
 
             if ($video['type_background'] == 'slide_show' && !empty($voiceData['time'])) {
