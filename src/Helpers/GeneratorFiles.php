@@ -99,7 +99,7 @@ class GeneratorFiles
 
         if ($format == '9/16') {
             $width = $sizeImage[1] * 9 / 16;
-            $ffmpeg = 'ffmpeg -i ' . DIRECTORY_IMG . $nameImage . ' -vf crop=' . (int)$width .':' . $sizeImage[1] .':0:0 ' . DIRECTORY_IMG . $resultName;
+            $ffmpeg = 'ffmpeg -i ' . DIRECTORY_IMG . $nameImage . ' -vf crop=' . (int)$width .':' . $sizeImage[1] .' ' . DIRECTORY_IMG . $resultName;
         }
 
         if ($format == '16/9') {
