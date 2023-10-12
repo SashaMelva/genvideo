@@ -212,7 +212,7 @@ class GeneratorVideoCommand extends Command
                             return 0;
                         }
 
-                        $additionalVideoName = $formatVideo['fileName'];
+                        $resultName = $formatVideo['fileName'];
                         $this->log->info('Успех преобразования формата видео, имя файла ' . $resultName);
                     }
 
