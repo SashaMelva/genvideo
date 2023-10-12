@@ -233,14 +233,14 @@ class GeneratorFiles
     {
         $number = $this->contentId;
         #каждые 10 секунд меняем фотогрфию
-        $count_images = ceil($sound_time / 10);
-
-        for ($i = 0; $count_images > count($arr_images); $i++) {
-            $arr_images[] = $arr_images[$i];
-        }
-        for ($i = count($arr_images); $count_images < count($arr_images); $i--) {
-            unset($arr_images[$i]);
-        }
+//        $count_images = ceil($sound_time / 10);
+//
+//        for ($i = 0; $count_images > count($arr_images); $i++) {
+//            $arr_images[] = $arr_images[$i];
+//        }
+//        for ($i = count($arr_images); $count_images < count($arr_images); $i--) {
+//            unset($arr_images[$i]);
+//        }
 
         $imagesString = implode(',', $arr_images);
         $images = ' -i ' . DIRECTORY_IMG . str_replace(',', ' -i ' . DIRECTORY_IMG, $imagesString) . ' ';
