@@ -32,6 +32,15 @@
         "tuupola/slim-jwt-auth": "^3.7",
         "monolog/monolog": "^2.9",
         "james-heinrich/getid3": "^1.9",
+        "google/apiclient": "^2.0",
         "vlucas/phpdotenv": "^5.5"
+    },
+    "scripts": {
+        "pre-autoload-dump": "Google\\Task\\Composer::cleanup"
+    },
+    "extra": {
+        "google/apiclient-services": [
+            "YouTube"
+        ]
     }
 }

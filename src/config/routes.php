@@ -12,6 +12,10 @@ use App\Controller\Files\DeleteMusic;
 use App\Controller\Files\UploadAdditionalVideo;
 use App\Controller\Files\UploadImage;
 use App\Controller\Files\UploadMusic;
+use App\Controller\Integration\SaveTokenCallBack;
+use App\Controller\Integration\TokenCallBack;
+use App\Controller\Integration\CabinetItems;
+use App\Controller\Integration\GetToken;
 use App\Controller\Projects\AddUserProject;
 use App\Controller\Projects\CreateProject;
 use App\Controller\Projects\DeleteProject;
@@ -92,6 +96,12 @@ return static function(App $app):void
 //            $group->get('/delete-sound/{id:[0-9]+}', DeleteMusic::class);
 //            $group->get('/delete-video/{id:[0-9]+}', DeleteAdditionalVideo::class);
         });
+
+//        $group->group('/integration', function (RouteCollectorProxyInterface $group) {
+            $group->get('/token/{id:[0-9]+}', GetToken::class);
+            $group->get('/token-callback/{id:[0-9]+}', TokenCallBack::class);
+            $group->get('/add-token/{id:[0-9]+}', SaveTokenCallBack::class);
+//        });
 
     });
 
