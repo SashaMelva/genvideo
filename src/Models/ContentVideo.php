@@ -23,6 +23,85 @@ class ContentVideo extends Model
         return self::query()->find($id)->getModel();
     }
 
+    public static function findByProjectID(int $id): array
+    {
+        return self::query()
+            ->select(
+                'content.id AS content_id',
+                'content.name AS content_name',
+                'content.created_at',
+                'content.updated_at',
+                'content.file_path',
+                'content.file_name',
+                'content.project_id',
+                'content.format',
+                'content.status_id',
+                'status_content.name AS status_name',
+                'users.id AS creator_id',
+                'users.name AS creator_name',
+                'users.email AS creator_email',
+            )
+            ->leftJoin('status_content', 'content.status_id', '=', 'status_content.id')
+            ->leftJoin('users', 'content.creator_id', '=', 'users.id')
+            ->where([['content.project_id', '=', $id]])
+            ->get()->toArray();
+    }
+
+    public static function findByID(int $id): array
+    {
+        return self::query()
+            ->select(
+                'content.id AS content_id',
+                'content.name AS content_name',
+                'content.created_at',
+                'content.updated_at',
+                'content.file_path',
+                'content.file_name',
+                'content.project_id',
+                'content.format',
+                'content.status_id',
+                'status_content.name AS status_name',
+                'users.id AS creator_id',
+                'users.name AS creator_name',
+                'users.email AS creator_email',
+            )
+            ->leftJoin('status_content', 'content.status_id', '=', 'status_content.id')
+            ->leftJoin('users', 'content.creator_id', '=', 'users.id')
+            ->where([['content.id', '=', $id]])
+            ->get()->toArray()[0];
+    }
+
+    public static function findAllDataByID(int $id): array
+    {
+        return self::query()
+            ->select(
+                'content.id AS content_id',
+                'content.name AS content_name',
+                'content.creator_id AS content_creator_id',
+                'content.type_background',
+                'content.voice_id',
+                'content.ampula_voice',
+                'content.format AS content_format',
+                'content.color_background_id AS color_background_id',
+                'text.id AS text_id',
+                'text.text',
+                'text.file_name_text',
+                'text.file_path_text',
+                'text.file_name_voice',
+                'text.file_path_voice',
+                'text.status_voice',
+                'text.status_text',
+                'status_content.name AS status_content_name',
+                'dictionary_voice.name AS dictionary_voice_name',
+                'dictionary_voice.language',
+                'color_background_id'
+            )
+            ->leftJoin('text', 'content.text_id', '=', 'text.id')
+            ->leftJoin('status_content', 'content.status_id', '=', 'status_content.id')
+            ->leftJoin('dictionary_voice', 'content.voice_id', '=', 'dictionary_voice.id')
+            ->where([['content.id', '=', $id]])
+            ->get()->toArray()[0];
+    }
     public static function changeStatus(int $contentId, string $statusId): void
     {
         self::query()
@@ -63,38 +142,6 @@ class ContentVideo extends Model
 
         $newContent->save();
         return $newContent;
-    }
-
-    public static function findAllDataByID(int $id): array
-    {
-        return self::query()
-            ->select(
-                'content.id AS content_id',
-                'content.name AS content_name',
-                'content.creator_id AS content_creator_id',
-                'content.type_background',
-                'content.voice_id',
-                'content.ampula_voice',
-                'content.format AS content_format',
-                'content.color_background_id AS color_background_id',
-                'text.id AS text_id',
-                'text.text',
-                'text.file_name_text',
-                'text.file_path_text',
-                'text.file_name_voice',
-                'text.file_path_voice',
-                'text.status_voice',
-                'text.status_text',
-                'status_content.name AS status_content_name',
-                'dictionary_voice.name AS dictionary_voice_name',
-                'dictionary_voice.language',
-                'color_background_id'
-            )
-            ->leftJoin('text', 'content.text_id', '=', 'text.id')
-            ->leftJoin('status_content', 'content.status_id', '=', 'status_content.id')
-            ->leftJoin('dictionary_voice', 'content.voice_id', '=', 'dictionary_voice.id')
-            ->where([['content.id', '=', $id]])
-            ->get()->toArray()[0];
     }
 
     public static function updateContent(int $contentId, string $fileName, string $filePath, int $statusId): void

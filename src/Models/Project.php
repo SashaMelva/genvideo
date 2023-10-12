@@ -36,6 +36,25 @@ class Project extends Model
             ])
             ->leftJoin('users', 'users.id', '=', 'projects.creator_id')
             ->where([['projects.id', '=', $id]])
+            ->get()->toArray()[0];
+    }
+
+    public static function fullContent(int $id): array
+    {
+        return self::query()
+            ->select([
+                'projects.id AS project_id',
+                'projects.name AS project_name',
+                'projects.creator_id',
+                'projects.created_at AS project_created_at',
+                'projects.updated_at AS project_updated_at',
+                'users.name AS creator_name',
+                'users.email AS creator_email',
+                'users.role AS creator_role',
+                'users.phone AS creator_phone',
+            ])
+            ->leftJoin('users', 'users.id', '=', 'projects.creator_id')
+            ->where([['projects.id', '=', $id]])
             ->get()->toArray();
     }
 

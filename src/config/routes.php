@@ -25,7 +25,9 @@ use App\Controller\Users\GetUserInfo;
 use App\Controller\Video\CollectionDataVideo;
 use App\Controller\Video\DownloadVideo;
 use App\Controller\Video\GeneratorVideo;
+use App\Controller\Video\GetAllContent;
 use App\Controller\Video\GetCollectionDataSettingVideo;
+use App\Controller\Video\GetContent;
 use App\Controller\Video\SendVideo;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -76,6 +78,9 @@ return static function(App $app):void
 
             $group->post('/download', DownloadVideo::class);
             $group->post('/send', SendVideo::class);
+
+            $group->get('/get-all/{id:[0-9]+}', GetAllContent::class);
+            $group->get('/get/{id:[0-9]+}', GetContent::class);
         });
 
         $group->group('/file', function (RouteCollectorProxyInterface $group) {
