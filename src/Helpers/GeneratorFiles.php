@@ -70,7 +70,6 @@ class GeneratorFiles
         $ffmpeg = $this->getSlideShowCode($images, $sound_name, $time);
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
-        var_dump($ffmpeg);
         if (!is_null($errors)) {
             return ['status' => false, 'command' => $ffmpeg];
         }
