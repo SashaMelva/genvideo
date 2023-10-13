@@ -19,7 +19,7 @@ class TokenYoutube extends Model
     {
         return  self::query()
             ->where([['user_id', '=', $userId]])
-            ->get()->toArray();
+            ->get()->toArray()[0];
     }
 
     public static function addToken(int $userId, string $accessToken, string $refreshToken): TokenYoutube

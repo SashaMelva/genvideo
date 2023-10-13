@@ -99,7 +99,7 @@ return static function(App $app):void
 
 //        $group->group('/integration', function (RouteCollectorProxyInterface $group) {
             $group->get('/token/{id:[0-9]+}', GetToken::class);
-            $group->get('/token-callback/{id:[0-9]+}', TokenCallBack::class);
+            $group->get('/token-callback', TokenCallBack::class);
             $group->get('/add-token/{id:[0-9]+}', SaveTokenCallBack::class);
 //        });
 
