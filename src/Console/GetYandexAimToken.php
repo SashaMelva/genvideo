@@ -38,23 +38,24 @@ class GetYandexAimToken extends Command
         $cmd = '/usr/bin/supervisorctl stop domain-for-get-course';
 
         if ($this->status_log) {
-            $this->log->info('Начало ' . date('Y-m-s H:i:s'));
+            $this->log->info('Получаем новый токен ' . date('Y-m-s H:i:s'));
         }
 
         $dir = '/var/www/genvideo/api/var/token/token.txt';
         try {
             shell_exec('yc iam create-token > ' . $dir);
-            $this->log->info(file_get_contents($dir));
-            DB::table('token_yandex')->where([['id', '=', 1]])->update(['token' => file_get_contents($dir)]);
+            $dataFile = file_get_contents($dir);
+
+            if (!empty($dataFile)) {
+                DB::table('token_yandex')->where([['id', '=', 1]])->update(['token' => $dataFile]);
+            } else {
+                $this->log->info('Ошибка получения токена ' . date('Y-m-s H:i:s'));
+            }
+
             unlink($dir);
 
         } catch (Exception $e) {
             $this->log->error($e->getMessage());
-        }
-
-
-        if ($this->status_log) {
-            $this->log->info('Выполнено ' . date('Y-m-s H:i:s'));
         }
 
         exec($cmd);
