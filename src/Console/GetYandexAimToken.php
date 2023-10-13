@@ -42,7 +42,7 @@ class GetYandexAimToken extends Command
         }
 
         $dir = '/var/www/genvideo/api/var/token/token.txt';
-        try {
+//        try {
             shell_exec('yc iam create-token > ' . $dir);
 
             if (!empty(file_get_contents($dir))) {
@@ -53,9 +53,9 @@ class GetYandexAimToken extends Command
 
 //            unlink($dir);
 
-        } catch (Exception $e) {
-            $this->log->error($e->getMessage());
-        }
+//        } catch (Exception $e) {
+//            $this->log->error($e->getMessage());
+//        }
 
         exec($cmd);
         return 0;
