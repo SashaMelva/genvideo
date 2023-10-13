@@ -22,6 +22,22 @@ class ListProject extends Model
             ->get()->toArray();
     }
 
+    public static function checkUserForProject(int $userId, int $projectId): bool
+    {
+        $access = self::query()
+            ->select('user_id')
+            ->where([['project_id', '=', $projectId]])
+            ->get()->toArray();
+
+        foreach ($access as $value) {
+            if($value['user_id'] == $userId) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static function findAllProjectInfoByUserId(int $userId): array
     {
         return self::query()
@@ -58,8 +74,6 @@ class ListProject extends Model
 
     public static function addProject(int $userId, int $projectId): ListProject
     {
-        var_dump($userId);
-        var_dump($projectId);
         $newList = new ListProject();
         $newList->setAttribute('user_id', $userId);
         $newList->setAttribute('project_id', $projectId);

@@ -28,14 +28,16 @@ class AddUserProject extends UserController
 
         if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
 
-            if (!User::accessCheck($token->user_id)) return $this->respondWithError(215);
+            if (!Project::accessCheckCreator($data['project_id'], $token->user_id)) return $this->respondWithError(215);
 
             try {
-                foreach ($data['users_id'] as $userId) {
-                    ListProject::addProject($userId, $data['project_id']);
-                }
 
+                $user = User::findByUserEmail($data['email']);
+                if (ListProject::checkUserForProject($user['id'], $data['project_id'])) return $this->respondWithError(400, 'Данный пользователь уже был добавлен в проект');
+
+                ListProject::addProject($user['id'], $data['project_id']);
                 return $this->respondWithData('Success');
+
             } catch (Exception $e) {
                 return $this->respondWithError($e->getCode(), $e->getMessage());
             }
