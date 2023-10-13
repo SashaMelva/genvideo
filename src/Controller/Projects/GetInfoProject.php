@@ -4,6 +4,7 @@ namespace App\Controller\Projects;
 
 use App\Controller\UserController;
 use App\Helpers\CheckTokenExpiration;
+use App\Models\ContentVideo;
 use App\Models\ListProject;
 use App\Models\Project;
 use App\Models\User;
@@ -29,18 +30,12 @@ class GetInfoProject extends UserController
             try {
                 $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
 
-//                if ($token->user_id) {
-
                 $projectId = $this->request->getAttribute('id');
                 $project = Project::fullInfo((int)$projectId);
+                $project['count_content'] = ContentVideo::countContent($projectId);
 
-                $users = ListProject::findAllUsersInfoByProjectId((int)$projectId);
-                $project['users'] = $users ?? null;
+                $project['users'] = ListProject::findAllUsersInfoByProjectId((int)$projectId);
                 return $this->respondWithData($project);
-
-//                } else {
-//                    return $this->respondWithError(215);
-//                }
 
             } catch (Throwable $e) {
                 return $this->respondWithError($e->getCode(), $e->getMessage());

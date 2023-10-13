@@ -62,6 +62,7 @@ class ListProject extends Model
     {
         return self::query()
             ->select([
+                'users.id AS user_id',
                 'users.name',
                 'users.email',
                 'users.role',
