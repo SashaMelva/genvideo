@@ -51,8 +51,8 @@ class UploadImage extends UserController
                     }
 
                     $image = ImageVideo::addImage($filename, $filePath, $data['project_id'], $data['type_image']);
+                    return $this->respondWithFile(DIRECTORY_IMG . $filename, $image['id'] . '.' . pathinfo(DIRECTORY_IMG . $filename, PATHINFO_EXTENSION));
 
-                    return $this->respondWithData(['path' => $image->file_path, 'id' => $image->id]);
                 } else {
                     return $this->respondWithError(400, 'Ошибка получения избражения. Код ошибки: ' . $uploadedFile->getError());
                 }
