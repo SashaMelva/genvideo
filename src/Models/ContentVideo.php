@@ -18,12 +18,17 @@ class ContentVideo extends Model
             ->get()->toArray();
     }
 
+    public static function countContent(int $projectId): int
+    {
+        return self::query()->where([['project_id', '=', $projectId]])->count();
+    }
+
     public static function findOne(int $id): Model|Collection|Builder|array|null
     {
         return self::query()->find($id)->getModel();
     }
 
-    public static function findByProjectID(int $id): array
+    public static function findByList(int $id, int $skip, int $take): array
     {
         return self::query()
             ->select(
@@ -44,6 +49,8 @@ class ContentVideo extends Model
             ->leftJoin('status_content', 'content.status_id', '=', 'status_content.id')
             ->leftJoin('users', 'content.creator_id', '=', 'users.id')
             ->where([['content.project_id', '=', $id]])
+            ->orderBy('content.id')
+            ->skip($skip)->take($take)
             ->get()->toArray();
     }
 
@@ -102,6 +109,7 @@ class ContentVideo extends Model
             ->where([['content.id', '=', $id]])
             ->get()->toArray()[0];
     }
+
     public static function changeStatus(int $contentId, string $statusId): void
     {
         self::query()
@@ -118,7 +126,7 @@ class ContentVideo extends Model
         string  $typeBackground,
         int     $voiceId,
         string  $format,
-        ?int  $colorBackgroundId,
+        ?int    $colorBackgroundId,
         string  $statusId,
         string  $textId,
         string  $ampulaVoice

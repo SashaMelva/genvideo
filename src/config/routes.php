@@ -83,7 +83,7 @@ return static function(App $app):void
             $group->post('/download', DownloadVideo::class);
             $group->post('/send', SendVideo::class);
 
-            $group->get('/get-all/{id:[0-9]+}', GetAllContent::class);
+            $group->post('/get-all', GetAllContent::class);
             $group->get('/get/{id:[0-9]+}', GetContent::class);
         });
 
