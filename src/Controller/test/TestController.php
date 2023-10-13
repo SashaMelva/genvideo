@@ -33,39 +33,43 @@ class TestController extends UserController
 
     public function action(): ResponseInterface
     {
+        $output = null;
+        $retval=[];
+        exec('yc iam create-token', $retval);
+        print_r($retval);
 
-        $client = new Google_Client();
-
-        $client->setDeveloperKey(API_KEY_YOUTUBE);
-
-        $service = new Google_Service_YouTube($client);
-
-        $video = new Google_Service_YouTube_Video();
-
-        $videoSnippet = new Google_Service_YouTube_VideoSnippet();
-        $videoSnippet->setDescription('Описание');
-        $videoSnippet->setTitle('Нахвание');
-        $video->setSnippet($videoSnippet);
-
-        $videoStatus = new Google_Service_YouTube_VideoStatus();
-        $videoStatus->setPrivacyStatus('public');
-        $video->setStatus($videoStatus);
-
-        try {
-            $response = $service->videos->insert(
-                'snippet,status',
-                $video,
-                array(
-                    'data' => file_get_contents(DIRECTORY_VIDEO . '65_text.mp4'),
-                    'mimeType' => 'video/*',
-                    'uploadType' => 'multipart'
-                )
-            );
-            echo "Video uploaded successfully. Video id is ". $response->id;
-
-        } catch(Exception $e) {
-               echo $e->getMessage();
-        }
+//        $client = new Google_Client();
+//
+//        $client->setDeveloperKey(API_KEY_YOUTUBE);
+//
+//        $service = new Google_Service_YouTube($client);
+//
+//        $video = new Google_Service_YouTube_Video();
+//
+//        $videoSnippet = new Google_Service_YouTube_VideoSnippet();
+//        $videoSnippet->setDescription('Описание');
+//        $videoSnippet->setTitle('Нахвание');
+//        $video->setSnippet($videoSnippet);
+//
+//        $videoStatus = new Google_Service_YouTube_VideoStatus();
+//        $videoStatus->setPrivacyStatus('public');
+//        $video->setStatus($videoStatus);
+//
+//        try {
+//            $response = $service->videos->insert(
+//                'snippet,status',
+//                $video,
+//                array(
+//                    'data' => file_get_contents(DIRECTORY_VIDEO . '65_text.mp4'),
+//                    'mimeType' => 'video/*',
+//                    'uploadType' => 'multipart'
+//                )
+//            );
+//            echo "Video uploaded successfully. Video id is ". $response->id;
+//
+//        } catch(Exception $e) {
+//               echo $e->getMessage();
+//        }
 
 //        $client = new Client();
 //
