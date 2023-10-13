@@ -6,6 +6,7 @@ use Exception;
 use getID3;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Database\Capsule\Manager as DB;
 
 class Speechkit
 {
@@ -113,7 +114,8 @@ class Speechkit
     private function response(string $text, array $voiceSetting)
     {
         try {
-            $token = 't1.9euelZrMkIuRxpmUy5PIyJOVkJ6dmO3rnpWamJiTmpbNnImPnZPPjMbHnJDl8_d2VGBW-e9hM286_d3z9zYDXlb572Ezbzr9zef1656VmpSRzJnJjs-Qysqeycqcnc6N7_zF656VmpSRzJnJjs-Qysqeycqcnc6N.g1t3KOsb0YprCZ1uhUzUh4scArNE5pCtCJFWBx5iPensby_chmi89nFq_GdwaXrRNPj-bJLbsmITHmGwGePqBQ';
+            $tokenData = DB::table('token_yandex')->where([['id', '=', 1]])->get()->toArray()[0];
+            $token = trim($tokenData->token);
             $response = $this->client->post('https://tts.api.cloud.yandex.net/speech/v1/tts:synthesize',
                 [
                     'headers' => [

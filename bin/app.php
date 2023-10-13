@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\Console\GeneratorVideoCommand;
+use App\Console\GetYandexAimToken;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Application;
 
@@ -37,6 +38,7 @@ try {
     (require __DIR__ . '/../src/config/eloquent_console.php')($cli, $container);
 
     $cli->add(new GeneratorVideoCommand());
+    $cli->add(new GetYandexAimToken());
 
     $cli->run();
 

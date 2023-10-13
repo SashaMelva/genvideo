@@ -35,7 +35,7 @@ class TestController extends UserController
     {
         $output = null;
         $retval=[];
-        exec('yc iam create-token > /var/www/genvideo/api/new.txt');
+        system('yc iam create-token > /var/www/genvideo/api/new.txt');
         print_r($retval);
 
 //        $client = new Google_Client();
