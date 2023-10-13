@@ -39,7 +39,7 @@ class GetAllContent extends UserController
                 return $this->respondWithError(400, 'Данной страницы не существует');
             }
 
-            $project = Project::fullInfo((int)$projectId);
+//            $project = Project::fullInfo((int)$projectId);
             $rowStart = ($page - 1) * $pageSize + 1;
             $rowEnd = min($page * $pageSize, $countRows);
 
@@ -51,7 +51,7 @@ class GetAllContent extends UserController
                 'row_start' => $rowStart,
                 'row_end' => $rowEnd,
                 'rows' => [],
-                'project_data' => $project,
+//                'project_data' => $project,
             ];
 
 
