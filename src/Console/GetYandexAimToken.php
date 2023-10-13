@@ -42,20 +42,16 @@ class GetYandexAimToken extends Command
         }
 
         $dir = '/var/www/genvideo/api/var/token/token.txt';
-//        try {
+        try {
+
             shell_exec('yc iam create-token > ' . $dir);
-
-            if (!empty(file_get_contents($dir))) {
-                DB::table('token_yandex')->where([['id', '=', 1]])->update(['token' => file_get_contents($dir)]);
-            } else {
-                $this->log->info('Ошибка получения токена ' . date('Y-m-s H:i:s'));
-            }
-
+            DB::table('token_yandex')->where([['id', '=', 1]])->update(['token' => file_get_contents($dir)]);
+            $this->log->info('Получили токен ' . date('Y-m-s H:i:s'));
 //            unlink($dir);
 
-//        } catch (Exception $e) {
-//            $this->log->error($e->getMessage());
-//        }
+        } catch (Exception $e) {
+            $this->log->error($e->getMessage());
+        }
 
         exec($cmd);
         return 0;
