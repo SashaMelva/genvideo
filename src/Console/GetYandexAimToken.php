@@ -47,7 +47,7 @@ class GetYandexAimToken extends Command
             shell_exec('yc iam create-token > ' . $dir);
             DB::table('token_yandex')->where([['id', '=', 1]])->update(['token' => file_get_contents($dir)]);
             $this->log->info('Получили токен ' . date('Y-m-s H:i:s'));
-//            unlink($dir);
+            unlink($dir);
 
         } catch (Exception $e) {
             $this->log->error($e->getMessage());
