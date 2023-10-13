@@ -5,7 +5,7 @@ namespace App\Controller\Projects;
 use App\Controller\UserController;
 use App\Helpers\CheckTokenExpiration;
 use App\Models\ListProject;
-use App\Models\User;
+use App\Models\Project;
 use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -26,15 +26,12 @@ class DeleteUserProject extends UserController
         $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
 
         if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
-
-            if (!User::accessCheck($token->user_id)) return $this->respondWithError(215);
+            if (!Project::accessCheckCreator($data['project_id'], $token->user_id)) return $this->respondWithError(215);
 
             try {
-                foreach ($data['users_id'] as $userId) {
-                    ListProject::deleteUserForProject($userId, $data['project_id']);
-                }
-
+                ListProject::deleteUserForProject($data['user_id'], $data['project_id']);
                 return $this->respondWithData('Success');
+
             } catch (Exception $e) {
                 return $this->respondWithError($e->getCode(), $e->getMessage());
             }
