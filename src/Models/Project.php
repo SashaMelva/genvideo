@@ -20,6 +20,28 @@ class Project extends Model
         return self::query()->find($id)->getModel();
     }
 
+    public static function findByUserId(int $id): Model|Builder|null
+    {
+        return self::query()
+            ->where([['id', '=', $id]])
+            ->first();
+    }
+
+    public static function findAll(): array
+    {
+        return self::query()
+            ->get()->toArray();
+    }
+
+    public static function accessCheckCreator(int $projectId, int $userid): bool
+    {
+        $access = self::query()
+            ->where([['id', '=', $projectId]])
+            ->get()->toArray()[0];
+
+        return $access['creator_id'] == $userid;
+    }
+
     public static function fullInfo(int $id): array
     {
         return self::query()
@@ -58,35 +80,11 @@ class Project extends Model
             ->get()->toArray();
     }
 
-    public static function findAll(): array
+    public static function updateName(int $id, string $name): void
     {
-        return self::query()
-            ->get()->toArray();
-    }
-
-    public static function findByUserEmail($email): Model|Builder|null
-    {
-        return self::query()
-            ->where([['email', '=', $email]])
-            ->first();
-    }
-
-    public static function findByUserId(int $id): Model|Builder|null
-    {
-        return self::query()
+        self::query()
             ->where([['id', '=', $id]])
-            ->first();
-    }
-
-    public static function createUser($userName, $userEmail, $password, $role = 'user'): User
-    {
-        $newUser = new User();
-        $newUser->setAttribute('name', $userName);
-        $newUser->setAttribute('email', $userEmail);
-        $newUser->setAttribute('password_hash', password_hash($password, PASSWORD_DEFAULT));
-        $newUser->setAttribute('role', $role);
-
-        return $newUser;
+            ->update(['name' => $name]);
     }
 
     public function validate(): bool
