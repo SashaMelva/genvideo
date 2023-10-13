@@ -15,9 +15,11 @@ class GetToken extends UserController
         try {
 
             $userId = $this->request->getAttribute('id');
+            $_SESSION['user_id'] = $userId;
             $client = new Client();
             $client->setAuthConfig(DIRECTORY_CLIENT_SECRET . 'client_secret.json');
             $client->addScope(GOOGLE_SERVICE_YOUTUBE::YOUTUBE_FORCE_SSL);
+            $client->setAccessType('offline');
 
             if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
 
@@ -27,7 +29,7 @@ class GetToken extends UserController
 
             } else {
 
-                $redirect_uri = 'http://localhost:8080/api/token-callback/' . $userId;
+                $redirect_uri = 'http://localhost:8080/api/token-callback';
                 return $this->response->withHeader('Location', filter_var($redirect_uri, FILTER_SANITIZE_URL));
 
             }

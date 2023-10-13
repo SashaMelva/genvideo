@@ -15,21 +15,29 @@ class TokenYoutube extends Model
         return self::query()->get()->toArray();
     }
 
-    public static function addToken(int $userId, string $token): TokenYoutube
+    public static function getTokenByUserId(string $userId): array
+    {
+        return  self::query()
+            ->where([['user_id', '=', $userId]])
+            ->get()->toArray();
+    }
+
+    public static function addToken(int $userId, string $accessToken, string $refreshToken): TokenYoutube
     {
         $newVideo = new TokenYoutube();
         $newVideo->setAttribute('user_id', $userId);
-        $newVideo->setAttribute('token', $token);
+        $newVideo->setAttribute('access_token', $accessToken);
+        $newVideo->setAttribute('refresh_token', $refreshToken);
         $newVideo->save();
 
         return $newVideo;
     }
 
-    public static function updateToken(int $userId, string $token): void
+    public static function updateToken(int $userId, string $accessToken, string $refreshToken): void
     {
         self::query()
             ->where([['user_id', '=', $userId]])
-            ->update(['token' => $token]);
+            ->update(['access_token' => $accessToken, 'refresh_token' => $refreshToken]);
     }
 
     public static function checkToken(int $userId): bool

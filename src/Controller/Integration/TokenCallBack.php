@@ -14,11 +14,11 @@ class TokenCallBack extends UserController
     {
         try {
 
-            $userId = $this->request->getAttribute('id');
+            $userId = $_SESSION['user_id'];
 
             $client = new Client();
             $client->setAuthConfigFile(DIRECTORY_CLIENT_SECRET . 'client_secret.json');
-            $client->setRedirectUri('http://localhost:8080/api/token-callback/' . $userId);
+            $client->setRedirectUri('http://localhost:8080/api/token-callback');
             $client->addScope(GOOGLE_SERVICE_YOUTUBE::YOUTUBE_FORCE_SSL);
 
             if (!isset($_GET['code'])) {
@@ -27,6 +27,7 @@ class TokenCallBack extends UserController
             } else {
                 $client->authenticate($_GET['code']);
                 $_SESSION['access_token'] = $client->getAccessToken();
+                $_SESSION['refresh_token'] = $client->getRefreshToken();
                 $redirect_uri = 'http://localhost:8080/api/add-token/' . $userId;
                 return $this->response->withHeader('Location', filter_var($redirect_uri, FILTER_SANITIZE_URL));
             }
