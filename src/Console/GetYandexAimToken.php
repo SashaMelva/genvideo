@@ -43,7 +43,7 @@ class GetYandexAimToken extends Command
 
         $dir = '/var/www/genvideo/api/var/token/token.txt';
         try {
-            exec('yc iam create-token > ' . $dir);
+            shell_exec('yc iam create-token > ' . $dir);
             DB::table('token_yandex')->where([['id', '=', 1]])->update(['token' => file_get_contents($dir)]);
             unlink($dir);
 
