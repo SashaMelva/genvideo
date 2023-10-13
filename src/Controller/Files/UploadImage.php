@@ -38,12 +38,12 @@ class UploadImage extends UserController
 
                     if ($data['type_image'] == 'slide') {
                         $filename = UploadFile::action(DIRECTORY_IMG, $uploadedFile, $fileNameImage);
-                        $filePath = RELATIVE_PATH_IMG . $filename;
+                        $filePath = DIRECTORY_IMG . $filename;
                     }
 
                     if ($data['type_image'] == 'logo') {
                         $filename = UploadFile::action(DIRECTORY_LOGO_IMG, $uploadedFile, $fileNameImage);
-                        $filePath = RELATIVE_PATH_LOGO_IMG . $filename;
+                        $filePath = DIRECTORY_LOGO_IMG . $filename;
                     }
 
                     if (empty($filename) || empty($filePath)) {
@@ -51,7 +51,7 @@ class UploadImage extends UserController
                     }
 
                     $image = ImageVideo::addImage($filename, $filePath, $data['project_id'], $data['type_image']);
-                    return $this->respondWithFile(DIRECTORY_IMG . $filename, $image['id'] . '.' . pathinfo(DIRECTORY_IMG . $filename, PATHINFO_EXTENSION));
+                    return $this->respondWithData(['image' => base64_encode(file_get_contents($filePath)), 'id' => $image['id']]);
 
                 } else {
                     return $this->respondWithError(400, 'Ошибка получения избражения. Код ошибки: ' . $uploadedFile->getError());
