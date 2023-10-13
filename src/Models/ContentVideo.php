@@ -39,15 +39,15 @@ class ContentVideo extends Model
                 'content.file_path',
                 'content.file_name',
                 'content.project_id',
-                'content.format',
+//                'content.format',
                 'content.status_id',
                 'status_content.name AS status_name',
-                'users.id AS creator_id',
-                'users.name AS creator_name',
-                'users.email AS creator_email',
+//                'users.id AS creator_id',
+//                'users.name AS creator_name',
+//                'users.email AS creator_email',
             )
             ->leftJoin('status_content', 'content.status_id', '=', 'status_content.id')
-            ->leftJoin('users', 'content.creator_id', '=', 'users.id')
+//            ->leftJoin('users', 'content.creator_id', '=', 'users.id')
             ->where([['content.project_id', '=', $id]])
             ->orderBy('content.id')
             ->skip($skip)->take($take)

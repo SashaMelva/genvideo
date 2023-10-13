@@ -26,7 +26,7 @@ class GetAllContent extends UserController
         $data = json_decode($this->request->getBody()->getContents(), true);
         $projectId = $data['project_id'];
 
-        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
+//        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
 
         try {
 //                $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
@@ -51,7 +51,6 @@ class GetAllContent extends UserController
                 'row_start' => $rowStart,
                 'row_end' => $rowEnd,
                 'rows' => [],
-//                'project_data' => $project,
             ];
 
 
@@ -65,8 +64,8 @@ class GetAllContent extends UserController
         } catch (Throwable $e) {
             return $this->respondWithError($e->getCode(), $e->getMessage());
         }
-        } else {
-            return $this->respondWithError(215);
-        }
+//        } else {
+//            return $this->respondWithError(215);
+//        }
     }
 }
