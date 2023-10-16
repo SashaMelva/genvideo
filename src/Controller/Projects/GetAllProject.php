@@ -31,8 +31,8 @@ class GetAllProject  extends UserController
 
                 $projects = ListProject::findAllProjectInfoByUserId($token->user_id);
 
-                foreach ($projects as $key => $project) {
-                    $project[$key]['count_content'] = ContentVideo::countContent($project['id']);
+                foreach ($projects as $project) {
+                    $project['count_content'] = ContentVideo::countContent($project['project_id']);
                 }
 
                 return $this->respondWithData($project);
