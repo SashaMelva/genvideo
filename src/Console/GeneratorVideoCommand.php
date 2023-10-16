@@ -175,6 +175,7 @@ class GeneratorVideoCommand extends Command
                     /**Подгоняем картинки под формат*/
                     $slidesName = [];
 
+                    $this->log->info('Список изображений ' . json_encode($slides));
                     foreach ($slides as $slide) {
                         $formatImage = $generatorFiles->generatorImageFormat($slide, $video['content_format']);
 
