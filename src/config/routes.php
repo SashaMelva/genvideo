@@ -20,6 +20,7 @@ use App\Controller\Projects\AddUserProject;
 use App\Controller\Projects\CreateProject;
 use App\Controller\Projects\DeleteProject;
 use App\Controller\Projects\DeleteUserProject;
+use App\Controller\Projects\GetAllProject;
 use App\Controller\Projects\GetInfoProject;
 use App\Controller\Projects\UpdateProject;
 use App\Controller\test\TestController;
@@ -64,6 +65,7 @@ return static function(App $app):void
         });
 
         $group->group('/project', function (RouteCollectorProxyInterface $group) {
+            $group->get('/get-all', GetAllProject::class);
             $group->get('/get-info/{id:[0-9]+}', GetInfoProject::class);
             $group->post('/create', CreateProject::class);
             $group->post('/update', UpdateProject::class);
