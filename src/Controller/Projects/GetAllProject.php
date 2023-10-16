@@ -35,7 +35,7 @@ class GetAllProject  extends UserController
                     $project['count_content'] = ContentVideo::countContent($project['project_id']);
                 }
 
-                return $this->respondWithData($project);
+                return $this->respondWithData($projects);
 
             } catch (Throwable $e) {
                 return $this->respondWithError($e->getCode(), $e->getMessage());
