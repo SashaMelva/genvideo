@@ -68,43 +68,42 @@ class GeneratorFiles
     public function generatorSladeShow(array $images, string $sound_name, string $time): array
     {
         $number = $this->contentId;
-        if (count($images) < 4) {
 
             $ffmpeg = $this->getSlideShowCode($images, $sound_name, $time);
-        } else {
-            $timeSlide = ceil((intval($time) / count($images)) * 25);;
-            $i = 1;
-            $v = "[v{$i}]";
-            $nameVideo = [];
-
-            foreach ($images as $key => $image) {
-                $nameVideo[] = $key . '_' . $number;
-                $v = $v . ' concat=n=' . 1 . ':v=1:a=0,format=yuv422p[v]" -map "[v]" -map ' . 1 . ':a -shortest -y ' . DIRECTORY_VIDEO . $key . '_' . $number . '.mp4';
-                $ffmpeg = 'ffmpeg -i ' . DIRECTORY_IMG . $image . ' -filter_complex "' . "[{$i}:v]scale=-1:10*ih,zoompan=z='min(zoom+0.0010,1.5)':d={$timeSlide}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'[v{$i}];" . $v;
-                $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
-
-                if (!is_null($errors)) {
-                    return ['status' => false, 'command' => $ffmpeg];
-                }
-            }
-
-            $ffmpegMerge = 'ffmpeg -i "concat:';
-            foreach ($nameVideo as $item) {
-                if ($this->mergeFiles($item, DIRECTORY_VIDEO)) {
-                    $ffmpegMerge .= DIRECTORY_VIDEO . $item . '.ts' . '|';
-                } else {
-                    return ['status' => false];
-                }
-            }
-
-            $ffmpegMerge .= '" -vcodec copy -acodec copy ' . DIRECTORY_VIDEO . $number . '.mp4';
-            $errors = shell_exec($ffmpegMerge . ' -hide_banner -loglevel error 2>&1');
-
-            if (!is_null($errors)) {
-                return ['status' => false, 'command' => $ffmpegMerge];
-            }
-
-        }
+//        } else {
+//            $timeSlide = ceil((intval($time) / count($images)) * 25);;
+//            $i = 1;
+//            $v = "[v{$i}]";
+//            $nameVideo = [];
+//
+//            foreach ($images as $key => $image) {
+//                $nameVideo[] = $key . '_' . $number;
+//                $v = $v . ' concat=n=' . 1 . ':v=1:a=0,format=yuv422p[v]" -map "[v]" -map ' . 1 . ':a -shortest -y ' . DIRECTORY_VIDEO . $key . '_' . $number . '.mp4';
+//                $ffmpeg = 'ffmpeg -i ' . DIRECTORY_IMG . $image . ' -filter_complex "' . "[{$i}:v]scale=-1:10*ih,zoompan=z='min(zoom+0.0010,1.5)':d={$timeSlide}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'[v{$i}];" . $v;
+//                $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+//
+//                if (!is_null($errors)) {
+//                    return ['status' => false, 'command' => $ffmpeg];
+//                }
+//            }
+//
+//            $ffmpegMerge = 'ffmpeg -i "concat:';
+//            foreach ($nameVideo as $item) {
+//                if ($this->mergeFiles($item, DIRECTORY_VIDEO)) {
+//                    $ffmpegMerge .= DIRECTORY_VIDEO . $item . '.ts' . '|';
+//                } else {
+//                    return ['status' => false];
+//                }
+//            }
+//
+//            $ffmpegMerge .= '" -vcodec copy -acodec copy ' . DIRECTORY_VIDEO . $number . '.mp4';
+//            $errors = shell_exec($ffmpegMerge . ' -hide_banner -loglevel error 2>&1');
+//
+//            if (!is_null($errors)) {
+//                return ['status' => false, 'command' => $ffmpegMerge];
+//            }
+//
+//        }
 
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
