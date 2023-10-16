@@ -67,7 +67,45 @@ class GeneratorFiles
     /**Генерируем cлайдшоу с фоновой музыкой*/
     public function generatorSladeShow(array $images, string $sound_name, string $time): array
     {
-        $ffmpeg = $this->getSlideShowCode($images, $sound_name, $time);
+        $number = $this->contentId;
+        if (count($images) < 4) {
+
+            $ffmpeg = $this->getSlideShowCode($images, $sound_name, $time);
+        } else {
+            $timeSlide = ceil((intval($time) / count($images)) * 25);;
+            $i = 1;
+            $v = "[v{$i}]";
+            $nameVideo = [];
+
+            foreach ($images as $key => $image) {
+                $nameVideo[] = $key . '_' . $number;
+                $v = $v . ' concat=n=' . 1 . ':v=1:a=0,format=yuv422p[v]" -map "[v]" -map ' . 1 . ':a -shortest -y ' . DIRECTORY_VIDEO . $key . '_' . $number . '.mp4';
+                $ffmpeg = 'ffmpeg -i ' . $image . '-filter_complex "' . "[{$i}:v]scale=-1:10*ih,zoompan=z='min(zoom+0.0010,1.5)':d={$timeSlide}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'[v{$i}];" . $v;
+                $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+
+                if (!is_null($errors)) {
+                    return ['status' => false, 'command' => $ffmpeg];
+                }
+            }
+
+            $ffmpegMerge = 'ffmpeg -i "concat:';
+            foreach ($nameVideo as $item) {
+                if ($this->mergeFiles($item, DIRECTORY_VIDEO)) {
+                    $ffmpegMerge .= DIRECTORY_VIDEO . $item . '.ts' . '|';
+                } else {
+                    return ['status' => false];
+                }
+            }
+
+            $ffmpegMerge .= '" -vcodec copy -acodec copy ' . DIRECTORY_VIDEO . $number . '.mp4';
+            $errors = shell_exec($ffmpegMerge . ' -hide_banner -loglevel error 2>&1');
+
+            if (!is_null($errors)) {
+                return ['status' => false, 'command' => $ffmpegMerge];
+            }
+
+        }
+
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         if (!is_null($errors)) {
@@ -93,13 +131,13 @@ class GeneratorFiles
     public function generatorImageFormat(string $nameImage, string $format): array
     {
         $infoImage = pathinfo(DIRECTORY_IMG . $nameImage);
-        $resultName = $infoImage['filename'] . '_format5.'. $infoImage['extension'];
-        $sizeImage = getimagesize( DIRECTORY_IMG . $nameImage);
+        $resultName = $infoImage['filename'] . '_format5.' . $infoImage['extension'];
+        $sizeImage = getimagesize(DIRECTORY_IMG . $nameImage);
         $proportion = $sizeImage[0] / $sizeImage[1];
 
         if ($format == '9/16') {
             $width = $sizeImage[1] * 9 / 16;
-            $ffmpeg = 'ffmpeg -i ' . DIRECTORY_IMG . $nameImage . ' -vf crop=' . (int)$width .':' . $sizeImage[1] .' ' . DIRECTORY_IMG . $resultName;
+            $ffmpeg = 'ffmpeg -i ' . DIRECTORY_IMG . $nameImage . ' -vf crop=' . (int)$width . ':' . $sizeImage[1] . ' ' . DIRECTORY_IMG . $resultName;
         }
 
         if ($format == '16/9') {
@@ -279,20 +317,11 @@ class GeneratorFiles
     private function getSlideShowCode(array $arr_images, string $sound_name, string $sound_time): string
     {
         $number = $this->contentId;
-        #каждые 10 секунд меняем фотогрфию
-//        $count_images = ceil($sound_time / 10);
-//
-//        for ($i = 0; $count_images > count($arr_images); $i++) {
-//            $arr_images[] = $arr_images[$i];
-//        }
-//        for ($i = count($arr_images); $count_images < count($arr_images); $i--) {
-//            unset($arr_images[$i]);
-//        }
+        $sound = '-i ' . DIRECTORY_MUSIC . $sound_name . ' ';
+
 
         $imagesString = implode(',', $arr_images);
         $images = ' -i ' . DIRECTORY_IMG . str_replace(',', ' -i ' . DIRECTORY_IMG, $imagesString) . ' ';
-
-        $sound = '-i ' . DIRECTORY_MUSIC . $sound_name . ' ';
 
         $d = ceil((intval($sound_time) / count($arr_images)) * 25);
         $scale = '';
@@ -306,6 +335,7 @@ class GeneratorFiles
         $v = $v . ' concat=n=' . count($arr_images) . ':v=1:a=0,format=yuv422p[v]" -map "[v]" -map ' . count($arr_images) . ':a -shortest -y ' . DIRECTORY_VIDEO . $number . '.mp4';
 
         return 'ffmpeg' . $images . $sound . '-filter_complex "' . $scale . $v;
+
     }
 
     private function getFilesSrt($shorttext, $arr = [], $ms = 4999): string
