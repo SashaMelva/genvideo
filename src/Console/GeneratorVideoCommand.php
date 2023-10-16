@@ -163,10 +163,10 @@ class GeneratorVideoCommand extends Command
             }
 
 #TODO
-//            $voiceData['time'] = '38.160015075377';
-//            $fileNameVoice = '63_66';
-//            $textData['status'] = true;
-//            $textData['name'] = '63_66';
+            $voiceData['time'] = '153.19200375881';
+            $fileNameVoice = '68_71';
+            $textData['status'] = true;
+            $textData['name'] = '68_71';
 
 
             if ($video['type_background'] == 'slide_show' && !empty($voiceData['time'])) {
@@ -182,14 +182,16 @@ class GeneratorVideoCommand extends Command
                             $this->log->error('Ошибка преобразования формата изображения ' . $slide . ' => ' . $formatImage['fileName']);
                             $this->log->error($formatImage['command']);
                             $slidesName[] = $slide;
+                            $this->log->info('Список изображений ' . json_encode($slidesName));
                             continue;
                         }
 
                         $slidesName[] = $formatImage['fileName'];
                         $this->log->info('Успех преобразования формата изображения, имя файла ' . $formatImage['fileName']);
+                        $this->log->info('Список изображений ' . json_encode($slidesName));
                     }
 
-
+                    $this->log->info('Список изображений ' . json_encode($slidesName));
                     $slideshow = $generatorFiles->generatorSladeShow($slidesName, $sound[0]['file_name'], $voiceData['time']);
 
                     if (!$slideshow['status']) {
