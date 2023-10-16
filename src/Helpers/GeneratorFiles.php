@@ -103,7 +103,7 @@ class GeneratorFiles
         }
 
         if ($format == '16/9') {
-            if ($proportion <= 1) {
+            if ($proportion <= 1.5) {
                 $height = $sizeImage[0] * 9 / 16;
                 $ffmpeg = 'ffmpeg -i ' . DIRECTORY_IMG . $nameImage . ' -vf crop=' . $sizeImage[0] . ':' . (int)$height . ' ' . DIRECTORY_IMG . $resultName;
             } else {
