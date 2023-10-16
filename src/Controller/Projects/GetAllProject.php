@@ -29,7 +29,11 @@ class GetAllProject  extends UserController
             try {
                 $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
 
-                $project = ListProject::findAllProjectInfoByUserId($token->user_id);
+                $projects = ListProject::findAllProjectInfoByUserId($token->user_id);
+
+                foreach ($projects as $key => $project) {
+                    $project[$key]['count_content'] = ContentVideo::countContent($project['id']);
+                }
 
                 return $this->respondWithData($project);
 
