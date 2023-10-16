@@ -180,7 +180,8 @@ class GeneratorVideoCommand extends Command
 
                         if (!$formatImage['status']) {
                             $this->log->error('Ошибка преобразования формата изображения ' . $slide . ' => ' . $formatImage['fileName']);
-                            $slidesName[] = $formatImage['fileName'];
+                            $this->log->error($formatImage['command']);
+                            $slidesName[] = $slide;
                             continue;
                         }
 
