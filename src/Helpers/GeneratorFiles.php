@@ -93,7 +93,7 @@ class GeneratorFiles
     public function generatorImageFormat(string $nameImage, string $format): array
     {
         $infoImage = pathinfo(DIRECTORY_IMG . $nameImage);
-        $resultName = $infoImage['filename'] . '_format2.'. $infoImage['extension'];
+        $resultName = $infoImage['filename'] . '_format3.'. $infoImage['extension'];
         $sizeImage = getimagesize( DIRECTORY_IMG . $nameImage);
         $proportion = $sizeImage[0] / $sizeImage[1];
 
