@@ -80,7 +80,7 @@ class GeneratorFiles
             foreach ($images as $key => $image) {
                 $nameVideo[] = $key . '_' . $number;
                 $v = $v . ' concat=n=' . 1 . ':v=1:a=0,format=yuv422p[v]" -map "[v]" -map ' . 1 . ':a -shortest -y ' . DIRECTORY_VIDEO . $key . '_' . $number . '.mp4';
-                $ffmpeg = 'ffmpeg -i ' . $image . '-filter_complex "' . "[{$i}:v]scale=-1:10*ih,zoompan=z='min(zoom+0.0010,1.5)':d={$timeSlide}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'[v{$i}];" . $v;
+                $ffmpeg = 'ffmpeg -i ' . DIRECTORY_IMG . $image . ' -filter_complex "' . "[{$i}:v]scale=-1:10*ih,zoompan=z='min(zoom+0.0010,1.5)':d={$timeSlide}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'[v{$i}];" . $v;
                 $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
                 if (!is_null($errors)) {
