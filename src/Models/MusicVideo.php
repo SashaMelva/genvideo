@@ -18,6 +18,12 @@ class MusicVideo extends Model
             ->get()->toArray();
     }
 
+    public static function findAll(): array
+    {
+        return self::query()
+            ->get()->toArray();
+    }
+
     public static function findOne(int $id): Model|Collection|Builder|array|null
     {
         return self::query()->find($id)->getModel();

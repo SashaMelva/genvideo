@@ -28,7 +28,7 @@ class GetCollectionDataSettingVideo extends UserController
 
             $images = ImageVideo::findAllByProjectId($data['project_id']);
             $video = AdditionalVideo::findAllByProjectId($data['project_id']);
-            $musics = MusicVideo::findAllByProjectId($data['project_id']);
+            $musics = MusicVideo::findAll();
             $logo = [];
 
             foreach ($images as $key => $img) {
