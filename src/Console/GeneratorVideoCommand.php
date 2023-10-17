@@ -193,6 +193,7 @@ class GeneratorVideoCommand extends Command
                     }
 
                     $this->log->info('Список изображений ' . json_encode($slidesName));
+                    var_dump($sound);
                     $slideshow = $generatorFiles->generatorSladeShow($slidesName, $sound[0]['file_name'], $voiceData['time']);
 
                     if (!$slideshow['status']) {
