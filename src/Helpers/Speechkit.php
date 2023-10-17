@@ -114,10 +114,9 @@ class Speechkit
     private function response(string $text, array $voiceSetting)
     {
         try {
-//            $tokenData = DB::table('token_yandex')->where([['id', '=', 1]])->get()->toArray()[0];
-//            $token = trim($tokenData->token);
+            $tokenData = DB::table('token_yandex')->where([['id', '=', 1]])->get()->toArray()[0];
+            $token = trim($tokenData->token);
 
-            $token = 't1.9euelZqNj5icyoqUzZKOjIyPiceRku3rnpWamJiTmpbNnImPnZPPjMbHnJDl8_dgOkxW-e8sBGty_N3z9yBpSVb57ywEa3L8zef1656Vmo6dyM7Jx5WPzcuej5OKyJOW7_zF656Vmo6dyM7Jx5WPzcuej5OKyJOW.uRThsPBK_EU9phNi0T2oc0Thgu-LSnZUk8KaJT5ysg3M_lKQBrsrXCgut5goJZBu-B95u_Jd18P3uSzMKKNBCQ';
             $response = $this->client->post('https://tts.api.cloud.yandex.net/speech/v1/tts:synthesize',
                 [
                     'headers' => [
