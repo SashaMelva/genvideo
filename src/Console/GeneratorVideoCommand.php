@@ -163,10 +163,10 @@ class GeneratorVideoCommand extends Command
             }
 
 #TODO
-            $voiceData['time'] = '1.464';
-            $fileNameVoice = '81_84';
-            $textData['status'] = true;
-            $textData['name'] = '81_84';
+//            $voiceData['time'] = '1.464';
+//            $fileNameVoice = '81_84';
+//            $textData['status'] = true;
+//            $textData['name'] = '81_84';
 
 
             if ($video['type_background'] == 'slide_show' && !empty($voiceData['time'])) {
@@ -193,7 +193,6 @@ class GeneratorVideoCommand extends Command
                     }
 
                     $this->log->info('Список изображений ' . json_encode($slidesName));
-                    var_dump($sound);
                     $slideshow = $generatorFiles->generatorSladeShow($slidesName, $sound[0]['file_name'], $voiceData['time']);
 
                     if (!$slideshow['status']) {
