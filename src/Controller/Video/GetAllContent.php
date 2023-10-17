@@ -35,6 +35,14 @@ class GetAllContent extends UserController
             $countRows = ContentVideo::countContent((int)$projectId);
             $totalPage = ceil($countRows / $pageSize);
 
+            if ($countRows <= 0) {
+                return $this->respondWithData([
+                    'current_page' => $page,
+                    'page_size' => $pageSize,
+                    'total_rows' => $countRows,]
+                );
+            }
+
             if ($page > $totalPage) {
                 return $this->respondWithError(400, 'Данной страницы не существует');
             }
@@ -56,7 +64,6 @@ class GetAllContent extends UserController
 
             if ($countRows > 0) {
                 $resultData['rows'] = ContentVideo::findByList((int)$projectId, ($page - 1) * $pageSize, $pageSize);
-
             }
 
             return $this->respondWithData($resultData);
