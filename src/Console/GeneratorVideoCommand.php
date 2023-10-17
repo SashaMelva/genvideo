@@ -163,10 +163,10 @@ class GeneratorVideoCommand extends Command
             }
 
 #TODO
-//            $voiceData['time'] = '153.19200375881';
-//            $fileNameVoice = '68_71';
-//            $textData['status'] = true;
-//            $textData['name'] = '68_71';
+            $voiceData['time'] = '1.464';
+            $fileNameVoice = '81_84';
+            $textData['status'] = true;
+            $textData['name'] = '81_84';
 
 
             if ($video['type_background'] == 'slide_show' && !empty($voiceData['time'])) {
@@ -248,6 +248,7 @@ class GeneratorVideoCommand extends Command
                         $this->log->info('Успех преобразования формата видео, имя файла ' . $resultName);
                     }
 
+                    var_dump($sound);
                     $backgroundVideo = $generatorFiles->generatorBackgroundVideoAndMusic($additionalVideoName, $sound[0]['file_name'], $voiceData['time']);
 
                     if (!$backgroundVideo['status']) {
