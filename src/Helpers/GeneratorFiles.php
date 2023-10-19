@@ -122,7 +122,7 @@ class GeneratorFiles
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         if (!is_null($errors)) {
-            return ['status' => false];
+            return ['status' => false, 'command' => $ffmpeg];
         }
 
         return ['fileName' => $resultName, 'status' => true];
