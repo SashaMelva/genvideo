@@ -34,6 +34,7 @@ class UploadAdditionalVideo extends UserController
                 $uploadedFile = $uploadedFiles['video'];
                 $fileNameMusic = $data['project_id'] . '_' . date('Y_m_d_H_i_s') . '_' . floor(microtime(true) * 1000);
 
+                var_dump($uploadedFile->getError());
                 if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
 
 
