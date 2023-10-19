@@ -301,21 +301,6 @@ class GeneratorVideoCommand extends Command
                 $this->log->info('Логотип прикреплён, имя файла ' . $resultName);
             }
 
-            if (!empty($videoEnd) || !empty($videoStart)) {
-
-                $backgroundVideo = $generatorFiles->mergeVideo($resultName, $video['content_format'], $videoStart[0] ?? null, $videoEnd[0] ?? null);
-
-                if (!$backgroundVideo['status']) {
-                    ContentVideo::changeStatus($videoId, 5);
-                    $this->log->error('Ошибка склеивания видео');
-                    exec($cmd);
-                    return 0;
-                }
-
-                $resultName = $backgroundVideo['fileName'];
-                $this->log->info('Видое склеились, имя файла ' . $resultName);
-            }
-
             if (!empty($fileNameVoice)) {
 
                 $voice = $generatorFiles->generatorMusic($fileNameVoice, $resultName);
@@ -346,6 +331,21 @@ class GeneratorVideoCommand extends Command
 
                 $resultName = $titers['fileName'];
                 $this->log->info('Субтитры наложены, имя файла ' . $resultName);
+            }
+
+            if (!empty($videoEnd) || !empty($videoStart)) {
+
+                $backgroundVideo = $generatorFiles->mergeVideo($resultName, $video['content_format'], $videoStart[0] ?? null, $videoEnd[0] ?? null);
+
+                if (!$backgroundVideo['status']) {
+                    ContentVideo::changeStatus($videoId, 5);
+                    $this->log->error('Ошибка склеивания видео');
+                    exec($cmd);
+                    return 0;
+                }
+
+                $resultName = $backgroundVideo['fileName'];
+                $this->log->info('Видое склеились, имя файла ' . $resultName);
             }
 
             ContentVideo::updateContent($videoId, $resultName . '.mp4', RELATIVE_PATH_VIDEO . $resultName . '.mp4', 4);
