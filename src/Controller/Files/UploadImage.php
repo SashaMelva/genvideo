@@ -23,10 +23,10 @@ class UploadImage extends UserController
     {
         header('Access-Control-Allow-Origin: *');
         $data = $this->getFormData();
-//        $access_token = $this->request->getHeaderLine('token');
-//        $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
-//
-//        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
+        $access_token = $this->request->getHeaderLine('token');
+        $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
+
+        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
 
             try {
 
@@ -61,8 +61,8 @@ class UploadImage extends UserController
             } catch (Exception $e) {
                 return $this->respondWithError($e->getCode(), $e->getMessage());
             }
-//        } else {
-//            return $this->respondWithError(215);
-//        }
+        } else {
+            return $this->respondWithError(215);
+        }
     }
 }

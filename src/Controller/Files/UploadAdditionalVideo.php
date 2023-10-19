@@ -23,12 +23,12 @@ class UploadAdditionalVideo extends UserController
     {
         header('Access-Control-Allow-Origin: *');
         $data = $this->getFormData();
-        $access_token = $this->request->getHeaderLine('token');
-        $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
+//        $access_token = $this->request->getHeaderLine('token');
+//        $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
 
-        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
+//        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
 
-            try {
+//            try {
 
                 $uploadedFiles = $this->request->getUploadedFiles();
                 $uploadedFile = $uploadedFiles['video'];
@@ -51,11 +51,11 @@ class UploadAdditionalVideo extends UserController
                     return $this->respondWithError(400, 'Ошибка получения видео. Код ошибки: ' . $uploadedFile->getError());
                 }
 
-            } catch (Exception $e) {
-                return $this->respondWithError($e->getCode(), $e->getMessage());
-            }
-        } else {
-            return $this->respondWithError(215);
-        }
+//            } catch (Exception $e) {
+//                return $this->respondWithError($e->getCode(), $e->getMessage());
+//            }
+//        } else {
+//            return $this->respondWithError(215);
+//        }
     }
 }
