@@ -117,14 +117,15 @@ class GeneratorFiles
     /**Генерируем видео с фоновой музыкой*/
     public function generatorBackgroundVideoAndMusic(string $nameVideo, string $sound_name, string $time): array
     {
-        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 ' . DIRECTORY_VIDEO . $this->contentId . '_1.mp4';
+        $resultName =  $this->contentId . '_music';
+        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $nameVideo . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 ' . DIRECTORY_VIDEO . $this->contentId . '.mp4';
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         if (!is_null($errors)) {
             return ['status' => false];
         }
 
-        return ['fileName' => $this->contentId, 'status' => true];
+        return ['fileName' => $resultName, 'status' => true];
     }
 
     public function generatorImageFormat(string $nameImage, string $format): array
@@ -178,7 +179,7 @@ class GeneratorFiles
     public function generatorVideoFormat(string $nameVideo, string $format): array
     {
         $resultName = $this->contentId . '_format';
-        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . ' -vf "scale=1080:-1,setdar=' . $format . '" ' . DIRECTORY_ADDITIONAL_VIDEO . $resultName . '.mp4';
+        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . ' -vf "scale=1080:-1,setdar=' . $format . '" ' . DIRECTORY_VIDEO . $resultName . '.mp4';
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         var_dump($ffmpeg);
@@ -186,7 +187,7 @@ class GeneratorFiles
             return ['status' => false];
         }
 
-        unlink(DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . '.mp4');
+        unlink(DIRECTORY_ADDITIONAL_VIDEO . $nameVideo);
         return ['fileName' => $resultName, 'status' => true];
     }
 

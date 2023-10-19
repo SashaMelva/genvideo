@@ -251,7 +251,6 @@ class GeneratorVideoCommand extends Command
                         $this->log->info('Успех преобразования формата видео, имя файла ' . $resultName);
                     }
 
-                    var_dump($sound);
                     $backgroundVideo = $generatorFiles->generatorBackgroundVideoAndMusic($additionalVideoName, $sound[0]['file_name'], $voiceData['time']);
 
                     if (!$backgroundVideo['status']) {
