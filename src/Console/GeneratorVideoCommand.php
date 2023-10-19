@@ -75,7 +75,7 @@ class GeneratorVideoCommand extends Command
             $videoEnd = [];
 
             if ($this->status_log) {
-                $this->log->info('Контент взят на генерацию: ' . PROJECT_DIR . $videoId);
+                $this->log->info('Контент взят на генерацию: ' . DIRECTORY_SPEECHKIT . $videoId);
             }
 
             ContentVideo::changeStatus($videoId, 2);
