@@ -248,7 +248,7 @@ class GeneratorFiles
                 $dataStartVideo = $this->generatorAdditionalVideoFormat($fileNameStart);
 
                 if ($dataStartVideo['status']) {
-                    $ffmpeg .= '|' . DIRECTORY_ADDITIONAL_VIDEO . $dataStartVideo['fileName'] . '.ts' . '|';
+                    $ffmpeg .=  DIRECTORY_ADDITIONAL_VIDEO . $dataStartVideo['fileName'] . '.ts' . '|';
                 } else {
                     return ['status' => false];
                 }
@@ -278,7 +278,7 @@ class GeneratorFiles
                 $dataEndVideo = $this->generatorAdditionalVideoFormat($fileNameEnd);
 
                 if ($dataEndVideo['status']) {
-                    $ffmpeg .= '|' . DIRECTORY_ADDITIONAL_VIDEO . $dataEndVideo['fileName'] . '.ts' . '|';
+                    $ffmpeg .= '|' . DIRECTORY_ADDITIONAL_VIDEO . $dataEndVideo['fileName'] . '.ts';
                 } else {
                     return ['status' => false];
                 }
