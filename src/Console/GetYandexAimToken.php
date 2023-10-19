@@ -41,7 +41,7 @@ class GetYandexAimToken extends Command
             $this->log->info('Получаем новый токен ' . date('Y-m-s H:i:s'));
         }
 
-        $dir = '/var/www/genvideo/api/var/token/token.txt';
+        $dir = '/var/www/genvi-api/var/token/token.txt';
         try {
 
             shell_exec('yc iam create-token > ' . $dir);
