@@ -223,7 +223,7 @@ class GeneratorFiles
     public function generatorAdditionalVideoFormat(string $nameVideo): array
     {
         $resultName = $nameVideo . '_format';
-        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . '.mp4 -aspect 9:16 -c:v h264_nvenc -c:a copy -f mpegts ' . DIRECTORY_ADDITIONAL_VIDEO . $resultName . '.ts';
+        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . '.mp4 -aspect 9:16 -c:v h264_nvenc -c:a copy -f mpegts -y' . DIRECTORY_ADDITIONAL_VIDEO . $resultName . '.ts';
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         var_dump($ffmpeg);
