@@ -67,45 +67,10 @@ class GeneratorFiles
     }
 
     /**Генерируем cлайдшоу с фоновой музыкой*/
-    public function generatorSladeShow(array $images, string $sound_name, string $time): array
+    public function generatorSladeShow(array $images, string $sound_name, string $time, string $format): array
     {
         $number = $this->contentId;
-
-        $ffmpeg = $this->getSlideShowCode($images, $sound_name, $time);
-//        } else {
-//            $timeSlide = ceil((intval($time) / count($images)) * 25);;
-//            $i = 1;
-//            $v = "[v{$i}]";
-//            $nameVideo = [];
-//
-//            foreach ($images as $key => $image) {
-//                $nameVideo[] = $key . '_' . $number;
-//                $v = $v . ' concat=n=' . 1 . ':v=1:a=0,format=yuv422p[v]" -map "[v]" -map ' . 1 . ':a -shortest -y ' . DIRECTORY_VIDEO . $key . '_' . $number . '.mp4';
-//                $ffmpeg = 'ffmpeg -i ' . DIRECTORY_IMG . $image . ' -filter_complex "' . "[{$i}:v]scale=-1:10*ih,zoompan=z='min(zoom+0.0010,1.5)':d={$timeSlide}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'[v{$i}];" . $v;
-//                $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
-//
-//                if (!is_null($errors)) {
-//                    return ['status' => false, 'command' => $ffmpeg];
-//                }
-//            }
-//
-//            $ffmpegMerge = 'ffmpeg -i "concat:';
-//            foreach ($nameVideo as $item) {
-//                if ($this->mergeFiles($item, DIRECTORY_VIDEO)) {
-//                    $ffmpegMerge .= DIRECTORY_VIDEO . $item . '.ts' . '|';
-//                } else {
-//                    return ['status' => false];
-//                }
-//            }
-//
-//            $ffmpegMerge .= '" -vcodec copy -acodec copy ' . DIRECTORY_VIDEO . $number . '.mp4';
-//            $errors = shell_exec($ffmpegMerge . ' -hide_banner -loglevel error 2>&1');
-//
-//            if (!is_null($errors)) {
-//                return ['status' => false, 'command' => $ffmpegMerge];
-//            }
-//
-//        }
+        $ffmpeg = $this->getSlideShowCode($images, $sound_name, $time, $format);
 
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
@@ -182,7 +147,7 @@ class GeneratorFiles
     public function generatorVideoFormatForSlideShow(string $nameVideo, string $format): array
     {
         $resultName = $this->contentId . '_format';
-        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $nameVideo . '.mp4 -vf "scale=1080:-1,setdar=' . $format . '" ' . DIRECTORY_VIDEO . $resultName . '.mp4';
+        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $nameVideo . '.mp4 -vf "scale=1080:-1,setdar=' . $format . '" -c:v h264_nvenc -c:a copy ' . DIRECTORY_VIDEO . $resultName . '.mp4';
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         if (!is_null($errors)) {
@@ -256,19 +221,45 @@ class GeneratorFiles
         return ['fileName' => $resultName, 'status' => true];
     }
 
+    public function generatorAdditionalVideoFormat(string $nameVideo): array
+    {
+        $resultName = $nameVideo . '_format';
+        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . '.mp4 -aspect 9:16 -c:v h264_nvenc -c:a copy -f mpegts' . DIRECTORY_ADDITIONAL_VIDEO . $resultName . '.ts';
+        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+
+        if (!is_null($errors)) {
+            return ['status' => false];
+        }
+
+        unlink(DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . '.mp4');
+        return ['fileName' => $resultName, 'status' => true];
+    }
 
     /**Склеиваем видео*/
-    public function mergeVideo(string $nameVideoContent, ?string $nameVideoStart = null, ?string $nameVideoEnd = null): array
+    public function mergeVideo(string $nameVideoContent, string $format, ?string $nameVideoStart = null, ?string $nameVideoEnd = null): array
     {
-        $fileName = $this->contentId . '_result1';
+        $fileName = $this->contentId . '_result';
         $ffmpeg = 'ffmpeg -i "concat:';
 
         if (!is_null($nameVideoStart)) {
             $fileNameStart = str_replace('.mp4', '', $nameVideoStart);
-            if ($this->mergeFiles($fileNameStart, DIRECTORY_ADDITIONAL_VIDEO)) {
-                $ffmpeg .= DIRECTORY_ADDITIONAL_VIDEO . $fileNameStart . '.ts' . '|';
+
+            if ($format == '9/16') {
+                $dataStartVideo = $this->generatorAdditionalVideoFormat($fileNameStart);
+
+                if ($dataStartVideo['status']) {
+                    $ffmpeg .= '|' . DIRECTORY_ADDITIONAL_VIDEO . $dataStartVideo['filename'] . '.ts' . '|';
+                } else {
+                    return ['status' => false];
+                }
+
             } else {
-                return ['status' => false];
+
+                if ($this->mergeFiles($fileNameStart, DIRECTORY_ADDITIONAL_VIDEO)) {
+                    $ffmpeg .= DIRECTORY_ADDITIONAL_VIDEO . $fileNameStart . '.ts' . '|';
+                } else {
+                    return ['status' => false];
+                }
             }
         }
 
@@ -281,10 +272,24 @@ class GeneratorFiles
 
         if (!is_null($nameVideoEnd)) {
             $fileNameEnd = str_replace('.mp4', '', $nameVideoEnd);
-            if ($this->mergeFiles($fileNameEnd, DIRECTORY_ADDITIONAL_VIDEO)) {
-                $ffmpeg .= '|' . DIRECTORY_ADDITIONAL_VIDEO . $fileNameEnd;
+
+            if ($format == '9/16') {
+
+                $dataEndVideo = $this->generatorAdditionalVideoFormat($fileNameEnd);
+
+                if ($dataEndVideo['status']) {
+                    $ffmpeg .= '|' . DIRECTORY_ADDITIONAL_VIDEO . $dataEndVideo['filename'] . '.ts' . '|';
+                } else {
+                    return ['status' => false];
+                }
+
             } else {
-                return ['status' => false];
+
+                if ($this->mergeFiles($fileNameEnd, DIRECTORY_ADDITIONAL_VIDEO)) {
+                    $ffmpeg .= '|' . DIRECTORY_ADDITIONAL_VIDEO . $fileNameEnd;
+                } else {
+                    return ['status' => false];
+                }
             }
         }
 
@@ -301,7 +306,7 @@ class GeneratorFiles
     private function mergeFiles(string $fileName, string $directory): bool
     {
 
-        $ffmpeg = 'ffmpeg -i ' . $directory . $fileName . '.mp4' . ' -acodec copy -vcodec copy -vbsf h264_nvenc -f mpegts ' . $directory . $fileName . '.ts';
+        $ffmpeg = 'ffmpeg -i ' . $directory . $fileName . '.mp4' . ' -c:v h264_nvenc -c:a copy -f mpegts ' . $directory . $fileName . '.ts';
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         if (!is_null($errors)) {
@@ -331,7 +336,7 @@ class GeneratorFiles
         return $result;
     }
 
-    private function getSlideShowCode(array $arr_images, string $sound_name, string $sound_time): string
+    private function getSlideShowCode(array $arr_images, string $sound_name, string $sound_time, string $format): string
     {
         $number = $this->contentId;
         $sound = '-i ' . DIRECTORY_MUSIC . $sound_name . ' ';
@@ -349,10 +354,13 @@ class GeneratorFiles
             $v .= "[v{$i}]";
         }
 
-        $v = $v . ' concat=n=' . count($arr_images) . ':v=1:a=0,format=yuv422p[v]" -map "[v]" -map ' . count($arr_images) . ':a -shortest -y ' . DIRECTORY_VIDEO . $number . '.mp4';
+        if ($format == '9/16') {
+            $v = $v . ' concat=n=' . count($arr_images) . ':v=1:a=0,format=yuv422p[v]" -map "[v]" -map ' . count($arr_images) . ':a -aspect 9:16 -shortest -c:v h264_nvenc -y ' . DIRECTORY_VIDEO . $number . '.mp4';
+        } else {
+            $v = $v . ' concat=n=' . count($arr_images) . ':v=1:a=0,format=yuv422p[v]" -map "[v]" -map ' . count($arr_images) . ':a -shortest -c:v h264_nvenc -y ' . DIRECTORY_VIDEO . $number . '.mp4';
+        }
 
         return 'ffmpeg' . $images . $sound . '-filter_complex "' . $scale . $v;
-
     }
 
     private function getFilesSrt($shorttext, $arr = [], $ms = 4999): string
