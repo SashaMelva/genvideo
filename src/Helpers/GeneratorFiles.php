@@ -2,6 +2,8 @@
 
 namespace App\Helpers;
 
+use getID3;
+
 class GeneratorFiles
 {
     private int $contentId;
@@ -69,7 +71,7 @@ class GeneratorFiles
     {
         $number = $this->contentId;
 
-            $ffmpeg = $this->getSlideShowCode($images, $sound_name, $time);
+        $ffmpeg = $this->getSlideShowCode($images, $sound_name, $time);
 //        } else {
 //            $timeSlide = ceil((intval($time) / count($images)) * 25);;
 //            $i = 1;
@@ -115,10 +117,25 @@ class GeneratorFiles
     }
 
     /**Генерируем видео с фоновой музыкой*/
-    public function generatorBackgroundVideoAndMusic(string $nameVideo, string $sound_name, string $time): array
+    public function generatorBackgroundVideoAndMusic(string $nameVideo, string $sound_name, string $timeVoice): array
     {
-        $resultName =  $this->contentId . '_music';
-        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $nameVideo . '.mp4 -i ' . DIRECTORY_MUSIC . $sound_name . ' -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 ' . DIRECTORY_VIDEO . $resultName . '.mp4';
+        $resultName = $this->contentId . '_music';
+
+//        $getID3 = new getID3;
+//        $file = $getID3->analyze(DIRECTORY_MUSIC . $sound_name);
+//        $timeSound = $file['playtime_seconds'];
+
+        $getID3 = new getID3;
+        $file = $getID3->analyze(DIRECTORY_VIDEO . $nameVideo . '.mp4');
+        $timeVideo = $file['playtime_seconds'];
+
+        if ($timeVoice > $timeVideo) {
+            $loop = floor($timeVoice / $timeVideo);
+            $ffmpeg = 'ffmpeg  -stream_loop ' . $loop . ' -i ' . DIRECTORY_VIDEO . $nameVideo . '.mp4 -i ' . DIRECTORY_MUSIC . $sound_name . ' -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 ' . DIRECTORY_VIDEO . $resultName . '.mp4';
+        } else {
+            $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $nameVideo . '.mp4 -i ' . DIRECTORY_MUSIC . $sound_name . ' -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 ' . DIRECTORY_VIDEO . $resultName . '.mp4';
+        }
+
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         if (!is_null($errors)) {
@@ -144,10 +161,10 @@ class GeneratorFiles
         if ($format == '16/9') {
             if ($proportion <= 1.5) {
                 $height = $sizeImage[0] * 9 / 16;
-                $ffmpeg = 'ffmpeg -i ' . DIRECTORY_IMG . $nameImage . ' -vf crop=' . $sizeImage[0] . ':' . (int)$height . ' ' . DIRECTORY_IMG . $resultName. ' -y';
+                $ffmpeg = 'ffmpeg -i ' . DIRECTORY_IMG . $nameImage . ' -vf crop=' . $sizeImage[0] . ':' . (int)$height . ' ' . DIRECTORY_IMG . $resultName . ' -y';
             } else {
                 $width = $sizeImage[1] * 16 / 9;
-                $ffmpeg = 'ffmpeg -i ' . DIRECTORY_IMG . $nameImage . ' -vf crop=' . (int)$width . ':' . $sizeImage[1] . ' ' . DIRECTORY_IMG . $resultName. ' -y';
+                $ffmpeg = 'ffmpeg -i ' . DIRECTORY_IMG . $nameImage . ' -vf crop=' . (int)$width . ':' . $sizeImage[1] . ' ' . DIRECTORY_IMG . $resultName . ' -y';
             }
         }
 
