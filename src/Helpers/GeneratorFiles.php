@@ -293,7 +293,7 @@ class GeneratorFiles
             }
         }
 
-        $ffmpeg .= '" -vcodec copy -acodec copy ' . DIRECTORY_VIDEO . $fileName . '.mp4';
+        $ffmpeg .= '" -c:v h264_nvenc -c:a copy ' . DIRECTORY_VIDEO . $fileName . '.mp4';
 
         var_dump($ffmpeg);
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
