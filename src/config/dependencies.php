@@ -13,7 +13,7 @@ return [
     ],
     'eloquent_loc'=>[
         'driver' => 'pgsql',
-        'host' => '91.105.198.209',
+        'host' => '45.92.176.207',
         'database' => 'genvideo',
         'port' => 5432,
         'username' => 'courseup',
