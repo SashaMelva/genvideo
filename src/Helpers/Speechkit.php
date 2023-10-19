@@ -72,7 +72,8 @@ class Speechkit
             return ['status' => false];
 
         } catch (Exception $e) {
-            throw new Exception($e->getMessage());
+            return ['status' => false, 'message' => $e->getMessage()];
+           // throw new Exception($e->getMessage());
         }
     }
 
