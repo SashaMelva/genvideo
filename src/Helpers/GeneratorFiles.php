@@ -226,11 +226,12 @@ class GeneratorFiles
         $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . '.mp4 -aspect 9:16 -c:v h264_nvenc -c:a copy -f mpegts' . DIRECTORY_ADDITIONAL_VIDEO . $resultName . '.ts';
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
+        var_dump($ffmpeg);
         if (!is_null($errors)) {
             return ['status' => false];
         }
 
-        unlink(DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . '.mp4');
+        //unlink(DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . '.mp4');
         return ['fileName' => $resultName, 'status' => true];
     }
 
