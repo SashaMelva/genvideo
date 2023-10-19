@@ -46,6 +46,7 @@ class Speechkit
                 preg_match_all("/(.{1,$l})[ \n\r\t]+/", $desc, $descArray);
 
                 $data = $this->SplitMp3($descArray[0], $fileName, $voiceSetting);
+                return ['status' => false, 'command' => $data['command']];
                 $filesName = $data['files'];
                 $result = $data['status'];
                 $filePath = DIRECTORY_SPEECHKIT . $fileName . '.mp3';
@@ -62,15 +63,15 @@ class Speechkit
                     }
                 }
 
-                return ['status' => true, 'time' => $file['playtime_seconds']];
+                return ['status' => true, 'time' => $file['playtime_seconds'], 'command' => $data['command']];
 
             } elseif (!empty($filesName)) {
                 foreach ($filesName as $item) {
                     unlink($item);
                 }
             }
-            return ['status' => false];
 
+            return ['status' => false, 'command' => $data['command']];
         } catch (Exception $e) {
             return ['status' => false, 'message' => $e->getMessage()];
            // throw new Exception($e->getMessage());
@@ -102,7 +103,7 @@ class Speechkit
             $ffmpeg = 'ffmpeg -i "concat:' . $voices . '" -acodec copy -c:a libmp3lame ' . DIRECTORY_SPEECHKIT . $number . '.mp3';
             $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
-            return ['status' => true, 'files' => $tmp_array];
+            return ['status' => true, 'files' => $tmp_array, 'command' => $ffmpeg];
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }

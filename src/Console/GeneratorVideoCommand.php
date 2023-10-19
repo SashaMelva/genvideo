@@ -133,8 +133,8 @@ class GeneratorVideoCommand extends Command
                     $this->log->info('Успех генерации аудио озвучки, id текста ' . $video['text_id']);
 
                 } else {
-                    if (isset($voiceData['message'])) {
-                        $this->log->error($voiceData['message'] . $video['text_id']);
+                    if (isset($voiceData['command'])) {
+                        $this->log->error($voiceData['command'] . $video['text_id']);
                     }
 
                     TextVideo::changeVoiceStatus($video['text_id'], 'ошибка');
