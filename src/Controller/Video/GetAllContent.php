@@ -26,53 +26,53 @@ class GetAllContent extends UserController
         $data = json_decode($this->request->getBody()->getContents(), true);
         $projectId = $data['project_id'];
 
-//        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
+        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
 
-        try {
-//                $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
-            $page = $data['page'] ?? 1;
-            $pageSize = $data['page_size'] ?? 30;
-            $countRows = ContentVideo::countContent((int)$projectId);
-            $totalPage = ceil($countRows / $pageSize);
+            try {
+                $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
+                $page = $data['page'] ?? 1;
+                $pageSize = $data['page_size'] ?? 30;
+                $countRows = ContentVideo::countContent((int)$projectId);
+                $totalPage = ceil($countRows / $pageSize);
 
-            if ($countRows <= 0) {
-                return $this->respondWithData([
+                if ($countRows <= 0) {
+                    return $this->respondWithData([
+                            'current_page' => $page,
+                            'page_size' => $pageSize,
+                            'total_rows' => $countRows,]
+                    );
+                }
+
+                if ($page > $totalPage) {
+                    return $this->respondWithError(400, 'Данной страницы не существует');
+                }
+
+                $project = Project::fullInfo((int)$projectId);
+                $rowStart = ($page - 1) * $pageSize + 1;
+                $rowEnd = min($page * $pageSize, $countRows);
+
+                $resultData = [
                     'current_page' => $page,
                     'page_size' => $pageSize,
-                    'total_rows' => $countRows,]
-                );
+                    'total_rows' => $countRows,
+                    'total_page' => $totalPage,
+                    'row_start' => $rowStart,
+                    'row_end' => $rowEnd,
+                    'rows' => [],
+                ];
+
+
+                if ($countRows > 0) {
+                    $resultData['rows'] = ContentVideo::findByList((int)$projectId, ($page - 1) * $pageSize, $pageSize);
+                }
+
+                return $this->respondWithData($resultData);
+
+            } catch (Throwable $e) {
+                return $this->respondWithError($e->getCode(), $e->getMessage());
             }
-
-            if ($page > $totalPage) {
-                return $this->respondWithError(400, 'Данной страницы не существует');
-            }
-
-//            $project = Project::fullInfo((int)$projectId);
-            $rowStart = ($page - 1) * $pageSize + 1;
-            $rowEnd = min($page * $pageSize, $countRows);
-
-            $resultData = [
-                'current_page' => $page,
-                'page_size' => $pageSize,
-                'total_rows' => $countRows,
-                'total_page' => $totalPage,
-                'row_start' => $rowStart,
-                'row_end' => $rowEnd,
-                'rows' => [],
-            ];
-
-
-            if ($countRows > 0) {
-                $resultData['rows'] = ContentVideo::findByList((int)$projectId, ($page - 1) * $pageSize, $pageSize);
-            }
-
-            return $this->respondWithData($resultData);
-
-        } catch (Throwable $e) {
-            return $this->respondWithError($e->getCode(), $e->getMessage());
+        } else {
+            return $this->respondWithError(215);
         }
-//        } else {
-//            return $this->respondWithError(215);
-//        }
     }
 }
