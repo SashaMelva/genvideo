@@ -171,6 +171,7 @@ class GeneratorVideoCommand extends Command
             $textData['status'] = true;
             $textData['name'] = '89_92';
 
+            var_dump($video['content_format']);
 
             if ($video['type_background'] == 'slide_show' && !empty($voiceData['time'])) {
 

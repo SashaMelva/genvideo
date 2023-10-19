@@ -69,7 +69,6 @@ class GeneratorFiles
     /**Генерируем cлайдшоу с фоновой музыкой*/
     public function generatorSladeShow(array $images, string $sound_name, string $time, string $format): array
     {
-        $number = $this->contentId;
         $ffmpeg = $this->getSlideShowCode($images, $sound_name, $time, $format);
 
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
@@ -355,7 +354,7 @@ class GeneratorFiles
         }
 
         if ($format == '9/16') {
-            $v = $v . ' concat=n=' . count($arr_images) . ':v=1:a=0,format=yuv422p[v]" -map "[v]" -map ' . count($arr_images) . ':a -aspect 9:16 -shortest -c:v h264_nvenc -y ' . DIRECTORY_VIDEO . $number . '.mp4';
+            $v = $v . ' concat=n=' . count($arr_images) . ':v=1:a=0,format=yuv422p[v]" -map "[v]" -map ' . count($arr_images) . ':a -shortest -aspect 9:16 -c:v h264_nvenc -y ' . DIRECTORY_VIDEO . $number . '.mp4';
         } else {
             $v = $v . ' concat=n=' . count($arr_images) . ':v=1:a=0,format=yuv422p[v]" -map "[v]" -map ' . count($arr_images) . ':a -shortest -c:v h264_nvenc -y ' . DIRECTORY_VIDEO . $number . '.mp4';
         }
