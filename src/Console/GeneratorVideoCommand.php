@@ -145,7 +145,7 @@ class GeneratorVideoCommand extends Command
                 }
             }
 
-            if ($video['status_text'] == 0 || $video['status_text'] == 'false' || $video['status_text'] == 'создано') {
+            if ($video['status_text'] == 0 || $video['status_text'] == 'false' || $video['status_text'] == 'обработано') {
 
                 TextVideo::changeTextStatus($video['text_id'], 'в обработке');
                 $textData = $generatorFiles->generatorTextForTitre($video['text'], $video['text_id']);
