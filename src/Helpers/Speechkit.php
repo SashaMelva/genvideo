@@ -46,7 +46,6 @@ class Speechkit
                 preg_match_all("/(.{1,$l})[ \n\r\t]+/", $desc, $descArray);
 
                 $data = $this->SplitMp3($descArray[0], $fileName, $voiceSetting);
-                return ['status' => false, 'command' => $data['command']];
                 $filesName = $data['files'];
                 $result = $data['status'];
                 $filePath = DIRECTORY_SPEECHKIT . $fileName . '.mp3';
