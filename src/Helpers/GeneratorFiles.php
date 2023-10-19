@@ -187,7 +187,6 @@ class GeneratorFiles
             return ['status' => false];
         }
 
-        unlink(DIRECTORY_ADDITIONAL_VIDEO . $nameVideo);
         return ['fileName' => $resultName, 'status' => true];
     }
 
