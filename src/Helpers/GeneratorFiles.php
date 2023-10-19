@@ -125,6 +125,7 @@ class GeneratorFiles
             return ['status' => false, 'command' => $ffmpeg];
         }
 
+        unlink(DIRECTORY_VIDEO . $nameVideo);
         return ['fileName' => $resultName, 'status' => true];
     }
 
