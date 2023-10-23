@@ -105,7 +105,7 @@ class Speechkit
                     }
                 }
 
-                return ['status' => true, 'time' => $file['playtime_seconds'], 'command' => $data['command']];
+                return ['status' => true, 'time' => $file['playtime_seconds'], 'name' => $fileName, 'command' => $data['command']];
 
             } elseif (!empty($filesName)) {
                 foreach ($filesName as $item) {
