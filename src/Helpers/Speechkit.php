@@ -100,17 +100,17 @@ class Speechkit
                 $seconds = $file['playtime_seconds'];
 
                 if (isset($seconds) && !empty($filesName)) {
-//                    foreach ($filesName as $item) {
-//                        unlink($item);
-//                    }
+                    foreach ($filesName as $item) {
+                        unlink($item);
+                    }
                 }
 
                 return ['status' => true, 'time' => $file['playtime_seconds'], 'command' => $data['command']];
 
             } elseif (!empty($filesName)) {
-//                foreach ($filesName as $item) {
-//                    unlink($item);
-//                }
+                foreach ($filesName as $item) {
+                    unlink($item);
+                }
             }
 
             return ['status' => false, 'command' => $data['command']];
