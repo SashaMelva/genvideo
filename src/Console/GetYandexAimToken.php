@@ -35,7 +35,7 @@ class GetYandexAimToken extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         date_default_timezone_set('Europe/Moscow');
-        $cmd = '/usr/bin/supervisorctl stop domain-for-get-course';
+        $cmd = '/usr/bin/supervisorctl stop get-token';
 
         if ($this->status_log) {
             $this->log->info('Получаем новый токен ' . date('Y-m-s H:i:s'));

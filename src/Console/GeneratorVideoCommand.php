@@ -44,7 +44,7 @@ class GeneratorVideoCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         date_default_timezone_set('Europe/Moscow');
-        $cmd = '/usr/bin/supervisorctl stop domain-for-get-course';
+        $cmd = '/usr/bin/supervisorctl stop generator-video';
 
         if ($this->status_log) {
             $this->log->info('Начало ' . date('Y-m-s H:i:s'));
