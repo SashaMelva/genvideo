@@ -13,48 +13,22 @@ class GeneratorFiles
         $this->contentId = $contentId;
     }
 
-    /**Генерируем текст для субтитров*/
-    public function generatorTextForTitre(string $text, int $text_id): array
-    {
-        $nameFiles = $this->contentId . '_' . $text_id;
-        $data = [
-            'name' => $nameFiles,
-            'path' => RELATIVE_PATH_TEXT . $nameFiles,
-            'status' => false
-        ];
-
-        $text = str_replace(' ', ' ', $text);
-        $textArray = explode(' ', $text);
-
-        // разбиваем текст на строки по ~ 150 символов
-        $shortTextArray = $this->getArrayStr($textArray, 150);
-
-        // формируем, сохраняем файл субтитров .srt и конвертируем в .ass
-        $length = file_put_contents(DIRECTORY_TEXT . $nameFiles . '.srt', $this->getFilesSrt($shortTextArray));
-
-        if ($length !== false) {
-            $ffmpeg = 'ffmpeg -i ' . DIRECTORY_TEXT . $nameFiles . '.srt -y ' . DIRECTORY_TEXT . $nameFiles . '.ass';
-        }
-
-        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
-
-        if (is_null($errors)) {
-            $data['status'] = true;
-        }
-
-        return $data;
-    }
-
     /**Генерируем субтитры*/
-    public function generatorText(string $videoName, string $titerName): array
+    public function generatorText(string $videoName, string $titerName, string $formatVideo): array
     {
         $resultName = $this->contentId . '_text';
         $stringDirectory = str_replace('\\', '\\\\', DIRECTORY_TEXT);
         $stringDirectory = str_replace(':', '\\:', $stringDirectory);
 
-        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -filter_complex "subtitles=\'' . $stringDirectory . $titerName . '.ass' . '\':force_style=' .
-            "'OutlineColour=&H80000000,BorderStyle=3,Outline=1,Shadow=0,MarginV=110'" .
-            '" -c:v h264_nvenc -c:a copy -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
+        if ($formatVideo == '9/16') {
+            $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -filter_complex "subtitles=\'' . $stringDirectory . $titerName . '.ass' . '\':force_style=' .
+                "'OutlineColour=&H80000000,BorderStyle=3,Outline=1,Shadow=0,MarginV=110'" .
+                '" -c:v h264_nvenc -c:a copy -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
+        } else {
+            $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -filter_complex "subtitles=\'' . $stringDirectory . $titerName . '.ass' . '\':force_style=' .
+                "'OutlineColour=&H80000000,BorderStyle=3,Outline=1,FontSize=12,Shadow=0,MarginV=110'" .
+                '" -c:v h264_nvenc -c:a copy -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
+        }
 
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
@@ -158,10 +132,10 @@ class GeneratorFiles
     }
 
     /**Генерируем видео с нужного формата*/
-    public function generatorVideoFormat(string $nameVideo, string $format): array
+    public function generatorVideoFormat(string $nameVideo): array
     {
         $resultName = $this->contentId . '_format';
-        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . ' -vf "scale=1080:-1,setdar=' . $format . '" ' . DIRECTORY_VIDEO . $resultName . '.mp4';
+        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . ' -vf "crop=((9*in_h)/16):in_h:in_w/2-((9*in_h)/16)/2:0" -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         var_dump($ffmpeg);
@@ -223,7 +197,7 @@ class GeneratorFiles
     public function generatorAdditionalVideoFormat(string $nameVideo): array
     {
         $resultName = $nameVideo . '_format';
-        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . '.mp4 -aspect 9:16 -c:v h264_nvenc -c:a copy -f mpegts -y ' . DIRECTORY_ADDITIONAL_VIDEO . $resultName . '.ts';
+        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . '.mp4 -vf "crop=((9*in_h)/16):in_h:in_w/2-((9*in_h)/16)/2:0" -c:v h264_nvenc -c:a copy -f mpegts -y ' . DIRECTORY_ADDITIONAL_VIDEO . $resultName . '.ts';
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         var_dump($ffmpeg);
@@ -318,26 +292,6 @@ class GeneratorFiles
         return true;
     }
 
-
-    private function getArrayStr(array $textArray, int $countChar): array
-    {
-        $result = [];
-        $text = $textArray[0] . ' ';
-        $count = count($textArray);
-
-        for ($i = 1; $i < $count; $i++) {
-            if (strlen($text) + strlen($textArray[$i]) > $countChar) {
-                $result[] = $text;
-                $text = '';
-            }
-
-            $text .= $textArray[$i] . ' ';
-        }
-
-        $result[] = $text;
-        return $result;
-    }
-
     private function getSlideShowCode(array $arr_images, string $sound_name, string $sound_time, string $format): string
     {
         $number = $this->contentId;
@@ -363,54 +317,5 @@ class GeneratorFiles
         }
 
         return 'ffmpeg' . $images . $sound . '-filter_complex "' . $scale . $v;
-    }
-
-    private function getFilesSrt($shorttext, $arr = [], $ms = 4999): string
-    {
-        foreach ($shorttext as $key => $item) {
-
-            if ($key == 0) {
-                $arr[] = ($key + 1) . "\r\n" . '00:00:00,000 --> '
-                    . str_replace('.', ',', $this->formatMilliseconds($ms)) . "\r\n" . $item . "\r\n";
-                continue;
-            }
-
-            $arr[] = ($key + 1) . "\r\n" . str_replace('.', ',', $this->formatMilliseconds($ms))
-                . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($ms + 4999)) . "\r\n" . $item . "\r\n";
-            $ms = $ms + 4999;
-        }
-        return implode("\r\n", $arr);
-    }
-
-    private function getFilesSrtTest($shorttext, $arr = [], $ms = 8999)
-    {
-
-        foreach ($shorttext as $key => $item) {
-
-            if ($key == 0) {
-                $arr[] = ($key + 1) . "\r\n" . '00:00:03,099 --> '
-                    . str_replace('.', ',', $this->formatMilliseconds($ms + 3099)) . "\r\n" . $item . "\r\n";
-                continue;
-            }
-
-            $arr[] = ($key + 1) . "\r\n" . str_replace('.', ',', $this->formatMilliseconds($ms + 3099))
-                . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($ms + 8999 + 3099)) . "\r\n" . $item . "\r\n";
-            $ms = $ms + 8999;
-        }
-        return implode("\r\n", $arr);
-    }
-
-    private function formatMilliseconds($milliseconds): string
-    {
-        $seconds = floor($milliseconds / 1000);
-        $minutes = floor($seconds / 60);
-        $hours = floor($minutes / 60);
-        $milliseconds = $milliseconds % 1000;
-        $seconds = $seconds % 60;
-        $minutes = $minutes % 60;
-
-        $format = '%u:%02u:%02u.%03u';
-        $time = sprintf($format, $hours, $minutes, $seconds, $milliseconds);
-        return rtrim($time, '0');
     }
 }

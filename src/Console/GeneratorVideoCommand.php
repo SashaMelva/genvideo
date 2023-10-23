@@ -130,6 +130,8 @@ class GeneratorVideoCommand extends Command
 
                     TextVideo::changeTextStatus($video['text_id'], 'обработано');
                     TextVideo::updateFileVoice($video['text_id'], $fileNameVoice, RELATIVE_PATH_SPEECHKIT . $fileNameVoice . '.' . $voiceSetting['format'], 'успех', $voiceData['time']);
+                    TextVideo::updateFileText($video['text_id'], $fileNameVoice, RELATIVE_PATH_TEXT . $fileNameVoice, 'успех');
+                    $this->log->info('Успех генерации субтитров, id текста ' . $video['text_id']);
                     $this->log->info('Успех генерации аудио озвучки, id текста ' . $video['text_id']);
 
                 } else {
@@ -138,27 +140,9 @@ class GeneratorVideoCommand extends Command
                     }
 
                     TextVideo::changeVoiceStatus($video['text_id'], 'ошибка');
-                    ContentVideo::changeStatus($videoId, 5);
-                    $this->log->error('Ошибка генерации аудио озвучки, id текста ' . $video['text_id']);
-                    exec($cmd);
-                    return 0;
-                }
-            }
-
-            if ($video['status_text'] == 0 || $video['status_text'] == 'false' || $video['status_text'] == 'обработано') {
-
-                TextVideo::changeTextStatus($video['text_id'], 'в обработке');
-                $textData = $generatorFiles->generatorTextForTitre($video['text'], $video['text_id']);
-
-                if ($textData['status']) {
-
-                    TextVideo::updateFileText($video['text_id'], $textData['name'], $textData['path'], 'успех');
-                    $this->log->info('Успех генерации субтитров, id текста ' . $video['text_id']);
-
-                } else {
-
                     TextVideo::changeTextStatus($video['text_id'], 'ошибка');
                     ContentVideo::changeStatus($videoId, 5);
+                    $this->log->error('Ошибка генерации аудио озвучки, id текста ' . $video['text_id']);
                     $this->log->error('Ошибка генерации субтитров, id текста ' . $video['text_id']);
                     exec($cmd);
                     return 0;
@@ -224,7 +208,7 @@ class GeneratorVideoCommand extends Command
                     $additionalVideoName = $videoBackground[0];
                     /**Подгоняем видео под формат*/
                     if ($video['content_format'] == '9/16') {
-                        $formatVideo = $generatorFiles->generatorVideoFormat($additionalVideoName, $video['content_format']);
+                        $formatVideo = $generatorFiles->generatorVideoFormat($additionalVideoName);
 
                         if (!$formatVideo['status']) {
                             ContentVideo::changeStatus($videoId, 5);
@@ -303,9 +287,9 @@ class GeneratorVideoCommand extends Command
                 $this->log->info('Озвучка наложена, имя файла ' . $resultName);
             }
 
-            if ($textData['status']) {
+            if ($voiceData['status']) {
 
-                $titers = $generatorFiles->generatorText($resultName, $textData['name']);
+                $titers = $generatorFiles->generatorText($resultName, $voiceData['name'], $video['content_format']);
 
                 if (!$titers['status']) {
                     ContentVideo::changeStatus($videoId, 5);
