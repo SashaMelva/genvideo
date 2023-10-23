@@ -44,7 +44,7 @@ class GetYandexAimToken extends Command
         $dir = '/var/www/genvi-api/var/token/token.txt';
         try {
 
-            shell_exec('yc iam create-token > ' . $dir);
+            shell_exec('/root/yandex-cloud/bin/yc iam create-token > ' . $dir);
             DB::table('token_yandex')->where([['id', '=', 1]])->update(['token' => file_get_contents($dir)]);
             $this->log->info('Получили токен ' . date('Y-m-s H:i:s'));
             unlink($dir);
