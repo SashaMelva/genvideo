@@ -289,6 +289,7 @@ class GeneratorVideoCommand extends Command
 
             if ($voiceData['status']) {
 
+                $this->log->info('Название файла субтитров  ' . $voiceData['name']);
                 $titers = $generatorFiles->generatorText($resultName, $voiceData['name'], $video['content_format']);
 
                 if (!$titers['status']) {
