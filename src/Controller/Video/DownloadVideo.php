@@ -33,12 +33,12 @@ class DownloadVideo extends UserController
             try {
                 $file = DIRECTORY_VIDEO . $video['file_name'];
                 if (file_exists($file)) {
+
                     if (ob_get_level()) {
                         ob_end_clean();
                     }
 
-                    header('Access-Control-Allow-Origin', 'https://api.genvi.pro');
-                    header('Access-Control-Allow-Credentials', 'true');
+                    header('Access-Control-Allow-Origin: *');
                     header('Content-Description: File Transfer');
                     header('Content-Type: application/octet-stream');
                     header('Content-Disposition: attachment; filename=' . basename($file));
