@@ -37,7 +37,8 @@ class DownloadVideo extends UserController
                         ob_end_clean();
                     }
 
-                    header('Access-Control-Allow-Origin');
+                    header('Access-Control-Allow-Origin', 'https://api.genvi.pro');
+                    header('Access-Control-Allow-Credentials', 'true');
                     header('Content-Description: File Transfer');
                     header('Content-Type: application/octet-stream');
                     header('Content-Disposition: attachment; filename=' . basename($file));
