@@ -23,21 +23,21 @@ class DownloadVideo extends UserController
      */
     public function action(): ResponseInterface
     {
-        $access_token = $this->request->getHeaderLine('token');
-        $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
-        $data = json_decode($this->request->getBody()->getContents(), true);
+//        $access_token = $this->request->getHeaderLine('token');
+//        $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
+        $contentId = $this->request->getAttribute('id');
+        $video = ContentVideo::findByID($contentId);
 
-        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
+        var_dump($video);
+//        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
 
             try {
-                $file = DIRECTORY_VIDEO . $data['file_name'];
+                $file = DIRECTORY_VIDEO . $video['file_name'];
                 if (file_exists($file)) {
-                    // сбрасываем буфер вывода PHP, чтобы избежать переполнения памяти выделенной под скрипт
-                    // если этого не сделать файл будет читаться в память полностью!
                     if (ob_get_level()) {
                         ob_end_clean();
                     }
-                    // заставляем браузер показать окно сохранения файла
+
                     header('Content-Description: File Transfer');
                     header('Content-Type: application/octet-stream');
                     header('Content-Disposition: attachment; filename=' . basename($file));
@@ -46,17 +46,30 @@ class DownloadVideo extends UserController
                     header('Cache-Control: must-revalidate');
                     header('Pragma: public');
                     header('Content-Length: ' . filesize($file));
-                    // читаем файл и отправляем его пользователю
 
-                    return $this->respondWithData(readfile($file));
+                    if ($fd = fopen($file, 'rb')) {
+                        while (!feof($fd)) {
+                            print fread($fd, 1024);
+                        }
+                        fclose($fd);
+                    }
+
+                    return $this->respondWithData([
+                        'status' => 'success',
+                        'message' => 'Файл успешно отдан'
+                    ]);
+                }else {
+                    return $this->respondWithData([
+                        'status' => 'error',
+                        'message' => 'Файл не найден'
+                    ]);
                 }
 
-                return $this->respondWithData(400, 'Неудалось скачать файл');
             } catch (Exception $e) {
                 return $this->respondWithError($e->getCode(), $e->getMessage());
             }
-        } else {
-            return $this->respondWithError(215);
-        }
+//        } else {
+//            return $this->respondWithError(215);
+//        }
     }
 }
