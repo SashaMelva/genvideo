@@ -37,6 +37,7 @@ class DownloadVideo extends UserController
                         ob_end_clean();
                     }
 
+                    header('Access-Control-Allow-Origin');
                     header('Content-Description: File Transfer');
                     header('Content-Type: application/octet-stream');
                     header('Content-Disposition: attachment; filename=' . basename($file));
