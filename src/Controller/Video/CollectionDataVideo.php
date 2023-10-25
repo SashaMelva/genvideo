@@ -27,12 +27,30 @@ class CollectionDataVideo extends UserController
     {
         $access_token = $this->request->getHeaderLine('token');
         $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
-        $data = json_decode($this->request->getBody()->getContents(), true);
-        $userId = $token->user_id;
+      $data = json_decode($this->request->getBody()->getContents(), true);
+      $userId = 30;//$token->user_id;
 
         if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
 
             try {
+
+                if (is_null($data['project_id']) ||
+                    is_null($data['text']) ||
+                    is_null($data['name']) ||
+                    is_null($data['type_background']) ||
+                    is_null($data['voice_id']) ||
+                    is_null($data['format']) ||
+                    is_null($data['ampula_voice']) ||
+                    is_null($data['musics_ids']) ) {
+
+                    return $this->respondWithError(400, 'Не заполнены обязательые поля');
+                }
+                if ($data['type_background'] == '' && is_null($data['images_ids'])) {
+                    return $this->respondWithError(400, 'Не указаны избражения для слайд-шоу');
+                }
+                if ($data['type_background'] == '' && is_null($data['videos_ids'])) {
+                    return $this->respondWithError(400, 'Не указано видео для основной части контента');
+                }
 
                 $text = TextVideo::addText(
                     $data['project_id'],
@@ -60,6 +78,7 @@ class CollectionDataVideo extends UserController
                     $text->id,
                     $data['ampula_voice'],
                 );
+
                 $contentId = $content->id;
 
                 if (!empty($data['musics_ids'])) {
