@@ -239,8 +239,8 @@ class Speechkit
         $minutes = $minutes % 60;
 
         $format = '%u:%02u:%02u.%03u';
-        $time = sprintf($format, $hours, $minutes, $seconds, $milliseconds);
-        return rtrim($time, '0');
+
+        return sprintf($format, $hours, $minutes, $seconds, $milliseconds);
     }
     /**
      * @throws GuzzleException
