@@ -53,27 +53,27 @@ class Speechkit
                         if (iconv_strlen(trim($textArray[$i])) > $countChar) {
 
                             $textLongArray = explode(',', trim($textArray[$i]));
-                            $textLong = trim($textLongArray[0]) . ',';
+                            $textLong = trim($textLongArray[0]) . ', ';
                             unset($textLongArray[0]);
                             $countLong = count($textLongArray);
 
                             for ($j = 1; $j <= $countLong; $j++) {
                                 if (iconv_strlen($textLong) + iconv_strlen($textLongArray[$j]) > $countChar) {
-                                    $result[] = trim($textLong) . ',';
+                                    $result[] = trim($textLong) . ', ';
                                     $textLong = '';
                                 }
 
                                 $textLong .= trim($textLongArray[$j]) . ', ';
 
                                 if ($j == $countLong) {
-                                    $result[] = trim($textLong) . ',';
+                                    $result[] = trim($textLong) . ', ';
                                 }
                             }
                             $text = '';
                             continue;
                         }
 
-                        $rep = str_replace('..', '.', trim($text) . '.');
+                        $rep = str_replace('..', '.', trim($text) . '. ');
                         $rep = str_replace('!.', '.', $rep);
                         $result[] = str_replace('?.', '.', $rep);
                         $text = '';
@@ -82,7 +82,7 @@ class Speechkit
                     $text .= trim($textArray[$i]) . '. ';
 
                     if ($i == $count) {
-                        $rep = str_replace('..', '.', trim($text) . '.');
+                        $rep = str_replace('..', '.', trim($text) . '. ');
                         $rep = str_replace('!.', '!', $rep);
                         $result[] = str_replace('?.', '?', $rep);
                     }
