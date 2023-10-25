@@ -9,6 +9,7 @@ use App\Controller\Authorization\RegistryUser;
 use App\Controller\Files\DeleteAdditionalVideo;
 use App\Controller\Files\DeleteImage;
 use App\Controller\Files\DeleteMusic;
+use App\Controller\Files\ImportDataForExcel;
 use App\Controller\Files\UploadAdditionalVideo;
 use App\Controller\Files\UploadImage;
 use App\Controller\Files\UploadMusic;
@@ -77,16 +78,16 @@ return static function(App $app):void
         $group->group('/video', function (RouteCollectorProxyInterface $group) {
             $group->post('/get-content-setting', GetCollectionDataSettingVideo::class);
             $group->post('/collection-data', CollectionDataVideo::class);
-            //$group->get('/generate/{id:[0-9]+}', GeneratorVideo::class);
-
-
-            $group->get('/test', TestController::class);
-
-            $group->get('/load/{id:[0-9]+}', DownloadVideo::class);
-            $group->post('/send', SendVideo::class);
-
             $group->post('/get-all', GetAllContent::class);
             $group->get('/get/{id:[0-9]+}', GetContent::class);
+
+            $group->get('/load/{id:[0-9]+}', DownloadVideo::class);
+
+            $group->post('/send', SendVideo::class);
+            //$group->get('/generate/{id:[0-9]+}', GeneratorVideo::class);
+            $group->get('/test', TestController::class);
+
+
         });
 
         $group->group('/file', function (RouteCollectorProxyInterface $group) {
@@ -94,6 +95,7 @@ return static function(App $app):void
             $group->post('/add-music', UploadMusic::class);
             $group->post('/add-video', UploadAdditionalVideo::class);
 
+            $group->post('/import/excel/', ImportDataForExcel::class);
 //            $group->get('/delete-image/{id:[0-9]+}', DeleteImage::class);
 //            $group->get('/delete-sound/{id:[0-9]+}', DeleteMusic::class);
 //            $group->get('/delete-video/{id:[0-9]+}', DeleteAdditionalVideo::class);

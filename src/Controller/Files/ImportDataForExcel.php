@@ -5,7 +5,7 @@ namespace App\Controller\Files;
 use App\Controller\UserController;
 use App\Helpers\CheckTokenExpiration;
 use App\Helpers\UploadFile;
-use App\Models\AdditionalVideo;
+use App\Models\ImportExcel;
 use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -13,7 +13,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class UploadAdditionalVideo extends UserController
+class ImportDataForExcel  extends UserController
 {
     /**
      * @throws ContainerExceptionInterface
@@ -31,24 +31,28 @@ class UploadAdditionalVideo extends UserController
             try {
 
                 $uploadedFiles = $this->request->getUploadedFiles();
-                $uploadedFile = $uploadedFiles['video'];
-                $fileNameMusic = $data['project_id'] . '_' . date('Y_m_d_H_i_s') . '_' . floor(microtime(true) * 1000);
+                $uploadedFile = $uploadedFiles['excel'];
+                $fileNameExcel = $data['project_id'] . '_' . date('Y_m_d_H_i_s') . '_' . floor(microtime(true) * 1000);
 
                 if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
 
+                    $extension = pathinfo($uploadedFile->getClientFilename(), PATHINFO_EXTENSION);
 
-                    $filename = UploadFile::action(DIRECTORY_ADDITIONAL_VIDEO, $uploadedFile, $fileNameMusic);
-                    $filePath = RELATIVE_PATH_ADDITIONAL_VIDEO . $filename;
-
-                    if (empty($filename) || empty($filePath)) {
-                        return $this->respondWithError(400, 'Ошибка загрузки видео');
+                    if ($extension != 'csv') {
+                        return $this->respondWithError(400, 'Поддерживаются файлы для импорта только с форматом csv');
                     }
 
-                    $video = AdditionalVideo::addVideo($filename, $filePath, '00:00', $data['project_id'], $data['type_video']);
-                    return $this->respondWithData(['path' => $video->file_path, 'id' => $video->id]);
+                    $filename = UploadFile::action(DIRECTORY_EXCEL_IMPORT, $uploadedFile, $fileNameExcel);
+
+                    if (empty($filename)) {
+                        return $this->respondWithError(400, 'Ошибка загрузки файла');
+                    }
+
+                    $file = ImportExcel::addFile($filename, 1);
+                    return $this->respondWithData(['path' => $file->file_name, 'id' => $file->id]);
 
                 } else {
-                    return $this->respondWithError(400, 'Ошибка получения видео. Код ошибки: ' . $uploadedFile->getError());
+                    return $this->respondWithError(400, 'Ошибка получения файла. Код ошибки: ' . $uploadedFile->getError());
                 }
 
             } catch (Exception $e) {
