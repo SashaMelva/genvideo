@@ -4,6 +4,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\Console\GeneratorVideoCommand;
 use App\Console\GetYandexAimToken;
+use App\Console\ImportDataExcelCommand;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Application;
 
@@ -28,7 +29,7 @@ const DIRECTORY_ADDITIONAL_VIDEO = PROJECT_DIR .  DIRECTORY_SEPARATOR . 'var' . 
 define("RELATIVE_PATH_ADDITIONAL_VIDEO", $_ENV['HOST'] . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'video' . DIRECTORY_SEPARATOR);
 const DIRECTORY_TEXT = PROJECT_DIR .  DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'subtitles' . DIRECTORY_SEPARATOR;
 define("RELATIVE_PATH_TEXT", $_ENV['HOST'] . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'subtitles' . DIRECTORY_SEPARATOR);
-
+const DIRECTORY_EXCEL_IMPORT = PROJECT_DIR .  DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'excelImport' . DIRECTORY_SEPARATOR;
 try {
 
     /** @var ContainerInterface $container */
@@ -39,6 +40,7 @@ try {
 
     $cli->add(new GeneratorVideoCommand());
     $cli->add(new GetYandexAimToken());
+    $cli->add(new ImportDataExcelCommand());
 
     $cli->run();
 

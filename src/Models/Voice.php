@@ -16,4 +16,11 @@ class Voice  extends Model
     {
         return self::query()->get()->toArray();
     }
+
+    public static function getBySpeakerName(string $nameSpeaker)
+    {
+        return self::query()
+            ->where([['name', '=', $nameSpeaker]])
+            ->get()->toArray();
+    }
 }

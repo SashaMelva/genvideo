@@ -129,7 +129,8 @@ class ContentVideo extends Model
         ?int    $colorBackgroundId,
         string  $statusId,
         string  $textId,
-        string  $ampulaVoice
+        string  $ampulaVoice,
+        ?int  $statusGeneratorImage = 0
     ): ContentVideo
     {
         $newContent = new ContentVideo();
@@ -147,6 +148,7 @@ class ContentVideo extends Model
         $newContent->setAttribute('status_id', $statusId);
         $newContent->setAttribute('text_id', $textId);
         $newContent->setAttribute('ampula_voice', $ampulaVoice);
+        $newContent->setAttribute('genertor_image_status', $statusGeneratorImage);
 
         $newContent->save();
         return $newContent;
