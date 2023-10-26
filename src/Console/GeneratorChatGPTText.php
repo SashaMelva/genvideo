@@ -2,18 +2,10 @@
 
 namespace App\Console;
 
-use App\Helpers\GeneratorFiles;
-use App\Helpers\Speechkit;
-use App\Models\ColorBackground;
 use App\Models\ContentVideo;
 use App\Models\GPTChatRequests;
-use App\Models\ListImage;
-use App\Models\ListMusic;
-use App\Models\ListVideo;
-use App\Models\TextVideo;
 use Exception;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Database\Capsule\Manager as DB;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\StreamHandler;
@@ -46,6 +38,8 @@ class GeneratorChatGPTText extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         date_default_timezone_set('Europe/Moscow');
+        mb_internal_encoding("UTF-8");
+
         $cmd = '/usr/bin/supervisorctl stop generator-gpt-text';
 
         if ($this->status_log) {
@@ -69,7 +63,7 @@ class GeneratorChatGPTText extends Command
         try {
 
             if ($this->status_log) {
-                $this->log->info('Контент взят на генерацию: ' . $contentId);
+                $this->log->info('Контент взят на генерацию текста: ' . $contentId);
             }
 
             ContentVideo::changeStatus($contentId, 7);
@@ -85,12 +79,12 @@ class GeneratorChatGPTText extends Command
                 }
 
                 if (empty($gptRequest["text_request"])) {
-                    $this->log->info('Запрос для генерации текста пустой: ' . $gptRequest['text_request']);
+                    $this->log->error('Запрос для генерации текста пустой: ' . $gptRequest['text_request']);
+                    ContentVideo::changeStatus($contentId, 5);
                     exec($cmd);
                     return 0;
                 }
-                mb_internal_encoding("UTF-8");
-                $flagResponse = true;
+
                 $client = new Client();
 
                 $response = $client->post('http://127.0.0.1:8888/api/main',
@@ -105,41 +99,43 @@ class GeneratorChatGPTText extends Command
 
                 $responseData = json_decode($response->getBody()->getContents(), true);
 
-                var_dump($responseData);
-
                 if ($responseData['status'] == 'Ok') {
-                    $text = utf8_decode($responseData['response']);
+                    $text = $responseData['response'];
 
-                    var_dump($text);
                     if (empty($text)) {
-                        $flagResponse = false;
+
+                        $this->log->error('Результат запроса пустой текст контент поставлен в очередь'. $contentId);
+                        GPTChatRequests::changeStatusError($gptRequest['id'], 3, 'Ответ пустой');
+                        ContentVideo::changeStatus($contentId, 6);
+
                     } else {
 
-                       // TextVideo::updatedContentData($gptRequest['text_id'], $text);
                         GPTChatRequests::changeStatusAndContent($gptRequest['id'], 2, $text);
+                        ContentVideo::changeStatus($contentId, 8);
                         exit();
                     }
 
                 } else {
-                    $flagResponse = false;
+                    $this->log->info('Ошика при получении текста: ' . $responseData['response']);
+                    GPTChatRequests::changeStatusError($gptRequest['id'], 3, $responseData['response']);
+                    ContentVideo::changeStatus($contentId, 6);
                 }
 
             } else {
 
                 if ($this->status_log) {
                     $this->log->info('Не найден запрос на генерацию контента: ' . json_encode($contentIds));
+                    exec($cmd);
+                    return 0;
                 }
 
                 ContentVideo::changeStatus($contentId, 8);
             }
 
-
         } catch (Exception $e) {
             $this->log->error($e->getMessage());
-            ContentVideo::changeStatus($contentId, 5);
-        } catch (GuzzleException $e) {
-            $this->log->error($e->getMessage());
-            ContentVideo::changeStatus($contentId, 5);
+            $this->log->info('Контент опять поставлен в очередь на получении текста: ' . $contentId);
+            ContentVideo::changeStatus($contentId, 6);
         }
 
         if ($this->status_log) {

@@ -31,9 +31,17 @@ class GPTChatRequests extends Model
             ->update(['response' => $text, 'status' => $statusId]);
     }
 
-    public static function changeStatus(int $requestId, int $statusId, string $text){
+    public static function changeStatus(int $requestId, int $statusId): void
+    {
         self::query()
             ->where([['id', '=', $requestId]])
-            ->update(['response' => $text, 'status' => $statusId]);
+            ->update(['status' => $statusId]);
+    }
+
+    public static function changeStatusError(int $requestId, int $statusId, string $textError): void
+    {
+        self::query()
+            ->where([['id', '=', $requestId]])
+            ->update(['text_error' => $textError, 'status' => $statusId]);
     }
 }

@@ -47,8 +47,8 @@ class ImportDataExcelCommand extends Command
             $this->log->info('Начало ' . date('Y-m-d H:i:s'));
         }
 
-        //$filesImport = DB::table('import_excel')->select('id', 'file_name', 'creator_id')->where([['status', '=', 'загружен']])->get()->toArray();
-        $filesImport = DB::table('import_excel')->select('id', 'file_name', 'creator_id')->get()->toArray();
+        $filesImport = DB::table('import_excel')->select('id', 'file_name', 'creator_id')->where([['status', '=', 'загружен']])->get()->toArray();
+       // $filesImport = DB::table('import_excel')->select('id', 'file_name', 'creator_id')->get()->toArray();
 
         if (empty($filesImport)) {
             $this->log->info('Нет файлов для импорта');
