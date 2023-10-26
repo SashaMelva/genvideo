@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use App\Console\GeneratorChatGPTText;
 use App\Console\GeneratorVideoCommand;
 use App\Console\GetYandexAimToken;
 use App\Console\ImportDataExcelCommand;
@@ -41,6 +42,7 @@ try {
     $cli->add(new GeneratorVideoCommand());
     $cli->add(new GetYandexAimToken());
     $cli->add(new ImportDataExcelCommand());
+    $cli->add(new GeneratorChatGPTText());
 
     $cli->run();
 
