@@ -58,7 +58,7 @@ class GeneratorChatGPTText extends Command
             return 0;
         }
 
-        $contentId = 147;//$contentIds[0]->id;
+        $contentId = 151;//$contentIds[0]->id;
 
         try {
 
