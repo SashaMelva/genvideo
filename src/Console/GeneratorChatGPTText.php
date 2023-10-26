@@ -89,7 +89,7 @@ class GeneratorChatGPTText extends Command
                     exec($cmd);
                     return 0;
                 }
-
+                mb_internal_encoding("UTF-8");
                 $flagResponse = true;
                 $client = new Client();
 
@@ -103,14 +103,14 @@ class GeneratorChatGPTText extends Command
                         ]
                     ]);
 
-                var_dump($response->getBody()->getContents());
                 $responseData = json_decode($response->getBody()->getContents(), true);
 
                 var_dump($responseData);
 
                 if ($responseData['status'] == 'Ok') {
-                    $text = $responseData['response'];
+                    $text = utf8_decode($responseData['response']);
 
+                    var_dump($text);
                     if (empty($text)) {
                         $flagResponse = false;
                     } else {
