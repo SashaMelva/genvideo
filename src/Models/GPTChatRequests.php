@@ -19,34 +19,21 @@ class GPTChatRequests extends Model
             ->get()->toArray();
     }
 
-    public static function findAllByProjectId(int $projectId): array
-    {
-        return self::query()->where([['project_id', '=', $projectId]])
-            ->get()->toArray();
-    }
-
     public static function findOne(int $id): Model|Collection|Builder|array|null
     {
         return self::query()->find($id)->getModel();
     }
 
-    public static function addImage(string $nameFile, string $path, int $projectId, ?string $type = null): ImageVideo
-    {
-        $newImage = new ImageVideo();
-        $newImage->setAttribute('file_name', $nameFile);
-        $newImage->setAttribute('file_path', $path);
-        $newImage->setAttribute('project_id', $projectId);
-        $newImage->setAttribute('type', $type);
-
-        $newImage->save();
-
-        return $newImage;
-    }
-
-    public static function deleteImage(int $imageId): void
+    public static function changeStatusAndContent(int $requestId, int $statusId, string $text): void
     {
         self::query()
-            ->where([['id', '=', $imageId]])
-            ->delete();
+            ->where([['id', '=', $requestId]])
+            ->update(['response' => $text, 'status' => $statusId]);
+    }
+
+    public static function changeStatus(int $requestId, int $statusId, string $text){
+        self::query()
+            ->where([['id', '=', $requestId]])
+            ->update(['response' => $text, 'status' => $statusId]);
     }
 }

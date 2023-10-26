@@ -85,7 +85,7 @@ class GeneratorChatGPTText extends Command
                 }
 
                 if (empty($gptRequest["text_request"])) {
-                    $this->log->info('Запрос для генерации текста пустой: ' . $gptRequest['id']);
+                    $this->log->info('Запрос для генерации текста пустой: ' . $gptRequest['text_request']);
                     exec($cmd);
                     return 0;
                 }
@@ -104,11 +104,10 @@ class GeneratorChatGPTText extends Command
                     ]);
 
                 var_dump($response->getBody()->getContents());
-                $responseData = json_encode($response->getBody()->getContents(), JSON_UNESCAPED_UNICODE);
+                $responseData = json_decode($response->getBody()->getContents(), true);
 
                 var_dump($responseData);
 
-                exit();
                 if ($responseData['status'] == 'Ok') {
                     $text = $responseData['response'];
 
@@ -116,8 +115,9 @@ class GeneratorChatGPTText extends Command
                         $flagResponse = false;
                     } else {
 
-                        TextVideo::updatedContentData($gptRequest['text_id'], $text);
-                        GPTChatRequests::changeStatusAndContent($gptRequest['id'], $text);
+                       // TextVideo::updatedContentData($gptRequest['text_id'], $text);
+                        GPTChatRequests::changeStatusAndContent($gptRequest['id'], 2, $text);
+                        exit();
                     }
 
                 } else {
