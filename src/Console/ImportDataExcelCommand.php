@@ -161,12 +161,17 @@ class ImportDataExcelCommand extends Command
             /**Распределение данных по таблицам*/
             foreach ($rowsNoEmptyValue as $row) {
                 $this->log->info('Сохранениe данных для контента ' . $row['название видео']);
+                $statusContent = 6;
+
+                if (empty($row['текст для запроса'])) {
+                    $statusContent = 8;
+                }
 
                 $voiceId = Voice::getBySpeakerName($row['голос'])[0]['id'];
                 $generatorImageStatus = 0;
                 $textId = self::addItemText($row);
 
-                $contentId = self::addItemContent($row, (int)$exportItem->creator_id, $voiceId, $textId, $generatorImageStatus);
+                $contentId = self::addItemContent($row, (int)$exportItem->creator_id, $voiceId, $textId, $generatorImageStatus, $statusContent);
 
                 if (!empty($row['текст для запроса'])) {
                     self::addItemChatGptRequest($row, $textId, $contentId);
@@ -291,7 +296,7 @@ class ImportDataExcelCommand extends Command
         return true;
     }
 
-    public function addItemContent(array $row, int $creatorId, int $voiceId, int $textId, string $generatorImageStatus): int
+    public function addItemContent(array $row, int $creatorId, int $voiceId, int $textId, string $generatorImageStatus, int $statusId): int
     {
         $backgroundColor = [
             'Нет' => null,
@@ -308,7 +313,7 @@ class ImportDataExcelCommand extends Command
             $voiceId,
             $row['формат видео'],
             $backgroundColor[$row['фоновое затемнение']],
-            6,
+            $statusId,
             $textId,
             'good', #TODO интонацию аудио
             $generatorImageStatus
