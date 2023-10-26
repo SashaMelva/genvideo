@@ -58,7 +58,7 @@ class GeneratorChatGPTText extends Command
             return 0;
         }
 
-        $contentId = 151;//$contentIds[0]->id;
+        $contentId = $contentIds[0]->id;
 
         try {
 
@@ -110,6 +110,7 @@ class GeneratorChatGPTText extends Command
 
                     } else {
 
+                        $this->log->error('Успех. Получили результат запроса '. $gptRequest['id']);
                         GPTChatRequests::changeStatusAndContent($gptRequest['id'], 2, $text);
                         ContentVideo::changeStatus($contentId, 8);
                         exit();
