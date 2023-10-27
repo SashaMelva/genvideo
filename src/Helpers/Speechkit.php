@@ -184,9 +184,9 @@ class Speechkit
                         12504
                 ],
             ];
-            $nameAudio = ['153_159_0', '153_159_1', '153_159_3'];
+            $nameAudio = ['153_159_0', '153_159_1', '153_159_2'];
             //$tmp_array = ['D:\OpenServer\domains\genvideo.loc\var\resources\music\speechkit\153_159_0.mp3', 'D:\OpenServer\domains\genvideo.loc\var\resources\music\speechkit\153_159_1mp3', 'D:\OpenServer\domains\genvideo.loc\var\resources\music\speechkit\153_159_2.mp3'];
-            $tmp_array = ['/var/www/genvi-api/var/resources/music/speechkit/153_159_0.mp3', '/var/www/genvi-api/var/resources/music/speechkit/153_159_1mp3', '/var/www/genvi-api/var/resources/music/speechkit/153_159_2.mp3'];
+            $tmp_array = ['/var/www/genvi-api/var/resources/music/speechkit/153_159_0.mp3', '/var/www/genvi-api/var/resources/music/speechkit/153_159_1.mp3', '/var/www/genvi-api/var/resources/music/speechkit/153_159_2.mp3'];
 
             $voices = implode('|', $tmp_array);
             var_dump($voices);
@@ -201,7 +201,8 @@ class Speechkit
                     $outputAudio = $audio . '_long';
                     $ffmpeg = 'ffmpeg -i ' . DIRECTORY_SPEECHKIT . $audio . '.mp3 -af adelay=' . $delayBetweenOffersMs . ' ' . DIRECTORY_SPEECHKIT . $outputAudio . '.mp3';
                     var_dump($ffmpeg);
-                    shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+                    $e = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+                    var_dump($e );
                 }
 
                 $tmp_array = array_merge($tmp_array, $arrayLongAudio);
@@ -241,7 +242,7 @@ class Speechkit
                         . str_replace('.', ',', $this->formatMilliseconds($shortTime + $allTime)) . "\r\n" . $textShort[0] . "\r\n";
                 } else {
                     $arr[] = ($counter) . "\r\n" . str_replace('.', ',', $this->formatMilliseconds($allTime))
-                        . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($shortTime + $allTime + $delayBetweenOffersMs)) . "\r\n" . $textShort[0] . "\r\n";
+                        . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($shortTime + $allTime)) . "\r\n" . $textShort[0] . "\r\n";
                 }
                 $allTimeWhithShort = $shortTime + $allTime;
                 $counter += 1;
@@ -251,7 +252,7 @@ class Speechkit
             } else {
                 $counter += 1;
                 if ($key == 0) {
-                    $arr[] = ($counter) . "\r\n" . str_replace('.', ',', $this->formatMilliseconds($allTime + $delayBetweenOffersMs))
+                    $arr[] = ($counter) . "\r\n" . str_replace('.', ',', $this->formatMilliseconds($allTime))
                         . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($item['time'] + $allTime)) . "\r\n" . $item['text'] . "\r\n";
                 } else {
                     $arr[] = ($key + 1) . "\r\n" . '00:00:00,000 --> '
