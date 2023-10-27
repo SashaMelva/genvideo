@@ -23,7 +23,7 @@ class GeneratorVoiceAndSubtitlesCommand extends Command
     protected function configure(): void
     {
         $log = new Logger('info');
-        $log->pushHandler(new RotatingFileHandler('../var/log/format-text-gpt.log', 2, Logger::INFO));
+        $log->pushHandler(new RotatingFileHandler('../var/log/generator-voice-subtitles.log', 2, Logger::INFO));
         $log->pushHandler(new StreamHandler('php://stdout'));
 
         $this->log = $log;
