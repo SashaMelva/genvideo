@@ -169,8 +169,7 @@ class Speechkit
                 foreach ($nameAudio as $audio) {
                     $outputAudio = $audio . '_long';
                     $ffmpeg = 'ffmpeg -i ' . DIRECTORY_SPEECHKIT . $audio . '.mp3 -af adelay=' . $delayBetweenOffersMs . ' ' . DIRECTORY_SPEECHKIT . $outputAudio . '.mp3';
-                    var_dump($ffmpeg);
-                    //shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+                    shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
                     $arrayLongAudio[] = DIRECTORY_SPEECHKIT . $outputAudio . '.mp3';
                 }
 
