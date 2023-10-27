@@ -78,7 +78,7 @@ class GeneratorVoiceAndSubtitlesCommand extends Command
                     'lang' => $video['language'],
                     'voice' => $video['dictionary_voice_name'],
                     'emotion' => $video['ampula_voice'],
-                    'delay_between_offers_ms' => $video['delay_between_offers'],
+                    'delay_between_offers_ms' => is_null($video['delay_between_offers']) ? 0 : $video['delay_between_offers'],
                     'voice_speed' => is_null($video['voice_speed']) ? '1.0' : $video['voice_speed'],
                 ];
 

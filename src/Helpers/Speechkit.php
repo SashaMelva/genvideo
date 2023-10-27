@@ -41,12 +41,7 @@ class Speechkit
 
                 $resultText = $this->spillSubtitles($text);
 
-                if ($voiceSetting['delay_between_offers_ms'] == 0) {
-                    $data = $this->SplitMp3($resultText, $fileName, $voiceSetting);
-                } else {
-                    $data = $this->SplitMp3Pause($resultText, $fileName, $voiceSetting);
-                }
-
+                $data = $this->SplitMp3($resultText, $fileName, $voiceSetting);
 
                 $filesName = $data['files'];
                 $result = $data['status'];
@@ -179,6 +174,7 @@ class Speechkit
                     $arrayLongAudio[] = DIRECTORY_SPEECHKIT . $outputAudio . '.mp3';
                 }
 
+                $tmp_array = array_merge($tmp_array, $arrayLongAudio);
                 $voices = implode('|', $arrayLongAudio);
             }
 
@@ -191,7 +187,7 @@ class Speechkit
             $ffmpeg = 'ffmpeg -i ' . DIRECTORY_TEXT . $number . '.srt -y ' . DIRECTORY_TEXT . $number . '.ass';
             $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
-            return ['status' => true, 'files' => $tmp_array, 'command' => $ffmpeg];
+            return ['status' => true, 'files' => $tmp_array, 'command' => $ffmpeg ];
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
