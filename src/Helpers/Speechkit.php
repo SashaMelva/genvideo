@@ -190,6 +190,7 @@ class Speechkit
 
             $voices = implode('|', $tmp_array);
             var_dump($voices);
+            var_dump($delayBetweenOffersMs);
             if ($delayBetweenOffersMs > 0) {
                 $arrayLongAudio = [];
 
@@ -198,8 +199,9 @@ class Speechkit
                         $arrayLongAudio[] = DIRECTORY_SPEECHKIT . $audio . '.mp3';
                         continue;
                     }
-                    $outputAudio = $audio . '_long';
-                    $ffmpeg = 'ffmpeg -i ' . DIRECTORY_SPEECHKIT . $audio . '.mp3 -af adelay=' . $delayBetweenOffersMs . ' ' . DIRECTORY_SPEECHKIT . $outputAudio . '.mp3';
+                    $outputAudio = $audio . '_long.mp3';
+                    $ffmpeg = 'ffmpeg -i ' . DIRECTORY_SPEECHKIT . $audio . '.mp3 -af adelay=' . $delayBetweenOffersMs . ' ' . DIRECTORY_SPEECHKIT . $outputAudio ;
+                    $arrayLongAudio[] = $outputAudio;
                     var_dump($ffmpeg);
                     $e = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
                     var_dump($e );
