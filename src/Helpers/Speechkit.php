@@ -51,17 +51,17 @@ class Speechkit
                 $seconds = $file['playtime_seconds'];
 
                 if (isset($seconds) && !empty($filesName)) {
-//                    foreach ($filesName as $item) {
-//                        unlink($item);
-//                    }
+                    foreach ($filesName as $item) {
+                        unlink($item);
+                    }
                 }
 
                 return ['status' => true, 'time' => $file['playtime_seconds'], 'name' => $fileName, 'command' => $data['command']];
 
             } elseif (!empty($filesName)) {
-//                foreach ($filesName as $item) {
-//                    unlink($item);
-//                }
+                foreach ($filesName as $item) {
+                    unlink($item);
+                }
             }
 
             return ['status' => false, 'command' => $data['command']];
@@ -138,59 +138,31 @@ class Speechkit
             $subtitles = [];
             $nameAudio = [];
 
-//            foreach ($Mp3Files as $key => $item) {
-//
-//                $response = $this->response($item, $voiceSetting);
-//                $length = file_put_contents(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3', $response);
-//
-//                $getID3 = new getID3;
-//                $file = $getID3->analyze(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3');
-//                $seconds = $file['playtime_seconds'];
-//
-//                $subtitles[] = [
-//                    'text' => $item,
-//                    'time' => $seconds * 1000,
-//                ];
-//
-//                if (!$length) {
-//                    return ['status' => false, 'files' => []];
-//                }
-//
-//                $tmp_array[] = DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3';
-//                $nameAudio[] = $number . '_' . $key;
-//            }
+            foreach ($Mp3Files as $key => $item) {
 
+                $response = $this->response($item, $voiceSetting);
+                $length = file_put_contents(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3', $response);
 
-            $subtitles = [
+                $getID3 = new getID3;
+                $file = $getID3->analyze(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3');
+                $seconds = $file['playtime_seconds'];
 
-                [
-                    "text" =>
-                        "Добро пожаловать на медитацию на присутствие в настоящем моменте. Найдите удобное положение и закройте глаза. Сфокусируйте свое внимание на своем дыхании. Просто наблюдайте, как воздух входит в ваши ноздри и выходит из них. ",
-                    "time" =>
-                        15072
-                ],
+                $subtitles[] = [
+                    'text' => $item,
+                    'time' => $seconds * 1000,
+                ];
 
-                [
-                    "text" =>
-                        "Позвольте своим мыслям уйти, просто будьте здесь и сейчас, в этот момент. Ощутите свое тело и примите его таким, какое оно сейчас. Ощутите землю или поверхность, на которой вы находитесь, и почувствуйте, как она вас поддерживает. ",
-                    "time" =>
-                        14928
-                ],
+                if (!$length) {
+                    return ['status' => false, 'files' => []];
+                }
 
-                [
-                    "text" =>
-                        "Заметьте ощущения в вашем теле. Почувствуйте тепло, прохладу или любые другие физические ощущения, которые вы можете заметить. Примите их без сопротивления или суждений.. ",
-                    "time" =>
-                        12504
-                ],
-            ];
-            $nameAudio = ['153_159_0', '153_159_1', '153_159_2'];
-            //$tmp_array = ['D:\OpenServer\domains\genvideo.loc\var\resources\music\speechkit\153_159_0.mp3', 'D:\OpenServer\domains\genvideo.loc\var\resources\music\speechkit\153_159_1mp3', 'D:\OpenServer\domains\genvideo.loc\var\resources\music\speechkit\153_159_2.mp3'];
-            $tmp_array = ['/var/www/genvi-api/var/resources/music/speechkit/153_159_0.mp3', '/var/www/genvi-api/var/resources/music/speechkit/153_159_1.mp3', '/var/www/genvi-api/var/resources/music/speechkit/153_159_2.mp3'];
+                $tmp_array[] = DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3';
+                $nameAudio[] = $number . '_' . $key;
+            }
+
 
             $voices = implode('|', $tmp_array);
-            var_dump($voices);
-            var_dump($delayBetweenOffersMs);
+
             if ($delayBetweenOffersMs > 0) {
                 $arrayLongAudio = [];
 
@@ -200,11 +172,9 @@ class Speechkit
                         continue;
                     }
                     $outputAudio = $audio . '_long.mp3';
-                    $ffmpeg = 'ffmpeg -i ' . DIRECTORY_SPEECHKIT . $audio . '.mp3 -af adelay=' . $delayBetweenOffersMs . ' ' . DIRECTORY_SPEECHKIT . $outputAudio ;
+                    $ffmpeg = 'ffmpeg -i ' . DIRECTORY_SPEECHKIT . $audio . '.mp3 -af adelay=' . $delayBetweenOffersMs . ' ' . DIRECTORY_SPEECHKIT . $outputAudio;
                     $arrayLongAudio[] = DIRECTORY_SPEECHKIT . $outputAudio;
-                    var_dump($ffmpeg);
                     $e = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
-                    var_dump($e );
                 }
 
                 $tmp_array = array_merge($tmp_array, $arrayLongAudio);
@@ -214,13 +184,11 @@ class Speechkit
 
             $ffmpeg = 'ffmpeg -i "concat:' . $voices . '"  -acodec copy -c:a libmp3lame ' . DIRECTORY_SPEECHKIT . $number . '.mp3';
             $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
-            var_dump($ffmpeg);
             /**для субтитров*/
             $length = file_put_contents(DIRECTORY_TEXT . $number . '.srt', $this->getFilesSrt($subtitles, $delayBetweenOffersMs));
 
             $ffmpeg = 'ffmpeg -i ' . DIRECTORY_TEXT . $number . '.srt -y ' . DIRECTORY_TEXT . $number . '.ass';
             $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
-            var_dump($tmp_array);
             return ['status' => true, 'files' => $tmp_array, 'command' => $ffmpeg];
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
@@ -314,42 +282,24 @@ class Speechkit
             $tokenData = DB::table('token_yandex')->where([['id', '=', 1]])->get()->toArray()[0];
             $token = trim($tokenData->token);
 
-            if (isset($voiceSetting['voice_speed'])) {#TODO убрать else когда перейдём на новый алгоритм
-                $response = $this->client->post('https://tts.api.cloud.yandex.net/speech/v1/tts:synthesize',
-                    [
-                        'headers' => [
-                            'Authorization' => 'Bearer ' . $token,
-                            'x-folder-id' => 'b1glckrv5eg7s4kkhtpn',
-                            'Content-Type' => 'application/x-www-form-urlencoded'
-                        ],
-                        'form_params' => [
-                            'text' => $text,
-                            'format' => $voiceSetting['format'],
-                            'lang' => $voiceSetting['lang'],
-                            'voice' => $voiceSetting['voice'],
-                            'emotion' => $voiceSetting['emotion'],
-                            'speed' => $voiceSetting['voice_speed'],
-                            'folderId' => 'b1glckrv5eg7s4kkhtpn'
-                        ]
-                    ]);
-            } else {
-                $response = $this->client->post('https://tts.api.cloud.yandex.net/speech/v1/tts:synthesize',
-                    [
-                        'headers' => [
-                            'Authorization' => 'Bearer ' . $token,
-                            'x-folder-id' => 'b1glckrv5eg7s4kkhtpn',
-                            'Content-Type' => 'application/x-www-form-urlencoded'
-                        ],
-                        'form_params' => [
-                            'text' => $text,
-                            'format' => $voiceSetting['format'],
-                            'lang' => $voiceSetting['lang'],
-                            'voice' => $voiceSetting['voice'],
-                            'emotion' => $voiceSetting['emotion'],
-                            'folderId' => 'b1glckrv5eg7s4kkhtpn'
-                        ]
-                    ]);
-            }
+            $response = $this->client->post('https://tts.api.cloud.yandex.net/speech/v1/tts:synthesize',
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'x-folder-id' => 'b1glckrv5eg7s4kkhtpn',
+                        'Content-Type' => 'application/x-www-form-urlencoded'
+                    ],
+                    'form_params' => [
+                        'text' => $text,
+                        'format' => $voiceSetting['format'],
+                        'lang' => $voiceSetting['lang'],
+                        'voice' => $voiceSetting['voice'],
+                        'emotion' => $voiceSetting['emotion'],
+                        'speed' => $voiceSetting['voice_speed'] ?? '1.0',
+                        'folderId' => 'b1glckrv5eg7s4kkhtpn'
+                    ]
+                ]);
+
             if ($response->getStatusCode() !== 200) {
                 return false;
             }
