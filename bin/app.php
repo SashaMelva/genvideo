@@ -2,8 +2,12 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use App\Console\FormatTextFromChatGptCommand;
 use App\Console\GeneratorChatGPTText;
+use App\Console\GeneratorImage;
+use App\Console\GeneratorManyVideoCommand;
 use App\Console\GeneratorVideoCommand;
+use App\Console\GeneratorVoiceAndSubtitlesCommand;
 use App\Console\GetYandexAimToken;
 use App\Console\ImportDataExcelCommand;
 use Psr\Container\ContainerInterface;
@@ -39,11 +43,14 @@ try {
     $cli = new Application('Console');
     (require __DIR__ . '/../src/config/eloquent_console.php')($cli, $container);
 
-    $cli->add(new GeneratorVideoCommand());
-    $cli->add(new GetYandexAimToken());
-    $cli->add(new ImportDataExcelCommand());
-    $cli->add(new GeneratorChatGPTText());
-
+    $cli->add(new GeneratorVideoCommand()); //первый скрипт генерации видео
+    $cli->add(new GetYandexAimToken()); // получение токена для синтеза текста
+    $cli->add(new ImportDataExcelCommand()); //импорт данных с файлов excel
+    $cli->add(new GeneratorChatGPTText()); //отправка запроса на получеие текста т чата gpt
+    $cli->add(new FormatTextFromChatGptCommand()); //форматирование ответа, полученного от чата
+    $cli->add(new GeneratorImage()); // Получение картинок по описанию, полученного с чата
+    $cli->add(new GeneratorVoiceAndSubtitlesCommand()); //генерация озвучки и субтитров
+    $cli->add(new GeneratorManyVideoCommand()); //новый скрипт для генерации видео
     $cli->run();
 
 } catch (Throwable $exception) {

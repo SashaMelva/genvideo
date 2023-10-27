@@ -2,7 +2,7 @@
 
 namespace App\Console;
 
-class GeneratorImage
+class GeneratorImage extends \Symfony\Component\Console\Command\Command
 {
 
 }

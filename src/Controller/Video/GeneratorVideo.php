@@ -80,7 +80,7 @@ class GeneratorVideo extends UserController
                     'emotion' => $video['ampula_voice'],
                 ];
 
-                $timeVoice = (new Speechkit())->generator($video['text'], $fileNameVoice, $voiceSetting);
+                $timeVoice = (new Speechkit())->generatorWithSubtitles($video['text'], $fileNameVoice, $voiceSetting);
 
                 if ($timeVoice == 0) {
                     return $this->respondWithError(400, 'Ошибка генерации аудио озвучки');

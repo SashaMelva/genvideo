@@ -164,7 +164,7 @@ class ImportDataExcelCommand extends Command
                 $statusContent = 6;
 
                 if (empty($row['текст для запроса'])) {
-                    $statusContent = 8;
+                    $statusContent = 10;
                 }
 
                 $voiceId = Voice::getBySpeakerName($row['голос'])[0]['id'];

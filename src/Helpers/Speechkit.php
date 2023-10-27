@@ -20,7 +20,7 @@ class Speechkit
     /**Генерируем Speechkit
      * @throws Exception|GuzzleException
      */
-    public function generator(string $text, string $fileName, array $voiceSetting): array
+    public function generatorWithSubtitles(string $text, string $fileName, array $voiceSetting): array
     {
         try {
             $byte = mb_strlen($text, '8bit');
@@ -38,57 +38,16 @@ class Speechkit
                 }
 
             } else {
-                $desc = $text . ' ';
-                $desc = preg_replace("[\r\n]", " ", $desc);
-                $textArray = explode('.', $desc);
-                $countChar = 250;
-                $result = [];
-                $text = trim($textArray[0]) . '.';
-                unset($textArray[0]);
-                $count = count($textArray);
 
-                for ($i = 1; $i <= $count; $i++) {
+                $resultText = $this->spillSubtitles($text);
 
-                    if (iconv_strlen(trim($text)) + iconv_strlen(trim($textArray[$i])) > $countChar) {
-                        if (iconv_strlen(trim($textArray[$i])) > $countChar) {
-
-                            $textLongArray = explode(',', trim($textArray[$i]));
-                            $textLong = trim($textLongArray[0]) . ', ';
-                            unset($textLongArray[0]);
-                            $countLong = count($textLongArray);
-
-                            for ($j = 1; $j <= $countLong; $j++) {
-                                if (iconv_strlen($textLong) + iconv_strlen($textLongArray[$j]) > $countChar) {
-                                    $result[] = trim($textLong) . ', ';
-                                    $textLong = '';
-                                }
-
-                                $textLong .= trim($textLongArray[$j]) . ', ';
-
-                                if ($j == $countLong) {
-                                    $result[] = trim($textLong) . ', ';
-                                }
-                            }
-                            $text = '';
-                            continue;
-                        }
-
-                        $rep = str_replace('..', '.', trim($text) . '. ');
-                        $rep = str_replace('!.', '.', $rep);
-                        $result[] = str_replace('?.', '.', $rep);
-                        $text = '';
-                    }
-
-                    $text .= trim($textArray[$i]) . '. ';
-
-                    if ($i == $count) {
-                        $rep = str_replace('..', '.', trim($text) . '. ');
-                        $rep = str_replace('!.', '!', $rep);
-                        $result[] = str_replace('?.', '?', $rep);
-                    }
+                if ($voiceSetting['delay_between_offers_ms'] == 0) {
+                    $data = $this->SplitMp3($resultText, $fileName, $voiceSetting);
+                } else {
+                    $data = $this->SplitMp3Pause($resultText, $fileName, $voiceSetting);
                 }
 
-                $data = $this->SplitMp3($result, $fileName, $voiceSetting);
+
                 $filesName = $data['files'];
                 $result = $data['status'];
                 $filePath = DIRECTORY_SPEECHKIT . $fileName . '.mp3';
@@ -116,8 +75,63 @@ class Speechkit
             return ['status' => false, 'command' => $data['command']];
         } catch (Exception $e) {
             return ['status' => false, 'message' => $e->getMessage()];
-           // throw new Exception($e->getMessage());
+            // throw new Exception($e->getMessage());
         }
+    }
+
+    private function spillSubtitles(string $text): array
+    {
+        $desc = $text . ' ';
+        $desc = preg_replace("[\r\n]", " ", $desc);
+        $textArray = explode('.', $desc);
+        $countChar = 250;
+        $result = [];
+        $text = trim($textArray[0]) . '.';
+        unset($textArray[0]);
+        $count = count($textArray);
+
+        for ($i = 1; $i <= $count; $i++) {
+
+            if (iconv_strlen(trim($text)) + iconv_strlen(trim($textArray[$i])) > $countChar) {
+                if (iconv_strlen(trim($textArray[$i])) > $countChar) {
+
+                    $textLongArray = explode(',', trim($textArray[$i]));
+                    $textLong = trim($textLongArray[0]) . ', ';
+                    unset($textLongArray[0]);
+                    $countLong = count($textLongArray);
+
+                    for ($j = 1; $j <= $countLong; $j++) {
+                        if (iconv_strlen($textLong) + iconv_strlen($textLongArray[$j]) > $countChar) {
+                            $result[] = trim($textLong) . ', ';
+                            $textLong = '';
+                        }
+
+                        $textLong .= trim($textLongArray[$j]) . ', ';
+
+                        if ($j == $countLong) {
+                            $result[] = trim($textLong) . ', ';
+                        }
+                    }
+                    $text = '';
+                    continue;
+                }
+
+                $rep = str_replace('..', '.', trim($text) . '. ');
+                $rep = str_replace('!.', '.', $rep);
+                $result[] = str_replace('?.', '.', $rep);
+                $text = '';
+            }
+
+            $text .= trim($textArray[$i]) . '. ';
+
+            if ($i == $count) {
+                $rep = str_replace('..', '.', trim($text) . '. ');
+                $rep = str_replace('!.', '!', $rep);
+                $result[] = str_replace('?.', '?', $rep);
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -126,8 +140,10 @@ class Speechkit
     private function SplitMp3($Mp3Files, $number, $voiceSetting): array
     {
         try {
+            $delayBetweenOffersMs = floor(($voiceSetting['delay_between_offers_ms'] ?? 0) / 1000);
             $tmp_array = [];
             $subtitles = [];
+            $nameAudio = [];
 
             foreach ($Mp3Files as $key => $item) {
 
@@ -148,15 +164,29 @@ class Speechkit
                 }
 
                 $tmp_array[] = DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3';
+                $nameAudio[] = $number . '_' . $key;
             }
 
             $voices = implode('|', $tmp_array);
 
-            $ffmpeg = 'ffmpeg -i "concat:' . $voices . '" -acodec copy -c:a libmp3lame ' . DIRECTORY_SPEECHKIT . $number . '.mp3';
+            if ($delayBetweenOffersMs != 0) {
+                $arrayLongAudio = [];
+
+                foreach ($nameAudio as $audio) {
+                    $outputAudio = $audio . '_long';
+                    $ffmpeg = 'ffmpeg -i ' . DIRECTORY_SPEECHKIT . $audio . '.mp3 -af adelay=' . $delayBetweenOffersMs . ' ' . DIRECTORY_SPEECHKIT . $outputAudio . '.mp3';
+                    shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+                    $arrayLongAudio[] = DIRECTORY_SPEECHKIT . $outputAudio . '.mp3';
+                }
+
+                $voices = implode('|', $arrayLongAudio);
+            }
+
+            $ffmpeg = 'ffmpeg -i "concat:' . $voices . '"  -acodec copy -c:a libmp3lame ' . DIRECTORY_SPEECHKIT . $number . '.mp3';
             $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
             /**для субтитров*/
-            $length = file_put_contents(DIRECTORY_TEXT . $number . '.srt', $this->getFilesSrt($subtitles));
+            $length = file_put_contents(DIRECTORY_TEXT . $number . '.srt', $this->getFilesSrt($subtitles, $delayBetweenOffersMs));
 
             $ffmpeg = 'ffmpeg -i ' . DIRECTORY_TEXT . $number . '.srt -y ' . DIRECTORY_TEXT . $number . '.ass';
             $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
@@ -167,7 +197,7 @@ class Speechkit
         }
     }
 
-    private function getFilesSrt(array $text): string
+    private function getFilesSrt(array $text, float $delayBetweenOffersMs): string
     {
         $arr = [];
         $allTime = 0;
@@ -184,7 +214,7 @@ class Speechkit
                         . str_replace('.', ',', $this->formatMilliseconds($shortTime + $allTime)) . "\r\n" . $textShort[0] . "\r\n";
                 } else {
                     $arr[] = ($counter) . "\r\n" . str_replace('.', ',', $this->formatMilliseconds($allTime))
-                        . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($shortTime + $allTime)) . "\r\n" . $textShort[0] . "\r\n";
+                        . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($shortTime + $allTime + $delayBetweenOffersMs)) . "\r\n" . $textShort[0] . "\r\n";
                 }
                 $allTimeWhithShort = $shortTime + $allTime;
                 $counter += 1;
@@ -194,7 +224,7 @@ class Speechkit
             } else {
                 $counter += 1;
                 if ($key == 0) {
-                    $arr[] = ($counter) . "\r\n" . str_replace('.', ',', $this->formatMilliseconds($allTime))
+                    $arr[] = ($counter) . "\r\n" . str_replace('.', ',', $this->formatMilliseconds($allTime + $delayBetweenOffersMs))
                         . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($item['time'] + $allTime)) . "\r\n" . $item['text'] . "\r\n";
                 } else {
                     $arr[] = ($key + 1) . "\r\n" . '00:00:00,000 --> '
@@ -202,7 +232,7 @@ class Speechkit
                 }
             }
 
-            $allTime = $item['time'] + $allTime;
+            $allTime = $item['time'] + $allTime + $delayBetweenOffersMs;
         }
         return implode("\r\n", $arr);
     }
@@ -229,6 +259,7 @@ class Speechkit
 
         return $result;
     }
+
     private function formatMilliseconds($milliseconds): string
     {
         $seconds = floor($milliseconds / 1000);
@@ -242,33 +273,53 @@ class Speechkit
 
         return sprintf($format, $hours, $minutes, $seconds, $milliseconds);
     }
+
     /**
      * @throws GuzzleException
      * @throws Exception
      */
-    private function response(string $text, array $voiceSetting)
+    private function response(string $text, array $voiceSetting): bool|string
     {
         try {
             $tokenData = DB::table('token_yandex')->where([['id', '=', 1]])->get()->toArray()[0];
             $token = trim($tokenData->token);
 
-            $response = $this->client->post('https://tts.api.cloud.yandex.net/speech/v1/tts:synthesize',
-                [
-                    'headers' => [
-                        'Authorization' => 'Bearer ' . $token,
-                        'x-folder-id' => 'b1glckrv5eg7s4kkhtpn',
-                        'Content-Type' => 'application/x-www-form-urlencoded'
-                    ],
-                    'form_params' => [
-                        'text' => $text,
-                        'format' => $voiceSetting['format'],
-                        'lang' => $voiceSetting['lang'],
-                        'voice' => $voiceSetting['voice'],
-                        'emotion' => $voiceSetting['emotion'],
-                        'folderId' => 'b1glckrv5eg7s4kkhtpn'
-                    ]
-                ]);
-
+            if (isset($voiceSetting['voice_speed'])) {#TODO убрать else когда перейдём на новый алгоритм
+                $response = $this->client->post('https://tts.api.cloud.yandex.net/speech/v1/tts:synthesize',
+                    [
+                        'headers' => [
+                            'Authorization' => 'Bearer ' . $token,
+                            'x-folder-id' => 'b1glckrv5eg7s4kkhtpn',
+                            'Content-Type' => 'application/x-www-form-urlencoded'
+                        ],
+                        'form_params' => [
+                            'text' => $text,
+                            'format' => $voiceSetting['format'],
+                            'lang' => $voiceSetting['lang'],
+                            'voice' => $voiceSetting['voice'],
+                            'emotion' => $voiceSetting['emotion'],
+                            'speed' => $voiceSetting['voice_speed'],
+                            'folderId' => 'b1glckrv5eg7s4kkhtpn'
+                        ]
+                    ]);
+            } else {
+                $response = $this->client->post('https://tts.api.cloud.yandex.net/speech/v1/tts:synthesize',
+                    [
+                        'headers' => [
+                            'Authorization' => 'Bearer ' . $token,
+                            'x-folder-id' => 'b1glckrv5eg7s4kkhtpn',
+                            'Content-Type' => 'application/x-www-form-urlencoded'
+                        ],
+                        'form_params' => [
+                            'text' => $text,
+                            'format' => $voiceSetting['format'],
+                            'lang' => $voiceSetting['lang'],
+                            'voice' => $voiceSetting['voice'],
+                            'emotion' => $voiceSetting['emotion'],
+                            'folderId' => 'b1glckrv5eg7s4kkhtpn'
+                        ]
+                    ]);
+            }
             if ($response->getStatusCode() !== 200) {
                 return false;
             }

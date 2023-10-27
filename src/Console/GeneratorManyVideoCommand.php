@@ -152,7 +152,7 @@ class GeneratorManyVideoCommand  extends Command
                     'emotion' => $video['ampula_voice'],
                 ];
 
-                $voiceData = (new Speechkit())->generator($video['text'], $fileNameVoice, $voiceSetting);
+                $voiceData = (new Speechkit())->generatorWithSubtitles($video['text'], $fileNameVoice, $voiceSetting);
 
                 if ($voiceData['status']) {
 
