@@ -70,7 +70,7 @@ class GeneratorVoiceAndSubtitlesCommand extends Command
             ContentVideo::changeStatus($contentId, 10);
             $video = ContentVideo::findAllDataByID($contentId);
 
-            if ($video['status_voice'] == 0) {
+           // if ($video['status_voice'] == 0) {
 
                 $fileNameVoice = $contentId . '_' . $video['text_id'];
                 $voiceSetting = [
@@ -108,10 +108,9 @@ class GeneratorVoiceAndSubtitlesCommand extends Command
                     return 0;
                 }
 
-            }
-            else {
-                $this->log->info('По этому коннтенту уже сгенерирована озвучка: ' . $contentId);
-            }
+//            } else {
+//                $this->log->info('По этому коннтенту уже сгенерирована озвучка: ' . $contentId);
+//            }
         } catch (Exception $e) {
             $this->log->error($e->getMessage());
             $this->log->info('Ошибка форматирования текста: ' . $contentId);

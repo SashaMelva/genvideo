@@ -38,8 +38,6 @@ class Speechkit
 
             } else {
                 $resultText = $this->spillSubtitles($text);
-
-
                 $data = $this->SplitMp3($resultText, $fileName, $voiceSetting);
 
                 $filesName = $data['files'];
@@ -53,17 +51,17 @@ class Speechkit
                 $seconds = $file['playtime_seconds'];
 
                 if (isset($seconds) && !empty($filesName)) {
-                    foreach ($filesName as $item) {
-                        unlink($item);
-                    }
+//                    foreach ($filesName as $item) {
+//                        unlink($item);
+//                    }
                 }
 
                 return ['status' => true, 'time' => $file['playtime_seconds'], 'name' => $fileName, 'command' => $data['command']];
 
             } elseif (!empty($filesName)) {
-                foreach ($filesName as $item) {
-                    unlink($item);
-                }
+//                foreach ($filesName as $item) {
+//                    unlink($item);
+//                }
             }
 
             return ['status' => false, 'command' => $data['command']];
@@ -134,7 +132,8 @@ class Speechkit
     private function SplitMp3($Mp3Files, $number, $voiceSetting): array
     {
         try {
-            $delayBetweenOffersMs = floor(($voiceSetting['delay_between_offers_ms'] ?? 0) / 1000);
+            $delayBetweenOffersMs = $voiceSetting['delay_between_offers_ms'] ?? 0;
+
             $tmp_array = [];
             $subtitles = [];
             $nameAudio = [];
@@ -160,16 +159,18 @@ class Speechkit
                 $tmp_array[] = DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3';
                 $nameAudio[] = $number . '_' . $key;
             }
+            var_dump($subtitles);
 
             $voices = implode('|', $tmp_array);
-
-            if ($delayBetweenOffersMs != 0) {
+            var_dump($voices);
+            if ($delayBetweenOffersMs > 0) {
                 $arrayLongAudio = [];
 
                 foreach ($nameAudio as $audio) {
                     $outputAudio = $audio . '_long';
                     $ffmpeg = 'ffmpeg -i ' . DIRECTORY_SPEECHKIT . $audio . '.mp3 -af adelay=' . $delayBetweenOffersMs . ' ' . DIRECTORY_SPEECHKIT . $outputAudio . '.mp3';
-                    shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+                    var_dump($ffmpeg);
+                    //shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
                     $arrayLongAudio[] = DIRECTORY_SPEECHKIT . $outputAudio . '.mp3';
                 }
 
@@ -177,15 +178,16 @@ class Speechkit
                 $voices = implode('|', $arrayLongAudio);
             }
 
+
             $ffmpeg = 'ffmpeg -i "concat:' . $voices . '"  -acodec copy -c:a libmp3lame ' . DIRECTORY_SPEECHKIT . $number . '.mp3';
             $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
-
+            var_dump($ffmpeg);
             /**для субтитров*/
             $length = file_put_contents(DIRECTORY_TEXT . $number . '.srt', $this->getFilesSrt($subtitles, $delayBetweenOffersMs));
 
             $ffmpeg = 'ffmpeg -i ' . DIRECTORY_TEXT . $number . '.srt -y ' . DIRECTORY_TEXT . $number . '.ass';
             $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
-
+            var_dump($tmp_array);
             return ['status' => true, 'files' => $tmp_array, 'command' => $ffmpeg ];
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
