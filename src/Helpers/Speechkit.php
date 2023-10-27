@@ -201,7 +201,7 @@ class Speechkit
                     }
                     $outputAudio = $audio . '_long.mp3';
                     $ffmpeg = 'ffmpeg -i ' . DIRECTORY_SPEECHKIT . $audio . '.mp3 -af adelay=' . $delayBetweenOffersMs . ' ' . DIRECTORY_SPEECHKIT . $outputAudio ;
-                    $arrayLongAudio[] = $outputAudio;
+                    $arrayLongAudio[] = DIRECTORY_SPEECHKIT . $outputAudio;
                     var_dump($ffmpeg);
                     $e = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
                     var_dump($e );
