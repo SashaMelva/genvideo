@@ -138,39 +138,70 @@ class Speechkit
             $subtitles = [];
             $nameAudio = [];
 
-            foreach ($Mp3Files as $key => $item) {
+//            foreach ($Mp3Files as $key => $item) {
+//
+//                $response = $this->response($item, $voiceSetting);
+//                $length = file_put_contents(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3', $response);
+//
+//                $getID3 = new getID3;
+//                $file = $getID3->analyze(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3');
+//                $seconds = $file['playtime_seconds'];
+//
+//                $subtitles[] = [
+//                    'text' => $item,
+//                    'time' => $seconds * 1000,
+//                ];
+//
+//                if (!$length) {
+//                    return ['status' => false, 'files' => []];
+//                }
+//
+//                $tmp_array[] = DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3';
+//                $nameAudio[] = $number . '_' . $key;
+//            }
 
-                $response = $this->response($item, $voiceSetting);
-                $length = file_put_contents(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3', $response);
 
-                $getID3 = new getID3;
-                $file = $getID3->analyze(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3');
-                $seconds = $file['playtime_seconds'];
+            $subtitles = [
 
-                $subtitles[] = [
-                    'text' => $item,
-                    'time' => $seconds * 1000,
-                ];
+                [
+                    "text" =>
+                        "Добро пожаловать на медитацию на присутствие в настоящем моменте. Найдите удобное положение и закройте глаза. Сфокусируйте свое внимание на своем дыхании. Просто наблюдайте, как воздух входит в ваши ноздри и выходит из них. ",
+                    "time" =>
+                        15072
+                ],
 
-                if (!$length) {
-                    return ['status' => false, 'files' => []];
-                }
+                [
+                    "text" =>
+                        "Позвольте своим мыслям уйти, просто будьте здесь и сейчас, в этот момент. Ощутите свое тело и примите его таким, какое оно сейчас. Ощутите землю или поверхность, на которой вы находитесь, и почувствуйте, как она вас поддерживает. ",
+                    "time" =>
+                        14928
+                ],
 
-                $tmp_array[] = DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3';
-                $nameAudio[] = $number . '_' . $key;
-            }
-            var_dump($subtitles);
+                [
+                    "text" =>
+                        "Заметьте ощущения в вашем теле. Почувствуйте тепло, прохладу или любые другие физические ощущения, которые вы можете заметить. Примите их без сопротивления или суждений.. ",
+                    "time" =>
+                        12504
+                ],
+            ];
+            $nameAudio = ['153_159_0', '153_159_1', '153_159_3'];
+            //$tmp_array = ['D:\OpenServer\domains\genvideo.loc\var\resources\music\speechkit\153_159_0.mp3', 'D:\OpenServer\domains\genvideo.loc\var\resources\music\speechkit\153_159_1mp3', 'D:\OpenServer\domains\genvideo.loc\var\resources\music\speechkit\153_159_2.mp3'];
+            $tmp_array = ['/var/www/genvi-api/var/resources/music/speechkit/153_159_0.mp3', '/var/www/genvi-api/var/resources/music/speechkit/153_159_1mp3', '/var/www/genvi-api/var/resources/music/speechkit/153_159_2.mp3'];
 
             $voices = implode('|', $tmp_array);
             var_dump($voices);
             if ($delayBetweenOffersMs > 0) {
                 $arrayLongAudio = [];
 
-                foreach ($nameAudio as $audio) {
+                foreach ($nameAudio as $key => $audio) {
+                    if ($key == 0) {
+                        $arrayLongAudio[] = DIRECTORY_SPEECHKIT . $audio . '.mp3';
+                        continue;
+                    }
                     $outputAudio = $audio . '_long';
                     $ffmpeg = 'ffmpeg -i ' . DIRECTORY_SPEECHKIT . $audio . '.mp3 -af adelay=' . $delayBetweenOffersMs . ' ' . DIRECTORY_SPEECHKIT . $outputAudio . '.mp3';
+                    var_dump($ffmpeg);
                     shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
-                    $arrayLongAudio[] = DIRECTORY_SPEECHKIT . $outputAudio . '.mp3';
                 }
 
                 $tmp_array = array_merge($tmp_array, $arrayLongAudio);
@@ -187,7 +218,7 @@ class Speechkit
             $ffmpeg = 'ffmpeg -i ' . DIRECTORY_TEXT . $number . '.srt -y ' . DIRECTORY_TEXT . $number . '.ass';
             $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
             var_dump($tmp_array);
-            return ['status' => true, 'files' => $tmp_array, 'command' => $ffmpeg ];
+            return ['status' => true, 'files' => $tmp_array, 'command' => $ffmpeg];
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
