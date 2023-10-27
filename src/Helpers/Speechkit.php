@@ -28,7 +28,6 @@ class Speechkit
             $result = false;
             $filesName = [];
 
-
             if ($byte <= 250) {
                 $response = $this->response($byte, $voiceSetting);
                 $length = file_put_contents($filePath, $response);
@@ -38,8 +37,8 @@ class Speechkit
                 }
 
             } else {
-
                 $resultText = $this->spillSubtitles($text);
+
 
                 $data = $this->SplitMp3($resultText, $fileName, $voiceSetting);
 
@@ -81,7 +80,7 @@ class Speechkit
         $textArray = explode('.', $desc);
         $countChar = 250;
         $result = [];
-        $text = trim($textArray[0]) . '.';
+        $text = trim($textArray[0]) . '. ';
         unset($textArray[0]);
         $count = count($textArray);
 
@@ -113,16 +112,16 @@ class Speechkit
 
                 $rep = str_replace('..', '.', trim($text) . '. ');
                 $rep = str_replace('!.', '.', $rep);
-                $result[] = str_replace('?.', '.', $rep);
+                $result[] = str_replace('? .', '. ', $rep);
                 $text = '';
             }
 
             $text .= trim($textArray[$i]) . '. ';
 
             if ($i == $count) {
-                $rep = str_replace('..', '.', trim($text) . '. ');
-                $rep = str_replace('!.', '!', $rep);
-                $result[] = str_replace('?.', '?', $rep);
+                $rep = str_replace('. .', '.', trim($text) . '. ');
+                $rep = str_replace('! .', '!', $rep);
+                $result[] = str_replace('? .', '?', $rep);
             }
         }
 
