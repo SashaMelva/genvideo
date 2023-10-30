@@ -15,11 +15,12 @@ class ImportExcel extends Model
         return self::query()->get()->toArray();
     }
 
-    public static function addFile(string $fileName, int $statusId): ImportExcel
+    public static function addFile(string $fileName, int $statusId, int $creatorId): ImportExcel
     {
         $newList = new ImportExcel();
         $newList->setAttribute('file_name', $fileName);
         $newList->setAttribute('status', $newList->statusImport($statusId));
+        $newList->setAttribute('creator_id', $creatorId);
         $newList->save();
         return $newList;
     }
