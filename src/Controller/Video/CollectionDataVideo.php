@@ -77,6 +77,7 @@ class CollectionDataVideo extends UserController
                     1,
                     $text->id,
                     $data['ampula_voice'],
+                    $data['subtitles']
                 );
 
                 $contentId = $content->id;
