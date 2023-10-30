@@ -274,7 +274,7 @@ class ImportDataExcelCommand extends Command
             return false;
         }
 
-        if (is_null($rows['текст для запроса']) && is_null($rows['текст для озвучки'])) {
+        if (is_null($rows['текст для запроса']) || is_null($rows['текст для озвучки'])) {
             return false;
         }
 
