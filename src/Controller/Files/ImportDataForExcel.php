@@ -23,12 +23,12 @@ class ImportDataForExcel  extends UserController
     {
         header('Access-Control-Allow-Origin: *');
         $data = $this->getFormData();
-        $access_token = $this->request->getHeaderLine('token');
-        $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
+//        $access_token = $this->request->getHeaderLine('token');
+//        $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
 
-        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
+//        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
 
-            try {
+//            try {
 
                 $uploadedFiles = $this->request->getUploadedFiles();
                 $uploadedFile = $uploadedFiles['excel'];
@@ -43,23 +43,23 @@ class ImportDataForExcel  extends UserController
                     }
 
                     $filename = UploadFile::action(DIRECTORY_EXCEL_IMPORT, $uploadedFile, $fileNameExcel);
-
+                    var_dump($filename);
                     if (empty($filename)) {
                         return $this->respondWithError(400, 'Ошибка загрузки файла');
                     }
 
-                    $file = ImportExcel::addFile($filename, 1, $token->user_id);
+                    $file = ImportExcel::addFile($filename, 1, 30);
                     return $this->respondWithData(['file_name' => $file->file_name, 'id' => $file->id]);
 
                 } else {
                     return $this->respondWithError(400, 'Ошибка получения файла. Код ошибки: ' . $uploadedFile->getError());
                 }
 
-            } catch (Exception $e) {
-                return $this->respondWithError($e->getCode(), $e->getMessage());
-            }
-        } else {
-            return $this->respondWithError(215);
-        }
+//            } catch (Exception $e) {
+//                return $this->respondWithError($e->getCode(), $e->getMessage());
+//            }
+//        } else {
+//            return $this->respondWithError(215);
+//        }
     }
 }
