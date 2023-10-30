@@ -9,6 +9,9 @@ use App\Controller\Authorization\RegistryUser;
 use App\Controller\Files\DeleteAdditionalVideo;
 use App\Controller\Files\DeleteImage;
 use App\Controller\Files\DeleteMusic;
+use App\Controller\Files\GetTypeImage;
+use App\Controller\Files\GetTypeMusic;
+use App\Controller\Files\GetTypeVideo;
 use App\Controller\Files\ImportDataForExcel;
 use App\Controller\Files\LoadMusic;
 use App\Controller\Files\LoadVideo;
@@ -110,6 +113,10 @@ return static function(App $app):void
             $group->get('/load-music/{id:[0-9]+}', LoadMusic::class);
 
             $group->post('/import/excel', ImportDataForExcel::class);
+
+            $group->get('/type/image', GetTypeImage::class);
+            $group->get('/type/music', GetTypeMusic::class);
+            $group->get('/type/video', GetTypeVideo::class);
 //            $group->get('/delete-image/{id:[0-9]+}', DeleteImage::class);
 //            $group->get('/delete-sound/{id:[0-9]+}', DeleteMusic::class);
 //            $group->get('/delete-video/{id:[0-9]+}', DeleteAdditionalVideo::class);
