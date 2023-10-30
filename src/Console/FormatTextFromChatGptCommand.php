@@ -91,6 +91,8 @@ class FormatTextFromChatGptCommand  extends Command
 
                 $this->log->info('Соранение результата');
                 TextVideo::updatedContentData($gptRequest['text_id'], $resultText);
+                ContentVideo::changeStatus($contentId, 1);
+                //ContentVideo::changeStatus($contentId, 10);
 
             } else {
 
