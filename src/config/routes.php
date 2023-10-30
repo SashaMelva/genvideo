@@ -21,7 +21,10 @@ use App\Controller\Projects\AddUserProject;
 use App\Controller\Projects\CreateProject;
 use App\Controller\Projects\DeleteProject;
 use App\Controller\Projects\DeleteUserProject;
+use App\Controller\Projects\GetAllImageProject;
+use App\Controller\Projects\GetAllMusicProject;
 use App\Controller\Projects\GetAllProject;
+use App\Controller\Projects\GetAllVideoProject;
 use App\Controller\Projects\GetInfoProject;
 use App\Controller\Projects\UpdateProject;
 use App\Controller\test\TestController;
@@ -73,6 +76,11 @@ return static function(App $app):void
             $group->post('/delete', DeleteProject::class);
             $group->post('/add-user', AddUserProject::class);
             $group->post('/delete-user', DeleteUserProject::class);
+
+
+            $group->get('/get-all/image/{id:[0-9]+}', GetAllImageProject::class);
+            $group->get('/get-all/music/{id:[0-9]+}', GetAllMusicProject::class);
+            $group->get('/get-all/video/{id:[0-9]+}', GetAllVideoProject::class);
         });
 
         $group->group('/video', function (RouteCollectorProxyInterface $group) {

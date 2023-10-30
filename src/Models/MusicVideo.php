@@ -14,7 +14,9 @@ class MusicVideo extends Model
 
     public static function findAllByProjectId(int $projectId): array
     {
-        return self::query()->where([['project_id', '=', $projectId]])
+        return self::query()
+            ->where([['project_id', '=', $projectId]])
+            ->orWhere([['project_id', '=', 8]])
             ->get()->toArray();
     }
 
