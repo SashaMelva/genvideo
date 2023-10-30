@@ -43,4 +43,11 @@ class AdditionalVideo extends Model
             ->where([['id', '=', $videoId]])
             ->delete();
     }
+
+    public static function findByID(int $videoId)
+    {
+        return self::query()
+            ->where([['id', '=', $videoId]])
+            ->get()->toArray()[0];
+    }
 }

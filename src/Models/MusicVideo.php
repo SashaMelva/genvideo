@@ -51,4 +51,11 @@ class MusicVideo extends Model
             ->where([['id', '=', $musicId]])
             ->delete();
     }
+
+    public static function findByID(int $musicId)
+    {
+        return self::query()
+            ->where([['id', '=', $musicId]])
+            ->get()->toArray()[0];
+    }
 }

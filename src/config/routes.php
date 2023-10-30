@@ -10,6 +10,8 @@ use App\Controller\Files\DeleteAdditionalVideo;
 use App\Controller\Files\DeleteImage;
 use App\Controller\Files\DeleteMusic;
 use App\Controller\Files\ImportDataForExcel;
+use App\Controller\Files\LoadMusic;
+use App\Controller\Files\LoadVideo;
 use App\Controller\Files\UploadAdditionalVideo;
 use App\Controller\Files\UploadImage;
 use App\Controller\Files\UploadMusic;
@@ -102,6 +104,10 @@ return static function(App $app):void
             $group->post('/add-image', UploadImage::class);
             $group->post('/add-music', UploadMusic::class);
             $group->post('/add-video', UploadAdditionalVideo::class);
+
+
+            $group->get('/load-video/{id:[0-9]+}', LoadVideo::class);
+            $group->get('/load-music/{id:[0-9]+}', LoadMusic::class);
 
             $group->post('/import/excel/', ImportDataForExcel::class);
 //            $group->get('/delete-image/{id:[0-9]+}', DeleteImage::class);
