@@ -26,7 +26,7 @@ class LoadMusic  extends UserController
         if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
 
             try {
-                $file = DIRECTORY_ADDITIONAL_VIDEO . $sound['file_name'];
+                $file = DIRECTORY_MUSIC . $sound['file_name'];
                 if (file_exists($file)) {
 
                     if (ob_get_level()) {
