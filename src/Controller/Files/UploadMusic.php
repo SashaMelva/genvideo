@@ -45,7 +45,7 @@ class UploadMusic extends UserController
                         return $this->respondWithError(400, 'Ошибка загрузки музыки');
                     }
 
-                    $music = MusicVideo::addMusic($fileName, $filePath, '00:00', $data['project_id'], $data['type_music']);
+                    $music = MusicVideo::addMusic($fileName, $filePath, '00:00', $data['project_id'],$data['name'] ?? '', $data['type_music']);
                     return $this->respondWithData(['path' => $music->file_path, 'id' => $music->id]);
 
                 } else {

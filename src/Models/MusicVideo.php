@@ -29,7 +29,7 @@ class MusicVideo extends Model
         return self::query()->find($id)->getModel();
     }
 
-    public static function addMusic(string $filename, string $path, string $time, int $userId, ?string $type = null): MusicVideo
+    public static function addMusic(string $filename, string $path, string $time, int $userId, ?string $name, ?string $type = null): MusicVideo
     {
         $newMusic = new MusicVideo();
         $newMusic->setAttribute('file_name', $filename);
@@ -37,6 +37,7 @@ class MusicVideo extends Model
         $newMusic->setAttribute('time', $time);
         $newMusic->setAttribute('project_id', $userId);
         $newMusic->setAttribute('type', $type);
+        $newMusic->setAttribute('name', $name);
         $newMusic->save();
 
         return $newMusic;

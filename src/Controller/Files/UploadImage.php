@@ -50,7 +50,7 @@ class UploadImage extends UserController
                         return $this->respondWithError(400, 'Ошибка загрузки изображения');
                     }
 
-                    $image = ImageVideo::addImage($filename, $filePath, $data['project_id'], $data['type_image']);
+                    $image = ImageVideo::addImage($filename, $filePath, $data['project_id'], $data['name'] ?? '', $data['type_image']);
                     return $this->respondWithData(['image' => base64_encode(file_get_contents($filePath)), 'id' => $image['id']]);
 
                 } else {

@@ -44,7 +44,7 @@ class UploadAdditionalVideo extends UserController
                         return $this->respondWithError(400, 'Ошибка загрузки видео');
                     }
 
-                    $video = AdditionalVideo::addVideo($filename, $filePath, '00:00', $data['project_id'], $data['type_video']);
+                    $video = AdditionalVideo::addVideo($filename, $filePath, '00:00', $data['project_id'],$data['name'], $data['type_video']);
                     return $this->respondWithData(['path' => $video->file_path, 'id' => $video->id]);
 
                 } else {

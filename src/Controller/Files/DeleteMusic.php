@@ -28,7 +28,7 @@ class DeleteMusic extends UserController
                 if ($user->isUser()) {
 
                     $music = MusicVideo::findOne($musicId);
-                    unlink(DIRECTORY_MUSIC . $music->name);
+                    unlink(DIRECTORY_MUSIC . $music->file_name);
                     ListMusic::deleteMusic($musicId);
                     MusicVideo::deleteMusic($musicId);
 

@@ -23,7 +23,7 @@ class AdditionalVideo extends Model
         return self::query()->find($id)->getModel();
     }
 
-    public static function addVideo(string $fileName, string $filePath, string $time, int $projectId, ?string $type = null): AdditionalVideo
+    public static function addVideo(string $fileName, string $filePath, string $time, int $projectId, ?string $name, ?string $type = null): AdditionalVideo
     {
         $newVideo = new AdditionalVideo();
         $newVideo->setAttribute('file_name', $fileName);
@@ -31,6 +31,7 @@ class AdditionalVideo extends Model
         $newVideo->setAttribute('time', $time);
         $newVideo->setAttribute('project_id', $projectId);
         $newVideo->setAttribute('type', $type);
+        $newVideo->setAttribute('name', $name);
         $newVideo->save();
 
         return $newVideo;

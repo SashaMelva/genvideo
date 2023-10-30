@@ -28,7 +28,7 @@ class DeleteAdditionalVideo extends UserController
                 if ($user->isUser()) {
 
                     $video = AdditionalVideo::findOne($videoId);
-                    unlink(DIRECTORY_MUSIC . $video->name);
+                    unlink(DIRECTORY_MUSIC . $video->file_name);
                     ListVideo::deleteVideo($videoId);
                     AdditionalVideo::deleteVideo($videoId);
 

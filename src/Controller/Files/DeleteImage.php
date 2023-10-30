@@ -28,7 +28,7 @@ class DeleteImage  extends UserController
                 if ($user->isUser()) {
 
                     $image = ImageVideo::findOne($imageId);
-                    unlink(DIRECTORY_MUSIC . $image->name);
+                    unlink(DIRECTORY_MUSIC . $image->file_name);
                     ListImage::deleteImage($imageId);
                     ImageVideo::deleteImage($imageId);
 
