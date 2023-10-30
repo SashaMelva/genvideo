@@ -48,7 +48,7 @@ class ImportDataExcelCommand extends Command
         }
 
         $filesImport = DB::table('import_excel')->select('id', 'file_name', 'creator_id')->where([['status', '=', 'загружен']])->get()->toArray();
-       // $filesImport = DB::table('import_excel')->select('id', 'file_name', 'creator_id')->get()->toArray();
+        // $filesImport = DB::table('import_excel')->select('id', 'file_name', 'creator_id')->get()->toArray();
 
         if (empty($filesImport)) {
             $this->log->info('Нет файлов для импорта');
@@ -281,11 +281,11 @@ class ImportDataExcelCommand extends Command
             return false;
         }
 
-        if ($rows['тип фона'] == 'Картинки' && $rows['сгенерировать картинки'] == 'Нет' && empty($rows['id картинок'])) {
+        if ($rows['тип фона'] == 'Картинки' || $rows['тип фона'] == 'slide_show' && $rows['сгенерировать картинки'] == 'Нет' && empty($rows['id картинок'])) {
             return false;
         }
 
-        if ($rows['тип фона'] == 'Видео' && is_null($rows['id видео'])) {
+        if ($rows['тип фона'] == 'Видео' || $rows['тип фона'] == 'video' && is_null($rows['id видео'])) {
             return false;
         }
 
@@ -303,13 +303,21 @@ class ImportDataExcelCommand extends Command
             'Черное' => 1
         ];
 
+        if ($row['тип фона'] == 'Картинки' || $row['тип фона'] == 'slide_show') {
+            $typeBackground = 'slide_show';
+        } elseif ($row['тип фона'] == 'Видео' || $row['тип фона'] == 'video') {
+            $typeBackground = 'video';
+        } else {
+            $typeBackground = null;
+        }
+
         $content = ContentVideo::addContent(
             $row['название видео'],
             $creatorId,
             null,
             null,
             $row['id проекта'],
-            $row['тип фона'],
+            $typeBackground,
             $voiceId,
             $row['формат видео'],
             $backgroundColor[$row['фоновое затемнение']],
@@ -342,7 +350,7 @@ class ImportDataExcelCommand extends Command
         );
     }
 
-    public function addItemImage(int $imageId, int $contentId, ?array $row = null)
+    public function addItemImage(int $imageId, int $contentId, ?array $row = null): bool
     {
         return DB::table('list_image')->insert(
             [
@@ -358,7 +366,7 @@ class ImportDataExcelCommand extends Command
     {
         return DB::table('GPT_chat_requests')->insert(
             [
-                'content_id' =>$contentId,
+                'content_id' => $contentId,
                 'text_request' => $row['текст для запроса'],
                 'status' => 1,
                 'text_id' => $textId,

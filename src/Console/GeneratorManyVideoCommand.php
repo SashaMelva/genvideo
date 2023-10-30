@@ -142,7 +142,7 @@ class GeneratorManyVideoCommand  extends Command
 
             $generatorFiles = new GeneratorFiles($contentId);
 
-            if ($video['status_voice'] == 0 || $video['status_voice'] == 'false' || $video['status_voice'] == 'создано') {
+            if ($video['status_voice'] == 0) {
 
                 $fileNameVoice = $contentId . '_' . $video['text_id'];
                 $voiceSetting = [
@@ -150,15 +150,19 @@ class GeneratorManyVideoCommand  extends Command
                     'lang' => $video['language'],
                     'voice' => $video['dictionary_voice_name'],
                     'emotion' => $video['ampula_voice'],
+                    'delay_between_offers_ms' => is_null($video['delay_between_offers']) ? 0 : $video['delay_between_offers'],
+                    'voice_speed' => is_null($video['voice_speed']) ? '1.0' : $video['voice_speed'],
                 ];
+
 
                 $voiceData = (new Speechkit())->generatorWithSubtitles($video['text'], $fileNameVoice, $voiceSetting);
 
+
                 if ($voiceData['status']) {
 
-                    TextVideo::changeTextStatus($video['text_id'], 'обработано');
-                    TextVideo::updateFileVoice($video['text_id'], $fileNameVoice, RELATIVE_PATH_SPEECHKIT . $fileNameVoice . '.' . $voiceSetting['format'], 'успех', $voiceData['time']);
-                    TextVideo::updateFileText($video['text_id'], $fileNameVoice, RELATIVE_PATH_TEXT . $fileNameVoice, 'успех');
+                    TextVideo::updateFileTextAndStatus($video['text_id'], $fileNameVoice, RELATIVE_PATH_TEXT . $fileNameVoice, '1');
+                    TextVideo::updateFileVoice($video['text_id'], $fileNameVoice, RELATIVE_PATH_SPEECHKIT . $fileNameVoice . '.' . $voiceSetting['format'], '1', $voiceData['time']);
+                    ContentVideo::changeStatus($contentId, 5);
                     $this->log->info('Успех генерации субтитров, id текста ' . $video['text_id']);
                     $this->log->info('Успех генерации аудио озвучки, id текста ' . $video['text_id']);
 
@@ -167,14 +171,17 @@ class GeneratorManyVideoCommand  extends Command
                         $this->log->error($voiceData['command'] . $video['text_id']);
                     }
 
-                    TextVideo::changeVoiceStatus($video['text_id'], 'ошибка');
-                    TextVideo::changeTextStatus($video['text_id'], 'ошибка');
-                    ContentVideo::changeStatus($contentId, 5);
+                    TextVideo::changeVoiceStatus($video['text_id'], '3');
+                    TextVideo::changeTextStatus($video['text_id'], '3');
+                    ContentVideo::changeStatus($contentId, 1);
                     $this->log->error('Ошибка генерации аудио озвучки, id текста ' . $video['text_id']);
                     $this->log->error('Ошибка генерации субтитров, id текста ' . $video['text_id']);
                     exec($cmd);
                     return 0;
                 }
+
+            } else {
+                $this->log->info('По этому коннтенту уже сгенерирована озвучка: ' . $contentId);
             }
 
 #TODO
@@ -315,7 +322,7 @@ class GeneratorManyVideoCommand  extends Command
                 $this->log->info('Озвучка наложена, имя файла ' . $resultName);
             }
 
-            if ($voiceData['status']) {
+            if ($video['subtitles']) {
 
                 $this->log->info('Название файла субтитров  ' . $voiceData['name']);
                 $titers = $generatorFiles->generatorText($resultName, $voiceData['name'], $video['content_format']);

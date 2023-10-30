@@ -4,8 +4,8 @@ namespace App\Console;
 
 use App\Models\ContentVideo;
 use App\Models\GPTChatRequests;
+use App\Models\TextVideo;
 use Exception;
-use GuzzleHttp\Client;
 use Illuminate\Database\Capsule\Manager as DB;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\StreamHandler;
@@ -78,21 +78,24 @@ class FormatTextFromChatGptCommand  extends Command
                     $this->log->info('Ответ запроса взят на обработку: ' . $gptRequest['id']);
                 }
 
-                if (empty($gptRequest["response"])) {
+                $resultText = $gptRequest["response"];
+
+                if (empty($resultText)) {
                     $this->log->error('Ответ запроса путой, контент поставлен в очередь на получение резкльтата запроса: ' . $contentId);
                     ContentVideo::changeStatus($contentId, 5);
                     exec($cmd);
                     return 0;
                 }
 
-               #TODO проверка на респонс и преобразование в текст
+                $this->log->info('Начало форматирования запроса');
 
-
+                $this->log->info('Соранение результата');
+                TextVideo::updatedContentData($gptRequest['text_id'], $resultText);
 
             } else {
 
                 if ($this->status_log) {
-                    $this->log->info('Не найден запрос на генерацию контента: ' . json_encode($contentIds));
+                    $this->log->info('Не найден запрос на генерацию контента: ' . $contentId);
                     ContentVideo::changeStatus($contentId, 5);
                     exec($cmd);
                     return 0;
