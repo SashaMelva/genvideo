@@ -50,7 +50,7 @@ class ImportDataExcelCommand extends Command
         $filesImport = DB::table('import_excel')->select('id', 'file_name', 'creator_id')->where([['status', '=', 'загружен']])->get()->toArray();
         // $filesImport = DB::table('import_excel')->select('id', 'file_name', 'creator_id')->get()->toArray();
 
-        if (is_null($filesImport)) {
+        if (empty($filesImport)) {
             $this->log->info('Нет файлов для импорта');
             exec($cmd);
             return 0;
@@ -259,30 +259,30 @@ class ImportDataExcelCommand extends Command
 
     private static function indexesToCheck(array $rows): bool
     {
-        if (empty($rows['id проекта']) ||
-            empty($rows['название видео']) ||
-            empty($rows['формат видео']) ||
-            empty($rows['id фоновой музыки']) ||
-            empty($rows['субтитры']) ||
-            empty($rows['голос']) ||
-            empty($rows['скорость голоса']) ||
+        if (is_null($rows['id проекта']) ||
+            is_null($rows['название видео']) ||
+            is_null($rows['формат видео']) ||
+            is_null($rows['id фоновой музыки']) ||
+            is_null($rows['субтитры']) ||
+            is_null($rows['голос']) ||
+            is_null($rows['скорость голоса']) ||
             is_null($rows['задержка между предложениями']) ||
-            empty($rows['фоновое затемнение']) ||
-            empty($rows['сгенерировать картинки']) ||
-            empty($rows['тип фона'])
+            is_null($rows['фоновое затемнение']) ||
+            is_null($rows['сгенерировать картинки']) ||
+            is_null($rows['тип фона'])
         ) {
             return false;
         }
 
-        if (empty($rows['текст для запроса']) && empty($rows['текст для озвучки'])) {
+        if (is_null($rows['текст для запроса']) && is_null($rows['текст для озвучки'])) {
             return false;
         }
 
-        if ($rows['формат видео'] == 'Есть' && (empty($rows['цвет текста субтитров']) || empty($rows['фон текст субтитров']))) {
+        if ($rows['формат видео'] == 'Есть' && (is_null($rows['цвет текста субтитров']) || is_null($rows['фон текст субтитров']))) {
             return false;
         }
 
-        if ($rows['тип фона'] == 'Картинки' || $rows['тип фона'] == 'slide_show' && $rows['сгенерировать картинки'] == 'Нет' && empty($rows['id картинок'])) {
+        if ($rows['тип фона'] == 'Картинки' || $rows['тип фона'] == 'slide_show' && $rows['сгенерировать картинки'] == 'Нет' && is_null($rows['id картинок'])) {
             return false;
         }
 
@@ -290,7 +290,7 @@ class ImportDataExcelCommand extends Command
             return false;
         }
 
-        if (!empty($rows['id банера']) && (is_null($rows['длительность банера']) || empty($rows['когда показать банер']))) {
+        if (!is_null($rows['id банера']) && (is_null($rows['длительность банера']) || is_null($rows['когда показать банер']))) {
             return false;
         }
 
