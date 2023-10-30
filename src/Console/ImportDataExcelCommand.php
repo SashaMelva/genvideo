@@ -63,6 +63,7 @@ class ImportDataExcelCommand extends Command
         try {
 
             $exportItem = $filesImport[0];
+            var_dump(DIRECTORY_EXCEL_IMPORT . $exportItem->file_name);
             $path = DIRECTORY_EXCEL_IMPORT . $exportItem->file_name;
             $allHeadersList = [
                 'id проекта',
