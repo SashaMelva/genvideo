@@ -259,6 +259,7 @@ class ImportDataExcelCommand extends Command
 
     private static function indexesToCheck(array $rows): bool
     {
+        var_dump(11);
         if (is_null($rows['id проекта']) ||
             is_null($rows['название видео']) ||
             is_null($rows['формат видео']) ||
@@ -273,23 +274,23 @@ class ImportDataExcelCommand extends Command
         ) {
             return false;
         }
-
+        var_dump(1);
         if (is_null($rows['текст для запроса']) || is_null($rows['текст для озвучки'])) {
             return false;
         }
-
+        var_dump(1);
         if ($rows['формат видео'] == 'Есть' && (is_null($rows['цвет текста субтитров']) || is_null($rows['фон текст субтитров']))) {
             return false;
         }
-
-        if ($rows['тип фона'] == 'Картинки' || $rows['тип фона'] == 'slide_show' && $rows['сгенерировать картинки'] == 'Нет' && is_null($rows['id картинок'])) {
+        var_dump(1);
+        if (($rows['тип фона'] == 'Картинки' || $rows['тип фона'] == 'slide_show') && $rows['сгенерировать картинки'] == 'Нет' && is_null($rows['id картинок'])) {
             return false;
         }
-
-        if ($rows['тип фона'] == 'Видео' || $rows['тип фона'] == 'video' && is_null($rows['id видео'])) {
+        var_dump(1);
+        if (($rows['тип фона'] == 'Видео' || $rows['тип фона'] == 'video') && is_null($rows['id видео'])) {
             return false;
         }
-
+        var_dump(1);
         if (!is_null($rows['id банера']) && (is_null($rows['длительность банера']) || is_null($rows['когда показать банер']))) {
             return false;
         }
