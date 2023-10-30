@@ -24,9 +24,8 @@ class ImportDataForExcel  extends UserController
         header('Access-Control-Allow-Origin: *');
         $data = $this->getFormData();
         $access_token = $this->request->getHeaderLine('token');
-        $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
 
-        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
+//        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
 
             try {
 
@@ -38,8 +37,8 @@ class ImportDataForExcel  extends UserController
 
                     $extension = pathinfo($uploadedFile->getClientFilename(), PATHINFO_EXTENSION);
 
-                    if ($extension != 'csv') {
-                        return $this->respondWithError(400, 'Поддерживаются файлы для импорта только с форматом csv');
+                    if ($extension != 'xlsx') {
+                        return $this->respondWithError(400, 'Поддерживаются файлы для импорта только с форматом xlsx');
                     }
 
                     $filename = UploadFile::action(DIRECTORY_EXCEL_IMPORT, $uploadedFile, $fileNameExcel);
@@ -49,7 +48,7 @@ class ImportDataForExcel  extends UserController
                     }
 
                     $file = ImportExcel::addFile($filename, 1);
-                    return $this->respondWithData(['path' => $file->file_name, 'id' => $file->id]);
+                    return $this->respondWithData(['file_name' => $file->file_name, 'id' => $file->id]);
 
                 } else {
                     return $this->respondWithError(400, 'Ошибка получения файла. Код ошибки: ' . $uploadedFile->getError());
@@ -58,8 +57,8 @@ class ImportDataForExcel  extends UserController
             } catch (Exception $e) {
                 return $this->respondWithError($e->getCode(), $e->getMessage());
             }
-        } else {
-            return $this->respondWithError(215);
-        }
+//        } else {
+//            return $this->respondWithError(215);
+//        }
     }
 }

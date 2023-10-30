@@ -109,7 +109,7 @@ return static function(App $app):void
             $group->get('/load-video/{id:[0-9]+}', LoadVideo::class);
             $group->get('/load-music/{id:[0-9]+}', LoadMusic::class);
 
-            $group->post('/import/excel/', ImportDataForExcel::class);
+            $group->post('/import/excel', ImportDataForExcel::class);
 //            $group->get('/delete-image/{id:[0-9]+}', DeleteImage::class);
 //            $group->get('/delete-sound/{id:[0-9]+}', DeleteMusic::class);
 //            $group->get('/delete-video/{id:[0-9]+}', DeleteAdditionalVideo::class);
