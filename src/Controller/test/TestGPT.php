@@ -22,7 +22,7 @@ class TestGPT extends UserController
 
         $client = new Client();
 
-        $response = $client->post('http://127.0.0.1:5000/api/main',
+        $response = $client->post('http://45.92.176.207:4749/api/main',
             [
                 'headers' => [
                     'Content-Type' => 'application/json'
@@ -34,6 +34,7 @@ class TestGPT extends UserController
 
         $responseData = json_decode($response->getBody()->getContents(), true);
 
+        print_r($responseData);
         file_put_contents(DIRECTORY_RESULT_CONTENT . $query . '.txt',$responseData);
 
         return $this->respondWithData('Ok');
