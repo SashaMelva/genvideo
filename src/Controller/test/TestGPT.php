@@ -18,7 +18,7 @@ class TestGPT extends UserController
      */
     public function action(): ResponseInterface
     {
-        $query = "Напиши 100 заголовков под ключевые слова: отношения мать отец";
+        $query = "Напиши 5 заголовков под ключевые слова: отношения мать отец";
 
         $client = new Client();
 
