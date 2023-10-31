@@ -220,16 +220,18 @@ class GeneratorFiles
     public function mergeVideo(string $nameVideoContent, string $format, ?string $nameVideoStart = null, ?string $nameVideoEnd = null): array
     {
         $fileName = $this->contentId . '_result';
-        $ffmpeg = 'ffmpeg -i "concat:';
+        $ffmpeg = 'ffmpeg ';
+        $countVideo = 1;
 
         if (!is_null($nameVideoStart)) {
+            $countVideo += 1;
             $fileNameStart = str_replace('.mp4', '', $nameVideoStart);
 
             if ($format == '9/16') {
                 $dataStartVideo = $this->generatorAdditionalVideoFormat($fileNameStart);
 
                 if ($dataStartVideo['status']) {
-                    $ffmpeg .= DIRECTORY_ADDITIONAL_VIDEO . $dataStartVideo['fileName'] . '.ts' . '|';
+                    $ffmpeg .= ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $dataStartVideo['fileName'] . '.ts';
                 } else {
                     return ['status' => false];
                 }
@@ -237,7 +239,7 @@ class GeneratorFiles
             } else {
 
                 if ($this->mergeFiles($fileNameStart, DIRECTORY_ADDITIONAL_VIDEO)) {
-                    $ffmpeg .= DIRECTORY_ADDITIONAL_VIDEO . $fileNameStart . '.ts' . '|';
+                    $ffmpeg .= ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $fileNameStart . '.ts' ;
                 } else {
                     return ['status' => false];
                 }
@@ -245,13 +247,14 @@ class GeneratorFiles
         }
 
         if ($this->mergeFiles($nameVideoContent, DIRECTORY_VIDEO)) {
-            $ffmpeg .= DIRECTORY_VIDEO . $nameVideoContent . '.ts';
+            $ffmpeg .= ' -i ' . DIRECTORY_VIDEO . $nameVideoContent . '.ts';
         } else {
             return ['status' => false];
         }
 
 
         if (!is_null($nameVideoEnd)) {
+            $countVideo += 1;
             $fileNameEnd = str_replace('.mp4', '', $nameVideoEnd);
 
             if ($format == '9/16') {
@@ -259,7 +262,7 @@ class GeneratorFiles
                 $dataEndVideo = $this->generatorAdditionalVideoFormat($fileNameEnd);
 
                 if ($dataEndVideo['status']) {
-                    $ffmpeg .= '|' . DIRECTORY_ADDITIONAL_VIDEO . $dataEndVideo['fileName'] . '.ts';
+                    $ffmpeg .= ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $dataEndVideo['fileName'] . '.ts';
                 } else {
                     return ['status' => false];
                 }
@@ -267,14 +270,20 @@ class GeneratorFiles
             } else {
 
                 if ($this->mergeFiles($fileNameEnd, DIRECTORY_ADDITIONAL_VIDEO)) {
-                    $ffmpeg .= '|' . DIRECTORY_ADDITIONAL_VIDEO . $fileNameEnd;
+                    $ffmpeg .= ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $fileNameEnd . '.ts';
                 } else {
                     return ['status' => false];
                 }
             }
         }
 
-        $ffmpeg .= '" -c:v h264_nvenc -c:a copy ' . DIRECTORY_VIDEO . $fileName . '.mp4';
+        if ($countVideo == 2){
+            $ffmpeg .= ' -filter_complex "[0:v] [0:a] [1:v] [1:a] concat=n=2:v=1:a=1 [v] [a]" -map "[v]" -map "[a]" ' . DIRECTORY_VIDEO . $fileName . '.mp4';
+        }
+
+        if ($countVideo == 3){
+            $ffmpeg .= '" -filter_complex "[0:v] [0:a] [1:v] [1:a] [2:v] [2:a] concat=n=3:v=1:a=1 [v] [a]" -map "[v]" -map "[a]" ' . DIRECTORY_VIDEO . $fileName . '.mp4';
+        }
 
         var_dump($ffmpeg);
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
