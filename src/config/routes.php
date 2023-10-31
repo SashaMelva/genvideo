@@ -20,7 +20,6 @@ use App\Controller\Files\UploadImage;
 use App\Controller\Files\UploadMusic;
 use App\Controller\Integration\SaveTokenCallBack;
 use App\Controller\Integration\TokenCallBack;
-use App\Controller\Integration\CabinetItems;
 use App\Controller\Integration\GetToken;
 use App\Controller\Projects\AddUserProject;
 use App\Controller\Projects\CreateProject;

@@ -35,5 +35,7 @@ class TestGPT extends UserController
         $responseData = json_decode($response->getBody()->getContents(), true);
 
         file_put_contents(DIRECTORY_RESULT_CONTENT . $query . '.txt',$responseData);
+
+        return $this->respondWithData('Ok');
     }
 }
