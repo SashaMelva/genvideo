@@ -19,10 +19,10 @@ class TextVideo extends Model
 
     public static function findById(int $id)
     {
-        return self::query()->where([['id', '=', $id]])->get()->toArray()[0];
+        return self::query()->where([['id', '=', $id]])->get()->toArray();
     }
 
-    public static function findAllByContentId(int $contentId): array
+    public static function findByContentId(int $contentId): array
     {
         return self::query()->where([['content_id', '=', $contentId]])
             ->get()->toArray();

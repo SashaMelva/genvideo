@@ -63,7 +63,6 @@ class GeneratorVideoCommand extends Command
         }
 
         $videoId = $contentIds[0]->id;
-//        foreach ($contentIds as $videoId) {
 
         try {
 
@@ -153,187 +152,187 @@ class GeneratorVideoCommand extends Command
                 }
             }
 #TODO
-//            $voiceData['time'] = '80.040007192089';
-//            $fileNameVoice = '89_92';
+            $textData = TextVideo::findById($video['text_id'])[0];
+//            $voiceData['time'] = '116.472004943369';
+//            $fileNameVoice = '164_181';
 //            $textData['status'] = true;
-//            $textData['name'] = '89_92';
 
-                var_dump($video['content_format']);
+            $this->log->info('Продолжительность файла ' . $textData['time']);
+            $this->log->info('Данные текста ' . json_encode($textData));
 
-                if ($video['type_background'] == 'slide_show' && !empty($voiceData['time'])) {
+            if ($video['type_background'] == 'slide_show' && !empty($textData['time'])) {
 
-                    if (!empty($slides)) {
-                        /**Подгоняем картинки под формат*/
-                        $slidesName = [];
+                if (!empty($slides)) {
+                    /**Подгоняем картинки под формат*/
+                    $slidesName = [];
 
-                        $this->log->info('Список изображений ' . json_encode($slides));
-                        foreach ($slides as $slide) {
-                            $formatImage = $generatorFiles->generatorImageFormat($slide, $video['content_format']);
+                    $this->log->info('Список изображений ' . json_encode($slides));
+                    foreach ($slides as $slide) {
+                        $formatImage = $generatorFiles->generatorImageFormat($slide, $video['content_format']);
 
-                            if (!$formatImage['status']) {
-                                $this->log->error('Ошибка преобразования формата изображения ' . $slide . ' => ' . $formatImage['fileName']);
-                                $this->log->error($formatImage['command']);
-                                $slidesName[] = $slide;
-                                $this->log->info('Список изображений ' . json_encode($slidesName));
-                                continue;
-                            }
-
-                            $slidesName[] = $formatImage['fileName'];
-                            $this->log->info('Успех преобразования формата изображения, имя файла ' . $formatImage['fileName']);
+                        if (!$formatImage['status']) {
+                            $this->log->error('Ошибка преобразования формата изображения ' . $slide . ' => ' . $formatImage['fileName']);
+                            $this->log->error($formatImage['command']);
+                            $slidesName[] = $slide;
                             $this->log->info('Список изображений ' . json_encode($slidesName));
+                            continue;
                         }
 
+                        $slidesName[] = $formatImage['fileName'];
+                        $this->log->info('Успех преобразования формата изображения, имя файла ' . $formatImage['fileName']);
                         $this->log->info('Список изображений ' . json_encode($slidesName));
-                        $slideshow = $generatorFiles->generatorSladeShow($slidesName, $sound[0]['file_name'], $voiceData['time'], $video['content_format']);
+                    }
 
-                        if (!$slideshow['status']) {
+                    $this->log->info('Список изображений ' . json_encode($slidesName));
+                    $slideshow = $generatorFiles->generatorSladeShow($slidesName, $sound[0]['file_name'], $textData['time'], $video['content_format']);
+
+                    if (!$slideshow['status']) {
+                        ContentVideo::changeStatus($videoId, 5);
+                        $this->log->error($slideshow['command']);
+                        $this->log->error('Ошибка генерации слайдшоу');
+                        exec($cmd);
+                        return 0;
+                    }
+
+                    $resultName = $slideshow['fileName'];
+                    $this->log->info('Сдайдшоу сгенерировано, имя файла ' . $resultName);
+
+                } else {
+                    ContentVideo::changeStatus($videoId, 5);
+                    $this->log->error('Изображения не загружены');
+                    exec($cmd);
+                    return 0;
+                }
+            }
+
+            if ($video['type_background'] == 'video' && !empty($textData['time'])) {
+                if (!empty($videoBackground)) {
+
+                    $additionalVideoName = $videoBackground[0];
+                    /**Подгоняем видео под формат*/
+                    if ($video['content_format'] == '9/16') {
+                        $formatVideo = $generatorFiles->generatorVideoFormat($additionalVideoName);
+
+                        if (!$formatVideo['status']) {
                             ContentVideo::changeStatus($videoId, 5);
-                            $this->log->error($slideshow['command']);
-                            $this->log->error('Ошибка генерации слайдшоу');
+                            $this->log->error('Ошибка преобразования формата видео');
                             exec($cmd);
                             return 0;
                         }
 
-                        $resultName = $slideshow['fileName'];
-                        $this->log->info('Сдайдшоу сгенерировано, имя файла ' . $resultName);
-
-                    } else {
-                        ContentVideo::changeStatus($videoId, 5);
-                        $this->log->error('Изображения не загружены');
-                        exec($cmd);
-                        return 0;
-                    }
-                }
-
-                if ($video['type_background'] == 'video' && !empty($voiceData['time'])) {
-                    if (!empty($videoBackground)) {
-
-                        $additionalVideoName = $videoBackground[0];
-                        /**Подгоняем видео под формат*/
-                        if ($video['content_format'] == '9/16') {
-                            $formatVideo = $generatorFiles->generatorVideoFormat($additionalVideoName);
-
-                            if (!$formatVideo['status']) {
-                                ContentVideo::changeStatus($videoId, 5);
-                                $this->log->error('Ошибка преобразования формата видео');
-                                exec($cmd);
-                                return 0;
-                            }
-
-                            $additionalVideoName = $formatVideo['fileName'];
-                            $this->log->info('Успех преобразования формата видео, имя файла ' . $resultName);
-                        }
-
-                        $backgroundVideo = $generatorFiles->generatorBackgroundVideoAndMusic($additionalVideoName, $sound[0]['file_name'], $voiceData['time']);
-
-                        if (!$backgroundVideo['status']) {
-                            ContentVideo::changeStatus($videoId, 5);
-                            $this->log->error('Ошибка генерации фонового видео ' . $backgroundVideo['command']);
-                            exec($cmd);
-                            return 0;
-                        }
-
-                        $resultName = $backgroundVideo['fileName'];
-                        $this->log->info('Фоновое видео сгенерировано, имя файла ' . $resultName);
-
-                    } else {
-                        ContentVideo::changeStatus($videoId, 5);
-                        $this->log->error('Видео не загружено');
-                        exec($cmd);
-                        return 0;
-                    }
-                }
-
-                if (!is_null($video['color_background_id']) && !empty($resultName)) {
-
-                    $colorBackground = ColorBackground::findById((int)$video['color_background_id']);
-                    $background = $generatorFiles->generatorBackground($colorBackground['file_name'], $resultName);
-
-                    if (!$background['status']) {
-                        ContentVideo::changeStatus($videoId, 5);
-                        $this->log->error('Ошибка наложения фона видео');
-                        exec($cmd);
-                        return 0;
+                        $additionalVideoName = $formatVideo['fileName'];
+                        $this->log->info('Успех преобразования формата видео, имя файла ' . $resultName);
                     }
 
-                    $resultName = $background['fileName'];
-                    $this->log->info('Фоновое изображение наложено, имя файла ' . $resultName);
-                }
-
-                if (!empty($logo)) {
-                    $logoForVideo = $generatorFiles->generatorLogo($logo[0], $resultName);
-
-                    if (!$logoForVideo['status']) {
-                        ContentVideo::changeStatus($videoId, 5);
-                        $this->log->error('Ошибка прикрепления логотипа');
-                        exec($cmd);
-                        return 0;
-                    }
-
-                    $resultName = $logoForVideo['fileName'];
-                    $this->log->info('Логотип прикреплён, имя файла ' . $resultName);
-                }
-
-                if (!empty($fileNameVoice)) {
-
-                    $voice = $generatorFiles->generatorMusic($fileNameVoice, $resultName);
-
-                    if (!$voice['status']) {
-                        ContentVideo::changeStatus($videoId, 5);
-                        $this->log->error($voice['command']);
-                        $this->log->error('Ошибка наложения озвучки текста');
-                        exec($cmd);
-                        return 0;
-                    }
-
-                    $resultName = $voice['fileName'];
-                    $this->log->info('Озвучка наложена, имя файла ' . $resultName);
-                }
-
-                if ($voiceData['status']) {
-
-                    $this->log->info('Название файла субтитров  ' . $voiceData['name']);
-                    $titers = $generatorFiles->generatorText($resultName, $voiceData['name'], $video['content_format']);
-
-                    if (!$titers['status']) {
-                        ContentVideo::changeStatus($videoId, 5);
-                        $this->log->error('Ошибка наложения субтитров');
-                        $this->log->error($titers['command']);
-                        exec($cmd);
-                        return 0;
-                    }
-
-                    $resultName = $titers['fileName'];
-                    $this->log->info('Субтитры наложены, имя файла ' . $resultName);
-                }
-
-                if (!empty($videoEnd) || !empty($videoStart)) {
-
-                    $backgroundVideo = $generatorFiles->mergeVideo($resultName, $video['content_format'], $videoStart[0] ?? null, $videoEnd[0] ?? null);
+                    $backgroundVideo = $generatorFiles->generatorBackgroundVideoAndMusic($additionalVideoName, $sound[0]['file_name'], $textData['time']);
 
                     if (!$backgroundVideo['status']) {
                         ContentVideo::changeStatus($videoId, 5);
-                        $this->log->error('Ошибка склеивания видео');
+                        $this->log->error('Ошибка генерации фонового видео ' . $backgroundVideo['command']);
                         exec($cmd);
                         return 0;
                     }
 
                     $resultName = $backgroundVideo['fileName'];
-                    $this->log->info('Видое склеились, имя файла ' . $resultName);
+                    $this->log->info('Фоновое видео сгенерировано, имя файла ' . $resultName);
+
+                } else {
+                    ContentVideo::changeStatus($videoId, 5);
+                    $this->log->error('Видео не загружено');
+                    exec($cmd);
+                    return 0;
+                }
+            }
+
+            if (!is_null($video['color_background_id']) && !empty($resultName)) {
+
+                $colorBackground = ColorBackground::findById((int)$video['color_background_id']);
+                $background = $generatorFiles->generatorBackground($colorBackground['file_name'], $resultName);
+
+                if (!$background['status']) {
+                    ContentVideo::changeStatus($videoId, 5);
+                    $this->log->error('Ошибка наложения фона видео');
+                    exec($cmd);
+                    return 0;
                 }
 
-                ContentVideo::updateContent($videoId, $resultName . '.mp4', RELATIVE_PATH_VIDEO . $resultName . '.mp4', 4);
-                $this->log->info('Видео сгенерировано, имя файла ' . $resultName . 'file_path: ' . RELATIVE_PATH_VIDEO . $resultName . '.mp4');
+                $resultName = $background['fileName'];
+                $this->log->info('Фоновое изображение наложено, имя файла ' . $resultName);
+            }
 
+            if (!empty($logo)) {
+                $logoForVideo = $generatorFiles->generatorLogo($logo[0], $resultName);
+
+                if (!$logoForVideo['status']) {
+                    ContentVideo::changeStatus($videoId, 5);
+                    $this->log->error('Ошибка прикрепления логотипа');
+                    exec($cmd);
+                    return 0;
+                }
+
+                $resultName = $logoForVideo['fileName'];
+                $this->log->info('Логотип прикреплён, имя файла ' . $resultName);
             }
-        catch
-            (Exception $e) {
-                $this->log->error($e->getMessage());
-                ContentVideo::changeStatus($videoId, 5);
-            } catch (GuzzleException $e) {
-                $this->log->error($e->getMessage());
-                ContentVideo::changeStatus($videoId, 5);
+
+            if (!empty($textData)) {
+
+                $voice = $generatorFiles->generatorMusic($textData['file_name_voice'], $resultName);
+
+                if (!$voice['status']) {
+                    ContentVideo::changeStatus($videoId, 5);
+                    $this->log->error($voice['command']);
+                    $this->log->error('Ошибка наложения озвучки текста');
+                    exec($cmd);
+                    return 0;
+                }
+
+                $resultName = $voice['fileName'];
+                $this->log->info('Озвучка наложена, имя файла ' . $resultName);
             }
+
+            if (is_null($textData['subtitles']) || $textData['subtitles']) {
+
+                $this->log->info('Название файла субтитров  ' . $textData['file_name_voice']);
+                $titers = $generatorFiles->generatorText($resultName, $textData['file_name_voice'], $video['content_format']);
+
+                if (!$titers['status']) {
+                    ContentVideo::changeStatus($videoId, 5);
+                    $this->log->error('Ошибка наложения субтитров');
+                    $this->log->error($titers['command']);
+                    exec($cmd);
+                    return 0;
+                }
+
+                $resultName = $titers['fileName'];
+                $this->log->info('Субтитры наложены, имя файла ' . $resultName);
+            }
+
+            if (!empty($videoEnd) || !empty($videoStart)) {
+
+                $backgroundVideo = $generatorFiles->mergeVideo($resultName, $video['content_format'], $videoStart[0] ?? null, $videoEnd[0] ?? null);
+
+                if (!$backgroundVideo['status']) {
+                    ContentVideo::changeStatus($videoId, 5);
+                    $this->log->error('Ошибка склеивания видео');
+                    exec($cmd);
+                    return 0;
+                }
+
+                $resultName = $backgroundVideo['fileName'];
+                $this->log->info('Видое склеились, имя файла ' . $resultName);
+            }
+
+            ContentVideo::updateContent($videoId, $resultName . '.mp4', RELATIVE_PATH_VIDEO . $resultName . '.mp4', 4);
+            $this->log->info('Видео сгенерировано, имя файла ' . $resultName . 'file_path: ' . RELATIVE_PATH_VIDEO . $resultName . '.mp4');
+
+        } catch
+        (Exception $e) {
+            $this->log->error($e->getMessage());
+            ContentVideo::changeStatus($videoId, 5);
+        } catch (GuzzleException $e) {
+            $this->log->error($e->getMessage());
+            ContentVideo::changeStatus($videoId, 5);
+        }
 //        }
 
         if ($this->status_log) {

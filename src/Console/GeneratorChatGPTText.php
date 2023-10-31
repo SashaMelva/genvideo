@@ -87,7 +87,7 @@ class GeneratorChatGPTText extends Command
 
                 $client = new Client();
 
-                $response = $client->post('http://127.0.0.1:8888/api/main',
+                $response = $client->post('http://45.92.176.207:4749/api/main',
                     [
                         'headers' => [
                             'Content-Type' => 'application/json'
