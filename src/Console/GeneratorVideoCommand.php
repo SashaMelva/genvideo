@@ -160,7 +160,7 @@ class GeneratorVideoCommand extends Command
             $this->log->info('Продолжительность файла ' . $textData['time']);
             $this->log->info('Данные текста ' . json_encode($textData));
 
-            if ($video['type_background'] == 'slide_show' && !empty($textData['time'])) {
+            if ($video['type_background'] == 'slide_show' && !is_null($textData['time'])) {
 
                 if (!empty($slides)) {
                     /**Подгоняем картинки под формат*/
@@ -205,7 +205,7 @@ class GeneratorVideoCommand extends Command
                 }
             }
 
-            if ($video['type_background'] == 'video' && !empty($textData['time'])) {
+            if ($video['type_background'] == 'video' && !is_null($textData['time'])) {
                 if (!empty($videoBackground)) {
 
                     $additionalVideoName = $videoBackground[0];
@@ -244,7 +244,7 @@ class GeneratorVideoCommand extends Command
                 }
             }
 
-            if (!is_null($video['color_background_id']) && !empty($resultName)) {
+            if (!is_null($video['color_background_id']) && !is_null($resultName)) {
 
                 $colorBackground = ColorBackground::findById((int)$video['color_background_id']);
                 $background = $generatorFiles->generatorBackground($colorBackground['file_name'], $resultName);
@@ -260,7 +260,7 @@ class GeneratorVideoCommand extends Command
                 $this->log->info('Фоновое изображение наложено, имя файла ' . $resultName);
             }
 
-            if (!empty($logo)) {
+            if (!empty($logo) && !is_null($resultName)) {
                 $logoForVideo = $generatorFiles->generatorLogo($logo[0], $resultName);
 
                 if (!$logoForVideo['status']) {
