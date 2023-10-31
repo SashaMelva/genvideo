@@ -33,6 +33,7 @@ use App\Controller\Projects\GetAllVideoProject;
 use App\Controller\Projects\GetInfoProject;
 use App\Controller\Projects\UpdateProject;
 use App\Controller\test\TestController;
+use App\Controller\test\TestGPT;
 use App\Controller\Users\ChangePassword;
 use App\Controller\Users\ChangePasswordViaMail;
 use App\Controller\Users\GetUserInfo;
@@ -58,6 +59,7 @@ return static function(App $app):void
     $app->group('/api', function (RouteCollectorProxyInterface $group) {
 
         $group->get('/test', TestController::class);
+        $group->get('/test-GPT', TestGPT::class);
 
         $group->group('/auth', function (RouteCollectorProxyInterface $group) {
             $group->post('/registry', RegistryUser::class);

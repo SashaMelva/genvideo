@@ -35,9 +35,6 @@ class TestController extends UserController
 
     public function action(): ResponseInterface
     {
-        $ffmpeg = 'ffmpeg -re  -auto_convert 1 -safe 0 -f concat -i mylist.txt  -i qr.png -filter_complex "[0:v][1:v]overlay=main_w-overlay_w-15:15"  -c:v libx264 -g 40 -keyint_min 1 -vsync 1 -c:a aac  -ar 48000 -ac 2 -strict -2 -af aresample=async=1000  OUTPUT.mp4';
-        var_dump($ffmpeg);
-        exit();
 
 
 
