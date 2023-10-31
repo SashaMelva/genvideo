@@ -22,25 +22,25 @@ class TestGPT extends UserController
 
         $client = new Client();
 
-//        $response = $client->post('http://127.0.0.1:5000/api/main',
-//            [
-//                'headers' => [
-//                    'Content-Type' => 'application/json'
-//                ],
-//                'json' => [
-//                    'title' => $query
-//                ]
-//            ]);
-//
-//        $responseData = json_decode($response->getBody()->getContents(), true);
-//
-//        file_put_contents(DIRECTORY_RESULT_CONTENT . $query . '.txt',$responseData);
-//
-//        return $this->respondWithData('Ok');
+        $response = $client->post('http://127.0.0.1:5000/api/main',
+            [
+                'headers' => [
+                    'Content-Type' => 'application/json'
+                ],
+                'json' => [
+                    'title' => $query
+                ]
+            ]);
 
-        $response = $client->get('http://127.0.0.1:5000/api/main');
+        $responseData = json_decode($response->getBody()->getContents(), true);
+
+        file_put_contents(DIRECTORY_RESULT_CONTENT . $query . '.txt',$responseData);
+
+        return $this->respondWithData('Ok');
+
+//        $response = $client->get('http://127.0.0.1:5000/api/main');
 
 
-        return $this->respondWithData($response);
+//        return $this->respondWithData($response);
     }
 }
