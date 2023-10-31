@@ -157,10 +157,10 @@ class GeneratorVideoCommand extends Command
 //            $fileNameVoice = '164_181';
 //            $textData['status'] = true;
 
-            $this->log->info('Продолжительность файла ' . $textData['time']);
+            $this->log->info('Продолжительность файла ' . $textData['time_voice']);
             $this->log->info('Данные текста ' . json_encode($textData));
 
-            if ($video['type_background'] == 'slide_show' && !is_null($textData['time'])) {
+            if ($video['type_background'] == 'slide_show' && !is_null($textData['time_voice'])) {
 
                 if (!empty($slides)) {
                     /**Подгоняем картинки под формат*/
@@ -184,7 +184,7 @@ class GeneratorVideoCommand extends Command
                     }
 
                     $this->log->info('Список изображений ' . json_encode($slidesName));
-                    $slideshow = $generatorFiles->generatorSladeShow($slidesName, $sound[0]['file_name'], $textData['time'], $video['content_format']);
+                    $slideshow = $generatorFiles->generatorSladeShow($slidesName, $sound[0]['file_name'], $textData['time_voice'], $video['content_format']);
 
                     if (!$slideshow['status']) {
                         ContentVideo::changeStatus($videoId, 5);
@@ -205,7 +205,7 @@ class GeneratorVideoCommand extends Command
                 }
             }
 
-            if ($video['type_background'] == 'video' && !is_null($textData['time'])) {
+            if ($video['type_background'] == 'video' && !is_null($textData['time_voice'])) {
                 if (!empty($videoBackground)) {
 
                     $additionalVideoName = $videoBackground[0];
@@ -224,7 +224,7 @@ class GeneratorVideoCommand extends Command
                         $this->log->info('Успех преобразования формата видео, имя файла ' . $resultName);
                     }
 
-                    $backgroundVideo = $generatorFiles->generatorBackgroundVideoAndMusic($additionalVideoName, $sound[0]['file_name'], $textData['time']);
+                    $backgroundVideo = $generatorFiles->generatorBackgroundVideoAndMusic($additionalVideoName, $sound[0]['file_name'], $textData['time_voice']);
 
                     if (!$backgroundVideo['status']) {
                         ContentVideo::changeStatus($videoId, 5);
