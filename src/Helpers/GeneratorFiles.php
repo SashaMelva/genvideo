@@ -69,19 +69,26 @@ class GeneratorFiles
 
         if ($timeVoice > $timeVideo) {
             $loop = floor($timeVoice / $timeVideo);
-            $ffmpeg = 'ffmpeg  -stream_loop ' . $loop . ' -i ' . DIRECTORY_VIDEO . $nameVideo . '.mp4 -i ' . DIRECTORY_MUSIC . $sound_name . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 ' . DIRECTORY_VIDEO . $resultName . '.mp4';
+            $ffmpeg = 'ffmpeg  -stream_loop ' . $loop . ' -i ' . DIRECTORY_VIDEO . $nameVideo . '.mp4 -i ' . DIRECTORY_MUSIC . $sound_name . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 ' . DIRECTORY_VIDEO . $resultName . '_new.mp4';
         } else {
-            $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $nameVideo . '.mp4 -i ' . DIRECTORY_MUSIC . $sound_name . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 ' . DIRECTORY_VIDEO . $resultName . '.mp4';
+            $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $nameVideo . '.mp4 -i ' . DIRECTORY_MUSIC . $sound_name . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 ' . DIRECTORY_VIDEO . $resultName . '_new.mp4';
         }
 
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+        if (!is_null($errors)) {
+            return ['status' => false, 'command' => $ffmpeg];
+        }
 
+        //$timeFormat = $this->formatMilliseconds($timeVoice * 1000);
+        $ffmpeg = "ffmpeg -i " . DIRECTORY_VIDEO . $resultName . "_new.mp4 -t " .$timeVoice." -c:v h264_nvenc -c:a aac " . DIRECTORY_VIDEO . $resultName . '.mp4';
+
+        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
         if (!is_null($errors)) {
             return ['status' => false, 'command' => $ffmpeg];
         }
 
         unlink(DIRECTORY_VIDEO . $nameVideo . '.mp4');
-        return ['fileName' => $resultName, 'status' => true];
+        return ['fileName' => $resultName, 'status' => true, 'command' => $ffmpeg];
     }
 
     public function generatorImageFormat(string $nameImage, string $format): array
@@ -222,7 +229,7 @@ class GeneratorFiles
                 $dataStartVideo = $this->generatorAdditionalVideoFormat($fileNameStart);
 
                 if ($dataStartVideo['status']) {
-                    $ffmpeg .=  DIRECTORY_ADDITIONAL_VIDEO . $dataStartVideo['fileName'] . '.ts' . '|';
+                    $ffmpeg .= DIRECTORY_ADDITIONAL_VIDEO . $dataStartVideo['fileName'] . '.ts' . '|';
                 } else {
                     return ['status' => false];
                 }
@@ -317,5 +324,19 @@ class GeneratorFiles
         }
 
         return 'ffmpeg' . $images . $sound . '-filter_complex "' . $scale . $v;
+    }
+
+    private function formatMilliseconds($milliseconds): string
+    {
+        $seconds = floor($milliseconds / 1000);
+        $minutes = floor($seconds / 60);
+        $hours = floor($minutes / 60);
+        $milliseconds = $milliseconds % 1000;
+        $seconds = $seconds % 60;
+        $minutes = $minutes % 60;
+
+        $format = '%u:%02u:%02u.%03u';
+
+        return sprintf($format, $hours, $minutes, $seconds, $milliseconds);
     }
 }

@@ -35,9 +35,22 @@ class TestController extends UserController
 
     public function action(): ResponseInterface
     {
-        $textData = TextVideo::findById(176)[0];
-        var_dump($textData['id']);
+
+        var_dump($this->formatMilliseconds('215.552036923077' * 1000));
         //return $this->respondWithData($textData[0]['time']);
+    }
+    private function formatMilliseconds($milliseconds): string
+    {
+        $seconds = floor($milliseconds / 1000);
+        $minutes = floor($seconds / 60);
+        $hours = floor($minutes / 60);
+        $milliseconds = $milliseconds % 1000;
+        $seconds = $seconds % 60;
+        $minutes = $minutes % 60;
+
+        $format = '%u:%02u:%02u.%03u';
+
+        return sprintf($format, $hours, $minutes, $seconds, $milliseconds);
     }
 }
 
