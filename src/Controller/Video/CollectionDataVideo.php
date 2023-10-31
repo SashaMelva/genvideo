@@ -27,8 +27,8 @@ class CollectionDataVideo extends UserController
     {
         $access_token = $this->request->getHeaderLine('token');
         $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
-      $data = json_decode($this->request->getBody()->getContents(), true);
-      $userId = 30;//$token->user_id;
+        $data = json_decode($this->request->getBody()->getContents(), true);
+        $userId = $token->user_id;
 
         if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
 
@@ -41,7 +41,7 @@ class CollectionDataVideo extends UserController
                     is_null($data['voice_id']) ||
                     is_null($data['format']) ||
                     is_null($data['ampula_voice']) ||
-                    is_null($data['musics_ids']) ) {
+                    is_null($data['musics_ids'])) {
 
                     return $this->respondWithError(400, 'Не заполнены обязательые поля');
                 }
@@ -61,7 +61,8 @@ class CollectionDataVideo extends UserController
                     null,
                     false,
                     false,
-                    null
+                    null,
+                    $data['subtitles']
                 );
 
                 $content = ContentVideo::addContent(
@@ -77,7 +78,6 @@ class CollectionDataVideo extends UserController
                     1,
                     $text->id,
                     $data['ampula_voice'],
-                    $data['subtitles']
                 );
 
                 $contentId = $content->id;

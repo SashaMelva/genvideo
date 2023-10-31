@@ -133,7 +133,6 @@ class ContentVideo extends Model
         string  $statusId,
         string  $textId,
         string  $ampulaVoice,
-        bool $subtitles,
         ?int  $statusGeneratorImage = 0,
     ): ContentVideo
     {
@@ -153,7 +152,6 @@ class ContentVideo extends Model
         $newContent->setAttribute('text_id', $textId);
         $newContent->setAttribute('ampula_voice', $ampulaVoice);
         $newContent->setAttribute('genertor_image_status', $statusGeneratorImage);
-        $newContent->setAttribute('subtitles', $subtitles);
 
         $newContent->save();
         return $newContent;

@@ -28,7 +28,7 @@ class TextVideo extends Model
             ->get()->toArray();
     }
 
-    public static function addText(int $projectId, string $text, ?string $fileName, ?string $filePath, ?string $fileNameVoice, ?string $filePathVoice, bool $statusVoice, bool $statusText, ?string $timeVoice): TextVideo
+    public static function addText(int $projectId, string $text, ?string $fileName, ?string $filePath, ?string $fileNameVoice, ?string $filePathVoice, bool $statusVoice, bool $statusText, ?string $timeVoice, string $subtitles): TextVideo
     {
         $textVideo = new TextVideo();
         $textVideo->setAttribute('project_id', $projectId);
@@ -42,6 +42,7 @@ class TextVideo extends Model
         $textVideo->setAttribute('status_voice', $statusVoice);
         $textVideo->setAttribute('status_text', $statusText);
         $textVideo->setAttribute('time_voice', $timeVoice);
+        $textVideo->setAttribute('subtitles', $subtitles);
 
         $textVideo->save();
         return $textVideo;
