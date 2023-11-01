@@ -262,7 +262,7 @@ class GeneratorManyVideoCommand  extends Command
             if ((!empty($videoEnd) || !empty($videoStart)) && (file_exists(DIRECTORY_ADDITIONAL_VIDEO . $videoEnd[0]) || file_exists(DIRECTORY_ADDITIONAL_VIDEO . $videoStart[0]))) {
                 $this->log->info('Склека видео началась ');
 
-                $backgroundVideo = $generatorFiles->mergeVideo($resultName, $video['content_format'], $videoStart[0] ?? null, $videoEnd[0] ?? null);
+                $backgroundVideo = $generatorFiles->mergeVideo( $this->log, $resultName, $video['content_format'], $videoStart[0] ?? null, $videoEnd[0] ?? null);
 
                 if (!$backgroundVideo['status']) {
                     ContentVideo::changeStatus($videoId, 5);
