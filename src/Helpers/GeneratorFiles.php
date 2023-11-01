@@ -146,7 +146,7 @@ class GeneratorFiles
     public function generatorVideoFormat(string $nameVideo): array
     {
         $resultName = $this->contentId . '_format';
-        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $nameVideo . ' -vf "crop=((9*in_h)/16):in_h:in_w/2-((9*in_h)/16)/2:0" -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
+        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . ' -vf "crop=((9*in_h)/16):in_h:in_w/2-((9*in_h)/16)/2:0" -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
         $this->log->info($ffmpeg);
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
