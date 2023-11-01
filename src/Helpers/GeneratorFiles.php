@@ -65,6 +65,7 @@ class GeneratorFiles
 
         $getID3 = new getID3;
         $file = $getID3->analyze(DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . '.mp4');
+        var_dump(DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . '.mp4');
         $timeVideo = $file['playtime_seconds'];
 
         if ($timeVoice > $timeVideo) {

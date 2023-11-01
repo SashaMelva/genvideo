@@ -110,7 +110,6 @@ class GeneratorManyVideoCommand  extends Command
 //            $textData['status'] = true;
 
             $this->log->info('Продолжительность файла ' . $textData['time_voice']);
-            $this->log->info('Данные текста ' . json_encode($textData));
 
             if ($video['type_background'] == 'slide_show' && !is_null($textData['time_voice'])) {
 
