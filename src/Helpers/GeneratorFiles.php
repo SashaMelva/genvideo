@@ -64,15 +64,15 @@ class GeneratorFiles
 //        $timeSound = $file['playtime_seconds'];
 
         $getID3 = new getID3;
-        $file = $getID3->analyze(DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . '.mp4');
-        var_dump(DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . '.mp4');
+        $file = $getID3->analyze(DIRECTORY_ADDITIONAL_VIDEO . $nameVideo);
+        var_dump(DIRECTORY_ADDITIONAL_VIDEO . $nameVideo);
         $timeVideo = $file['playtime_seconds'];
 
         if ($timeVoice > $timeVideo) {
             $loop = floor($timeVoice / $timeVideo);
-            $ffmpeg = 'ffmpeg  -stream_loop ' . $loop . ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . '.mp4 -i ' . DIRECTORY_MUSIC . $sound_name . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 ' . DIRECTORY_VIDEO . $resultName . '_new.mp4';
+            $ffmpeg = 'ffmpeg  -stream_loop ' . $loop . ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 ' . DIRECTORY_VIDEO . $resultName . '_new.mp4';
         } else {
-            $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . '.mp4 -i ' . DIRECTORY_MUSIC . $sound_name . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 ' . DIRECTORY_VIDEO . $resultName . '_new.mp4';
+            $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 ' . DIRECTORY_VIDEO . $resultName . '_new.mp4';
         }
 
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
