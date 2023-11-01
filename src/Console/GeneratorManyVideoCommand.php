@@ -159,6 +159,7 @@ class GeneratorManyVideoCommand  extends Command
                     $additionalVideoName = $videoBackground[0];
                     /**Подгоняем видео под формат*/
                     if ($video['content_format'] == '9/16') {
+                        $this->log->error('Перобразование формата');
                         $formatVideo = $generatorFiles->generatorVideoFormat($additionalVideoName);
 
                         if (!$formatVideo['status']) {
@@ -169,7 +170,7 @@ class GeneratorManyVideoCommand  extends Command
                         }
 
                         $additionalVideoName = $formatVideo['fileName'];
-                        $this->log->info('Успех преобразования формата видео, имя файла ' . $resultName);
+                        $this->log->info('Успех преобразования формата видео, имя файла ' . $additionalVideoName);
                     }
 
                     $backgroundVideo = $generatorFiles->generatorBackgroundVideoAndMusic($additionalVideoName, $sound[0]['file_name'], $textData['time_voice']);
