@@ -101,13 +101,8 @@ class GeneratorManyVideoCommand  extends Command
             }
 
             ContentVideo::changeStatus($videoId, 3);
-
             $generatorFiles = new GeneratorFiles($videoId, $this->log);
-#TODO
             $textData = TextVideo::findById($video['text_id'])[0];
-//            $voiceData['time'] = '116.472004943369';
-//            $fileNameVoice = '164_181';
-//            $textData['status'] = true;
 
             $this->log->info('Продолжительность файла ' . $textData['time_voice']);
 

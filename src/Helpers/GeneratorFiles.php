@@ -258,8 +258,8 @@ class GeneratorFiles
             }
         }
 
+        $this->log->info('Преобразование основного видео в формат ts');
         if ($this->mergeFiles($nameVideoContent, DIRECTORY_VIDEO)) {
-            $this->log->info('Преобразование основного видео в формат ts');
             $ffmpeg .= ' -i ' . DIRECTORY_VIDEO . $nameVideoContent . '.ts';
         } else {
             return ['status' => false, 'command' => $ffmpeg];
@@ -312,6 +312,7 @@ class GeneratorFiles
     {
 
         $ffmpeg = 'ffmpeg -i ' . $directory . $fileName . '.mp4' . ' -c:v h264_nvenc -c:a copy -f mpegts ' . $directory . $fileName . '.ts';
+        $this->log->info($ffmpeg);
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         if (!is_null($errors)) {
