@@ -126,9 +126,9 @@ class GeneratorChatGPTText extends Command
                     }
 
                 } else {
-                    $this->log->info('Ошика при получении текста: ' . $responseData['response']);
                     GPTChatRequests::changeStatusError($gptRequest['id'], 3, $responseData['response']);
                     ContentVideo::changeStatus($contentId, 6);
+                    $this->log->info('Ошика при получении текста: ' . $responseData['response']);
                     exec($cmd);
                     return 0;
                 }
