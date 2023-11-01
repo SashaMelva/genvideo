@@ -151,11 +151,8 @@ class GeneratorVideoCommand extends Command
                     return 0;
                 }
             }
-#TODO
+
             $textData = TextVideo::findById($video['text_id'])[0];
-//            $voiceData['time'] = '116.472004943369';
-//            $fileNameVoice = '164_181';
-//            $textData['status'] = true;
 
             $this->log->info('Продолжительность файла ' . $textData['time_voice']);
 
@@ -205,11 +202,13 @@ class GeneratorVideoCommand extends Command
             }
 
             if ($video['type_background'] == 'video' && !is_null($textData['time_voice'])) {
-                if (!empty($videoBackground)  && file_exists(DIRECTORY_ADDITIONAL_VIDEO . $videoBackground[0])) {
+                if (!empty($videoBackground) && file_exists(DIRECTORY_ADDITIONAL_VIDEO . $videoBackground[0])) {
+                    $this->log->error('Начало формирования новго видео');
 
                     $additionalVideoName = $videoBackground[0];
                     /**Подгоняем видео под формат*/
                     if ($video['content_format'] == '9/16') {
+                        $this->log->error('Перобразование формата');
                         $formatVideo = $generatorFiles->generatorVideoFormat($additionalVideoName);
 
                         if (!$formatVideo['status']) {
@@ -220,7 +219,7 @@ class GeneratorVideoCommand extends Command
                         }
 
                         $additionalVideoName = $formatVideo['fileName'];
-                        $this->log->info('Успех преобразования формата видео, имя файла ' . $resultName);
+                        $this->log->info('Успех преобразования формата видео, имя файла ' . $additionalVideoName);
                     }
 
                     $backgroundVideo = $generatorFiles->generatorBackgroundVideoAndMusic($additionalVideoName, $sound[0]['file_name'], $textData['time_voice']);
@@ -307,6 +306,7 @@ class GeneratorVideoCommand extends Command
             }
 
             if ((!empty($videoEnd) || !empty($videoStart)) && (file_exists(DIRECTORY_ADDITIONAL_VIDEO . $videoEnd[0]) || file_exists(DIRECTORY_ADDITIONAL_VIDEO . $videoStart[0]))) {
+                $this->log->info('Склека видео началась ');
 
                 $backgroundVideo = $generatorFiles->mergeVideo($resultName, $video['content_format'], $videoStart[0] ?? null, $videoEnd[0] ?? null);
 
