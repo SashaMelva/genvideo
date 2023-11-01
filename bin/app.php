@@ -10,6 +10,7 @@ use App\Console\GeneratorVideoCommand;
 use App\Console\GeneratorVoiceAndSubtitlesCommand;
 use App\Console\GetYandexAimToken;
 use App\Console\ImportDataExcelCommand;
+use App\Console\TestGPTRequest;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Application;
 
@@ -51,6 +52,9 @@ try {
     $cli->add(new GeneratorImage()); // Получение картинок по описанию, полученного с чата
     $cli->add(new GeneratorVoiceAndSubtitlesCommand()); //генерация озвучки и субтитров
     $cli->add(new GeneratorManyVideoCommand()); //новый скрипт для генерации видео
+
+    $cli->add(new TestGPTRequest());
+
     $cli->run();
 
 } catch (Throwable $exception) {
