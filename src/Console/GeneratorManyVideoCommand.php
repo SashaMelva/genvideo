@@ -154,6 +154,7 @@ class GeneratorManyVideoCommand  extends Command
 
             if ($video['type_background'] == 'video' && !is_null($textData['time_voice'])) {
                 if (!empty($videoBackground) && file_exists(DIRECTORY_ADDITIONAL_VIDEO . $videoBackground[0])) {
+                    $this->log->error('Начало формирования новго видео');
 
                     $additionalVideoName = $videoBackground[0];
                     /**Подгоняем видео под формат*/
