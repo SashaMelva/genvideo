@@ -205,6 +205,11 @@ class GeneratorFiles
     public function generatorAdditionalVideoFormat(string $nameVideo): array
     {
         $resultName = $nameVideo . '_format';
+
+        if (file_exists(DIRECTORY_ADDITIONAL_VIDEO . $resultName . '.ts')) {
+            return ['fileName' => $resultName, 'status' => true];
+        }
+
         var_dump($nameVideo);
         $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . '.mp4 -vf "crop=((9*in_h)/16):in_h:in_w/2-((9*in_h)/16)/2:0" -c:v h264_nvenc -c:a copy -f mpegts -y ' . DIRECTORY_ADDITIONAL_VIDEO . $resultName . '.ts';
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
