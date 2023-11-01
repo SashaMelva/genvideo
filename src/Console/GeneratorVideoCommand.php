@@ -312,7 +312,7 @@ class GeneratorVideoCommand extends Command
 
                 if (!$backgroundVideo['status']) {
                     ContentVideo::changeStatus($videoId, 5);
-                    $this->log->error('Ошибка склеивания видео');
+                    $this->log->error('Ошибка склеивания видео ' . $backgroundVideo['command']);
                     exec($cmd);
                     return 0;
                 }

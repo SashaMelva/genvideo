@@ -205,6 +205,7 @@ class GeneratorFiles
     public function generatorAdditionalVideoFormat(string $nameVideo): array
     {
         $resultName = $nameVideo . '_format';
+        var_dump($nameVideo);
         $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . '.mp4 -vf "crop=((9*in_h)/16):in_h:in_w/2-((9*in_h)/16)/2:0" -c:v h264_nvenc -c:a copy -f mpegts -y ' . DIRECTORY_ADDITIONAL_VIDEO . $resultName . '.ts';
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
@@ -234,7 +235,7 @@ class GeneratorFiles
                 if ($dataStartVideo['status']) {
                     $ffmpeg .= ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $dataStartVideo['fileName'] . '.ts';
                 } else {
-                    return ['status' => false];
+                    return ['status' => false, 'command' => $ffmpeg];
                 }
 
             } else {
@@ -242,7 +243,7 @@ class GeneratorFiles
                 if ($this->mergeFiles($fileNameStart, DIRECTORY_ADDITIONAL_VIDEO)) {
                     $ffmpeg .= ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $fileNameStart . '.ts' ;
                 } else {
-                    return ['status' => false];
+                    return ['status' => false, 'command' => $ffmpeg];
                 }
             }
         }
@@ -250,7 +251,7 @@ class GeneratorFiles
         if ($this->mergeFiles($nameVideoContent, DIRECTORY_VIDEO)) {
             $ffmpeg .= ' -i ' . DIRECTORY_VIDEO . $nameVideoContent . '.ts';
         } else {
-            return ['status' => false];
+            return ['status' => false, 'command' => $ffmpeg];
         }
 
 
@@ -265,7 +266,7 @@ class GeneratorFiles
                 if ($dataEndVideo['status']) {
                     $ffmpeg .= ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $dataEndVideo['fileName'] . '.ts';
                 } else {
-                    return ['status' => false];
+                    return ['status' => false, 'command' => $ffmpeg];
                 }
 
             } else {
@@ -273,11 +274,12 @@ class GeneratorFiles
                 if ($this->mergeFiles($fileNameEnd, DIRECTORY_ADDITIONAL_VIDEO)) {
                     $ffmpeg .= ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $fileNameEnd . '.ts';
                 } else {
-                    return ['status' => false];
+                    return ['status' => false, 'command' => $ffmpeg];
                 }
             }
         }
 
+        var_dump($countVideo);
         if ($countVideo == 2){
             $ffmpeg .= ' -filter_complex "[0:v] [0:a] [1:v] [1:a] concat=n=2:v=1:a=1 [v] [a]" -map "[v]" -map "[a]" ' . DIRECTORY_VIDEO . $fileName . '.mp4';
         }
@@ -290,7 +292,7 @@ class GeneratorFiles
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         if (!is_null($errors)) {
-            return ['status' => false];
+            return ['status' => false, 'command' => $ffmpeg];
         }
 
         return ['fileName' => $fileName, 'status' => true];
