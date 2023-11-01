@@ -307,7 +307,7 @@ class GeneratorVideoCommand extends Command
                 $this->log->info('Субтитры наложены, имя файла ' . $resultName);
             }
 
-            if (!empty($videoEnd) || !empty($videoStart)) {
+            if ((!empty($videoEnd) || !empty($videoStart)) && (file_exists(DIRECTORY_ADDITIONAL_VIDEO . $videoEnd[0]) || file_exists(DIRECTORY_ADDITIONAL_VIDEO . $videoStart[0]))) {
 
                 $backgroundVideo = $generatorFiles->mergeVideo($resultName, $video['content_format'], $videoStart[0] ?? null, $videoEnd[0] ?? null);
 
@@ -320,6 +320,9 @@ class GeneratorVideoCommand extends Command
 
                 $resultName = $backgroundVideo['fileName'];
                 $this->log->info('Видое склеились, имя файла ' . $resultName);
+            } else {
+                $this->log->error('Видео не найдено');
+                ContentVideo::changeStatus($videoId, 5);
             }
 
             ContentVideo::updateContent($videoId, $resultName . '.mp4', RELATIVE_PATH_VIDEO . $resultName . '.mp4', 4);
