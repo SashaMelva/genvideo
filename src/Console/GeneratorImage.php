@@ -64,7 +64,7 @@ class GeneratorImage extends Command
                 $this->log->info('Контент взят на генерацию текста: ' . $contentId);
             }
 
-            ContentVideo::changeStatus($contentId, 10);
+            ContentVideo::changeStatus($contentId, 1);
 
 
         } catch (Exception $e) {

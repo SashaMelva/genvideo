@@ -165,7 +165,8 @@ class ImportDataExcelCommand extends Command
                 $statusContent = 6;
 
                 if (empty($row['текст для запроса'])) {
-                    $statusContent = 10;
+                    /**Сейчас не реализова поиск картинок в яндекс, поэтомуу если контекнт не надоотправлять в gpt, то он сразу идёт на генерацию*/
+                    $statusContent = 1;
                 }
 
                 $voiceId = Voice::getBySpeakerName($row['голос'])[0]['id'];
