@@ -8,10 +8,12 @@ use Monolog\Logger;
 class GeneratorFiles
 {
     private int $contentId;
+    private Logger $log;
 
-    public function __construct($contentId)
+    public function __construct($contentId, $log)
     {
         $this->contentId = $contentId;
+        $this->log = $log;
     }
 
     /**Генерируем субтитры*/
@@ -211,11 +213,10 @@ class GeneratorFiles
             return ['fileName' => $resultName, 'status' => true];
         }
 
-        var_dump($nameVideo);
         $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . '.mp4 -vf "crop=((9*in_h)/16):in_h:in_w/2-((9*in_h)/16)/2:0" -c:v h264_nvenc -c:a copy -f mpegts -y ' . DIRECTORY_ADDITIONAL_VIDEO . $resultName . '.ts';
+        $this->log->info($ffmpeg);
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
-
-        var_dump($ffmpeg);
+        
         if (!is_null($errors)) {
             return ['status' => false];
         }
@@ -225,20 +226,19 @@ class GeneratorFiles
     }
 
     /**Склеиваем видео*/
-    public function mergeVideo(Logger $log, string $nameVideoContent, string $format, ?string $nameVideoStart = null, ?string $nameVideoEnd = null): array
+    public function mergeVideo(string $nameVideoContent, string $format, ?string $nameVideoStart = null, ?string $nameVideoEnd = null): array
     {
-        $log->info('Начало');
         $fileName = $this->contentId . '_result';
         $ffmpeg = 'ffmpeg ';
         $countVideo = 1;
 
         if (!is_null($nameVideoStart)) {
-            $log->info('Начало' . $countVideo);
             $countVideo += 1;
             $fileNameStart = str_replace('.mp4', '', $nameVideoStart);
 
-            $log->info('Преобразование формата');
+           
             if ($format == '9/16') {
+                $this->log->info('Форматирование стартовое видео под разрешение 9/16');
                 $dataStartVideo = $this->generatorAdditionalVideoFormat($fileNameStart);
 
                 if ($dataStartVideo['status']) {
@@ -248,7 +248,8 @@ class GeneratorFiles
                 }
 
             } else {
-
+                $this->log->info('Преобразование начального видео в формат ts');
+                
                 if ($this->mergeFiles($fileNameStart, DIRECTORY_ADDITIONAL_VIDEO)) {
                     $ffmpeg .= ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $fileNameStart . '.ts' ;
                 } else {
@@ -258,6 +259,7 @@ class GeneratorFiles
         }
 
         if ($this->mergeFiles($nameVideoContent, DIRECTORY_VIDEO)) {
+            $this->log->info('Преобразование основного видео в формат ts');
             $ffmpeg .= ' -i ' . DIRECTORY_VIDEO . $nameVideoContent . '.ts';
         } else {
             return ['status' => false, 'command' => $ffmpeg];
@@ -269,7 +271,7 @@ class GeneratorFiles
             $fileNameEnd = str_replace('.mp4', '', $nameVideoEnd);
 
             if ($format == '9/16') {
-
+                $this->log->info('Форматирование конечное видео под разрешение 9/16');
                 $dataEndVideo = $this->generatorAdditionalVideoFormat($fileNameEnd);
 
                 if ($dataEndVideo['status']) {
@@ -279,7 +281,7 @@ class GeneratorFiles
                 }
 
             } else {
-
+                $this->log->info('Преобразование конечного видео в формат ts');
                 if ($this->mergeFiles($fileNameEnd, DIRECTORY_ADDITIONAL_VIDEO)) {
                     $ffmpeg .= ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $fileNameEnd . '.ts';
                 } else {
@@ -288,8 +290,7 @@ class GeneratorFiles
             }
         }
 
-        $log->info($countVideo);
-        var_dump($countVideo);
+        $this->log->info('Количество видео для склейки ' . $countVideo);
         if ($countVideo == 2){
             $ffmpeg .= ' -filter_complex "[0:v] [0:a] [1:v] [1:a] concat=n=2:v=1:a=1 [v] [a]" -map "[v]" -map "[a]" ' . DIRECTORY_VIDEO . $fileName . '.mp4';
         }
@@ -297,8 +298,7 @@ class GeneratorFiles
         if ($countVideo == 3){
             $ffmpeg .= '" -filter_complex "[0:v] [0:a] [1:v] [1:a] [2:v] [2:a] concat=n=3:v=1:a=1 [v] [a]" -map "[v]" -map "[a]" ' . DIRECTORY_VIDEO . $fileName . '.mp4';
         }
-        $log->info($ffmpeg);
-        var_dump($ffmpeg);
+        $this->log->info($ffmpeg);
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         if (!is_null($errors)) {

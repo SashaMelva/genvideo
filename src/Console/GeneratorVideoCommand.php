@@ -111,7 +111,7 @@ class GeneratorVideoCommand extends Command
 
             ContentVideo::changeStatus($videoId, 3);
 
-            $generatorFiles = new GeneratorFiles($videoId);
+            $generatorFiles = new GeneratorFiles($videoId, $this->log);
 
             if ($video['status_voice'] == 0 || $video['status_voice'] == 'false') {
 
