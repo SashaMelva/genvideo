@@ -157,6 +157,7 @@ class GeneratorManyVideoCommand  extends Command
                 }
             }
 
+
             if ($video['type_background'] == 'video' && !is_null($textData['time_voice'])) {
                 if (!empty($videoBackground)) {
 
