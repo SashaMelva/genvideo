@@ -159,7 +159,7 @@ class GeneratorManyVideoCommand  extends Command
 
 
             if ($video['type_background'] == 'video' && !is_null($textData['time_voice'])) {
-                if (!empty($videoBackground)) {
+                if (!empty($videoBackground) && file_exists(DIRECTORY_ADDITIONAL_VIDEO . $videoBackground[0])) {
 
                     $additionalVideoName = $videoBackground[0];
                     /**Подгоняем видео под формат*/
