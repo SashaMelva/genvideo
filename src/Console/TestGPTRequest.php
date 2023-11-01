@@ -49,7 +49,7 @@ class TestGPTRequest  extends Command
 
         try {
 
-            $query = "Напиши 5 заголовков под ключевые слова: отношения мать отец";
+            $query = "Напиши 100 заголовков под ключевые слова: отношения мать отец";
 
             $client = new Client();
             $response = $client->post('http://45.92.176.207:4749/api/main',
