@@ -99,6 +99,12 @@ class GeneratorChatGPTText extends Command
 
                 $responseData = json_decode($response->getBody()->getContents(), true);
 
+                if (is_null($responseData)) {
+                    ContentVideo::changeStatus($contentId, 6);
+                    exec($cmd);
+                    return 0;
+                }
+
                 if ($responseData['status'] == 'Ok') {
                     $text = $responseData['response'];
 
@@ -107,29 +113,33 @@ class GeneratorChatGPTText extends Command
                         $this->log->error('Результат запроса пустой текст контент поставлен в очередь'. $contentId);
                         GPTChatRequests::changeStatusError($gptRequest['id'], 3, 'Ответ пустой');
                         ContentVideo::changeStatus($contentId, 6);
+                        exec($cmd);
+                        return 0;
 
                     } else {
 
                         $this->log->error('Успех. Получили результат запроса '. $gptRequest['id']);
                         GPTChatRequests::changeStatusAndContent($gptRequest['id'], 2, $text);
                         ContentVideo::changeStatus($contentId, 8);
-                        exit();
+                        exec($cmd);
+                        return 0;
                     }
 
                 } else {
                     $this->log->info('Ошика при получении текста: ' . $responseData['response']);
                     GPTChatRequests::changeStatusError($gptRequest['id'], 3, $responseData['response']);
                     ContentVideo::changeStatus($contentId, 6);
-                }
-
-            } else {
-
-                if ($this->status_log) {
-                    $this->log->info('Не найден запрос на генерацию контента: ' . json_encode($contentIds));
                     exec($cmd);
                     return 0;
                 }
 
+            } else {
+                if ($this->status_log) {
+                    $this->log->info('Не найден запрос на генерацию контента: ' . json_encode($contentIds));
+                    ContentVideo::changeStatus($contentId, 8);
+                    exec($cmd);
+                    return 0;
+                }
                 ContentVideo::changeStatus($contentId, 8);
             }
 
