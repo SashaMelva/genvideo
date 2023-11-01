@@ -311,7 +311,7 @@ class GeneratorFiles
     private function mergeFiles(string $fileName, string $directory): bool
     {
 
-        $ffmpeg = 'ffmpeg -i ' . $directory . $fileName . '.mp4' . ' -c:v h264_nvenc -c:a copy -f mpegts ' . $directory . $fileName . '.ts';
+        $ffmpeg = 'ffmpeg -i ' . $directory . $fileName . '.mp4' . ' -c:v h264_nvenc -c:a copy -f mpegts -y' . $directory . $fileName . '.ts';
         $this->log->info($ffmpeg);
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
