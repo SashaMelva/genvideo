@@ -336,7 +336,6 @@ class GeneratorVideoCommand extends Command
             $this->log->error($e->getMessage());
             ContentVideo::changeStatus($videoId, 5);
         }
-//        }
 
         if ($this->status_log) {
             $this->log->info('Выполнено ' . date('Y-m-s H:i:s'));

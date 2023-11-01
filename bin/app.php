@@ -53,7 +53,7 @@ try {
     $cli->add(new FormatTextFromChatGptCommand()); //форматирование ответа, полученного от чата
     $cli->add(new GeneratorImage()); // Получение картинок по описанию, полученного с чата
     $cli->add(new GeneratorVoiceAndSubtitlesCommand()); //генерация озвучки и субтитров
-    $cli->add(new GeneratorManyVideoCommand()); //новый скрипт для генерации видео
+    $cli->add(new GeneratorManyVideoCommand()); //новый скрипт для перегенерации видео генерации видео
 
     $cli->add(new TestGPTRequest());
 
