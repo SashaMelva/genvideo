@@ -74,7 +74,7 @@ class TestController extends UserController
         ];
         $result = $this->spillSubtitlesOffers($text);
 
-        $data = $this->SplitMp3($result, 'test', $voiceSetting, $voiceSetting['delay_between_offers_ms']);
+        $data = $this->SplitMp3($result, 'test_new', $voiceSetting, $voiceSetting['delay_between_offers_ms']);
 
         return $this->respondWithData($data);
     }
@@ -140,17 +140,18 @@ class TestController extends UserController
                             shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
                             $mergesAudio = [];
-                        }
 
-                        continue;
+                        } else {
+                            continue;
+                        }
                     }
 
                     $this->log->info('Формирование аудио с пустотой спереди ');
                     $outputAudio = $audio['nameAudio'] . '_long.mp3';
                     $ffmpeg = 'ffmpeg -i ' . $audioName . ' -af adelay=' . $delayBetween . ' ' . DIRECTORY_SPEECHKIT . $outputAudio;
                     $this->log->info($ffmpeg);
-                    $arrayLongAudio[] = DIRECTORY_SPEECHKIT . $outputAudio;
                     shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+                    $arrayLongAudio[] = DIRECTORY_SPEECHKIT . $outputAudio;
                 }
 
 
@@ -169,12 +170,12 @@ class TestController extends UserController
             $cutFrontVideo = $resultNameAllFiles . '_cut';
             $ffmpegShortAudio = 'ffmpeg -i '.DIRECTORY_SPEECHKIT . $resultNameAllFiles. '.mp3 -ss ' . (int)($delayBetween / 1000) . ' -acodec copy -y ' . DIRECTORY_SPEECHKIT . $cutFrontVideo. '.mp3';
             $this->log->info($ffmpegShortAudio);
-            shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+            shell_exec($ffmpegShortAudio . ' -hide_banner -loglevel error 2>&1');
             $tmp_array[] = DIRECTORY_SPEECHKIT . $cutFrontVideo . '.mp3';
 
             $this->log->info('Добавлям в конец файла две секунды');
-            $ffmpegShortAudio = 'ffmpeg -i '.DIRECTORY_SPEECHKIT . $cutFrontVideo. '.mp3 -af "apad=pad_dur=3" -y ' . DIRECTORY_SPEECHKIT . $number. '.mp3';
-            $this->log->info($ffmpegShortAudio);
+            $ffmpegShortAudioResult = 'ffmpeg -i '.DIRECTORY_SPEECHKIT . $cutFrontVideo. '.mp3 -af "apad=pad_dur=3" -y ' . DIRECTORY_SPEECHKIT . $number. '.mp3';
+            $this->log->info($ffmpegShortAudioResult);
             shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
 
@@ -216,9 +217,8 @@ class TestController extends UserController
         return $result;
     }
 
-    private function getFilesSrt(array $text, float $delayBetweenOffersMs): string
+    private function getFilesSrt(array $text, float $delayBetween): string
     {
-
         $arr = [];
         $allTime = 0;
         $counter = 0;
@@ -252,7 +252,7 @@ class TestController extends UserController
                 }
             }
 
-            $allTime = $item['time'] + $allTime + $delayBetweenOffersMs;
+            $allTime = $item['time'] + allTimeWithShort + $delayBetween;
         }
         return implode("\r\n", $arr);
     }
