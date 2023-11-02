@@ -49,7 +49,7 @@ class TestGPTRequest  extends Command
 
         try {
 
-            $query = "напиши текст мощной медитации на тему: Медитация на свободу от контроля и привязанности к тревоге";
+            $query = "Напиши текст для видео на тему: Важность медитации для жизни человека";
 
             $client = new Client();
             $response = $client->post('http://45.92.176.207:4749/api/main',
