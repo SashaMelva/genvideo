@@ -47,6 +47,8 @@ class TestController extends UserController
         $this->log = $log;
         $this->status_log = true;
 
+        $this->client = new Client();
+
         $this->log->info('Начало ' . date('Y-m-s H:i:s'));
 
 
