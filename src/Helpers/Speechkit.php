@@ -37,13 +37,16 @@ class Speechkit
                 }
 
             } else {
-                $resultText = $this->spillSubtitles($text);
+
+                $resultText = $this->spillSubtitlesParagraph($text);
+
                 $data = $this->SplitMp3($resultText, $fileName, $voiceSetting);
 
                 $filesName = $data['files'];
                 $result = $data['status'];
                 $filePath = DIRECTORY_SPEECHKIT . $fileName . '.mp3';
             }
+
             if ($result) {
                 // узнать длину звуковой дорожки
                 $getID3 = new getID3;
@@ -70,8 +73,10 @@ class Speechkit
             // throw new Exception($e->getMessage());
         }
     }
-
-    private function spillSubtitles(string $text): array
+    /**
+     * Разбиваем текст по абзацам
+     */
+    private function spillSubtitlesParagraph(string $text): array
     {
         $desc = $text . ' ';
         $desc = preg_replace("[\r\n]", " ", $desc);
@@ -120,6 +125,53 @@ class Speechkit
                 $rep = str_replace('. .', '.', trim($text) . '. ');
                 $rep = str_replace('! .', '!', $rep);
                 $result[] = str_replace('? .', '?', $rep);
+                $rep = str_replace('..', '.', trim($text) . '. ');
+                $rep = str_replace('!.', '!', $rep);
+                $result[] = str_replace('?.', '?', $rep);
+            }
+        }
+
+        return $result;
+    }
+
+    /** Распределение текста по предложениям длинною не более 250 симвволов, не теряя смысловой нагрузки */
+    private function spillSubtitlesOffers(string $text): array
+    {
+        $desc = trim($text);
+        $desc = preg_replace("[\r\n]", " ", $desc);
+        $textArray = explode('.', $desc);
+
+        if (iconv_strlen($textArray[count($textArray) - 1]) >= 0 && iconv_strlen($textArray[count($textArray) - 1]) < 2) {
+            unset($textArray[count($textArray) - 1]);
+        }
+
+        $countChar = 250;
+        $result = [];
+
+        /** Проверка остальных предложения на количество символов */
+        for ($i = 0; $i < count($textArray); $i++) {
+
+            if (iconv_strlen(trim($textArray[$i])) > $countChar) {
+                $textLongArray = explode(',', trim($textArray[$i]));
+                $textLong = trim($textLongArray[0]) . ', ';
+                unset($textLongArray[0]);
+
+                $countLong = count($textLongArray);
+
+                for ($j = 1; $j <= $countLong; $j++) {
+                    if (iconv_strlen($textLong) + iconv_strlen($textLongArray[$j]) > $countChar) {
+                        $result[] = ['text' => trim($textLong), 'merge' => true];
+                        $textLong = '';
+                    }
+
+                    $textLong .= trim($textLongArray[$j]) . ', ';
+
+                    if ($j == $countLong) {
+                        $result[] = ['text' => trim($textLong), 'merge' => true];
+                    }
+                }
+            } else {
+                $result[] = ['text' => trim($textArray[$i]) . '.', 'merge' => false];
             }
         }
 
@@ -132,6 +184,7 @@ class Speechkit
     private function SplitMp3($Mp3Files, $number, $voiceSetting): array
     {
         try {
+            $delayBetweenParagraphMs = $voiceSetting['delay_between_paragraphs'] ?? 0;
             $delayBetweenOffersMs = $voiceSetting['delay_between_offers_ms'] ?? 0;
 
             $tmp_array = [];
@@ -163,7 +216,7 @@ class Speechkit
 
             $voices = implode('|', $tmp_array);
 
-            if ($delayBetweenOffersMs > 0) {
+            if ($delayBetweenParagraphMs > 0) {
                 $arrayLongAudio = [];
 
                 foreach ($nameAudio as $key => $audio) {
@@ -172,7 +225,7 @@ class Speechkit
                         continue;
                     }
                     $outputAudio = $audio . '_long.mp3';
-                    $ffmpeg = 'ffmpeg -i ' . DIRECTORY_SPEECHKIT . $audio . '.mp3 -af adelay=' . $delayBetweenOffersMs . ' ' . DIRECTORY_SPEECHKIT . $outputAudio;
+                    $ffmpeg = 'ffmpeg -i ' . DIRECTORY_SPEECHKIT . $audio . '.mp3 -af adelay=' . $delayBetweenParagraphMs . ' ' . DIRECTORY_SPEECHKIT . $outputAudio;
                     $arrayLongAudio[] = DIRECTORY_SPEECHKIT . $outputAudio;
                     $e = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
                 }
@@ -185,7 +238,7 @@ class Speechkit
             $ffmpeg = 'ffmpeg -i "concat:' . $voices . '"  -acodec copy -c:a libmp3lame ' . DIRECTORY_SPEECHKIT . $number . '.mp3';
             $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
             /**для субтитров*/
-            $length = file_put_contents(DIRECTORY_TEXT . $number . '.srt', $this->getFilesSrt($subtitles, $delayBetweenOffersMs));
+            $length = file_put_contents(DIRECTORY_TEXT . $number . '.srt', $this->getFilesSrt($subtitles, $delayBetweenParagraphMs));
 
             $ffmpeg = 'ffmpeg -i ' . DIRECTORY_TEXT . $number . '.srt -y ' . DIRECTORY_TEXT . $number . '.ass';
             $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');

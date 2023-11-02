@@ -122,6 +122,7 @@ class GeneratorVideoCommand extends Command
                     'voice' => $video['dictionary_voice_name'],
                     'emotion' => $video['ampula_voice'],
                     'delay_between_offers_ms' => is_null($video['delay_between_offers']) ? 0 : $video['delay_between_offers'],
+                    'delay_between_paragraphs_ms' => is_null($video['delay_between_paragraphs']) ? 0 : $video['delay_between_paragraphs'],
                     'voice_speed' => is_null($video['voice_speed']) ? '1.0' : $video['voice_speed'],
                 ];
 
