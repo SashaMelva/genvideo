@@ -69,7 +69,7 @@ class TestController extends UserController
             'lang' => 'ru-RU',
             'voice' => 'ermil',
             'emotion' => 'good',
-            'delay_between_offers_ms' => 20000,
+            'delay_between_offers_ms' => 5000,
             'voice_speed' => '1.0'
         ];
         $result = $this->spillSubtitlesOffers($text);
@@ -135,7 +135,7 @@ class TestController extends UserController
                         if (!$nameAudio[$key + 1]['merge']) {
                             $audioName = $audio['nameAudio'] . '_merges.mp3';
 
-                            $ffmpeg = 'ffmpeg -i "concat:' . implode('|', $mergesAudio) . '"  -acodec copy -c:a libmp3lame ' . $audioName;
+                            $ffmpeg = 'ffmpeg -i "concat:' . implode('|', $mergesAudio) . '"  -acodec copy -c:a libmp3lame ' .DIRECTORY_SPEECHKIT . $audioName;
                             $this->log->info($ffmpeg);
                             shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
@@ -144,12 +144,6 @@ class TestController extends UserController
 
                         continue;
                     }
-
-//                    if ($key == 0) {
-//                        $this->log->info('Файл является частью для склейки ' . $audioName);
-//                        $arrayLongAudio[] = DIRECTORY_SPEECHKIT . $audio['nameAudio'] . '.mp3';
-//                        continue;
-//                    }
 
                     $this->log->info('Формирование аудио с пустотой спереди ');
                     $outputAudio = $audio['nameAudio'] . '_long.mp3';
@@ -165,18 +159,21 @@ class TestController extends UserController
             }
 
             $this->log->info('Склеиваеи все аудио ');
-            $resultNameAllFiles = $number;
+            $resultNameAllFiles = $number. '_all';
             $ffmpeg = 'ffmpeg -i "concat:' . $voices . '"  -acodec copy -c:a libmp3lame ' . DIRECTORY_SPEECHKIT . $resultNameAllFiles . '.mp3';
-            $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+            $this->log->info($ffmpeg);
+            shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+            $tmp_array[] = DIRECTORY_SPEECHKIT . $resultNameAllFiles . '.mp3';
 
             $this->log->info('Отрезаем спереди файла пустоту');
             $cutFrontVideo = $resultNameAllFiles . '_cut';
             $ffmpegShortAudio = 'ffmpeg -i '.DIRECTORY_SPEECHKIT . $resultNameAllFiles. '.mp3 -ss ' . (int)($delayBetween / 1000) . ' -acodec copy -y ' . DIRECTORY_SPEECHKIT . $cutFrontVideo. '.mp3';
             $this->log->info($ffmpegShortAudio);
             shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+            $tmp_array[] = DIRECTORY_SPEECHKIT . $cutFrontVideo . '.mp3';
 
             $this->log->info('Добавлям в конец файла две секунды');
-            $ffmpegShortAudio = 'ffmpeg -i '.DIRECTORY_SPEECHKIT . $resultNameAllFiles. '.mp3 -af "apad=pad_dur=3" -y ' . DIRECTORY_SPEECHKIT . $cutFrontVideo. '.mp3';
+            $ffmpegShortAudio = 'ffmpeg -i '.DIRECTORY_SPEECHKIT . $cutFrontVideo. '.mp3 -af "apad=pad_dur=3" -y ' . DIRECTORY_SPEECHKIT . $number. '.mp3';
             $this->log->info($ffmpegShortAudio);
             shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
@@ -205,7 +202,7 @@ class TestController extends UserController
                 $sumText .= ' ' . $text['text'];
 
                 if (!$texts[$key + 1]['merge']) {
-                    $result[] = ['text' => $sumTime, 'time' => $sumText];
+                    $result[] = ['text' => $sumText , 'time' =>  $sumTime];
                     $sumTime = 0;
                     $sumText = '';
                 }
