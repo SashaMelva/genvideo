@@ -42,7 +42,7 @@ class TestController extends UserController
     public function action(): ResponseInterface
     {
         $log = new Logger('info');
-        $log->pushHandler(new RotatingFileHandler('../var/log/import-data-excel.log', 2, Logger::INFO));
+        $log->pushHandler(new RotatingFileHandler('/var/www/genvi-api/var/log/test.log', 2, Logger::INFO));
         $log->pushHandler(new StreamHandler('php://stdout'));
         $this->log = $log;
         $this->status_log = true;
