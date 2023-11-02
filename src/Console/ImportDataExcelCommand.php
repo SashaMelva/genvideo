@@ -77,7 +77,8 @@ class ImportDataExcelCommand extends Command
                 'фон текст субтитров',
                 'голос',
                 'скорость голоса',
-                'задержка между предложениями',
+                'задержка между абзацами в миллисекундах',
+                'задержка между предложениями в миллисекундах',
                 'фоновое затемнение',
                 'тип фона',
                 'сгенерировать картинки',
@@ -267,7 +268,8 @@ class ImportDataExcelCommand extends Command
             is_null($rows['субтитры']) ||
             is_null($rows['голос']) ||
             is_null($rows['скорость голоса']) ||
-            is_null($rows['задержка между предложениями']) ||
+            is_null($rows['задержка между предложениями в миллисекундах']) ||
+            is_null($rows['задержка между абзацами в миллисекундах']) ||
             is_null($rows['фоновое затемнение']) ||
             is_null($rows['сгенерировать картинки']) ||
             is_null($rows['тип фона'])
@@ -345,7 +347,8 @@ class ImportDataExcelCommand extends Command
                 'text_color_background' => strtolower(trim($row['фон текст субтитров'])),
                 'subtitles' => $subtitles,
                 'voice_speed' => $row['скорость голоса'],
-                'delay_between_offers' => $row['задержка между предложениями'],
+                'delay_between_offers' => $row['задержка между предложениями в миллисекундах'],
+                'delay_between_paragraphs' => $row['задержка между абзацами в миллисекундах'],
                 'updated_at' => date('Y-m-d H:i:s'),
                 'created_at' => date('Y-m-d H:i:s'),
             ]
