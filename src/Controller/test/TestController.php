@@ -219,6 +219,7 @@ class TestController extends UserController
 
     private function getFilesSrt(array $text, float $delayBetween): string
     {
+        $this->log->info('Массив субтитры ' . json_encode($text, true));
         $arr = [];
         $allTime = 0;
         $counter = 0;
