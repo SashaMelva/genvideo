@@ -74,7 +74,7 @@ class TestController extends UserController
         ];
         $result = $this->spillSubtitlesOffers($text);
 
-        $data = $this->SplitMp3($result, 'test_new', $voiceSetting, $voiceSetting['delay_between_offers_ms']);
+        $data = $this->SplitMp3($result, 'test_Qwere', $voiceSetting, $voiceSetting['delay_between_offers_ms']);
 
         return $this->respondWithData($data);
     }
@@ -140,10 +140,10 @@ class TestController extends UserController
                             shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
                             $mergesAudio = [];
-
-                        } else {
-                            continue;
+                            $arrayLongAudio[] = DIRECTORY_SPEECHKIT . $audioName;
                         }
+
+                        continue;
                     }
 
                     $this->log->info('Формирование аудио с пустотой спереди ');
@@ -217,12 +217,12 @@ class TestController extends UserController
         return $result;
     }
 
-    private function getFilesSrt(array $text, float $delayBetween): string
+    private function getFilesSrt(array $text, float $delayBetweenOffersMs): string
     {
-        $this->log->info('Массив субтитры ' . json_encode($text, true));
         $arr = [];
         $allTime = 0;
         $counter = 0;
+        $this->log->info('Массив субтитры ' . json_encode($text, true));
         foreach ($text as $key => $item) {
 
             if ($item['time'] > 5600) {
@@ -253,7 +253,7 @@ class TestController extends UserController
                 }
             }
 
-            $allTime = $item['time'] + allTimeWithShort + $delayBetween;
+            $allTime = $item['time'] + $allTime + $delayBetweenOffersMs;
         }
         return implode("\r\n", $arr);
     }
