@@ -3,7 +3,10 @@
 namespace App\Console;
 
 use App\Models\ContentVideo;
+use App\Models\GPTChatCabinet;
 use App\Models\GPTChatRequests;
+use App\Models\ListCabinetGPTForProxy;
+use App\Models\ListRequestGPTCabinet;
 use Exception;
 use GuzzleHttp\Client;
 use Illuminate\Database\Capsule\Manager as DB;
@@ -46,107 +49,50 @@ class GeneratorChatGPTText extends Command
             $this->log->info('Начало ' . date('Y-m-s H:i:s'));
         }
 
-        $contentIds = DB::table('content')->select('id')->where([['status_id', '=', 6]])->get()->toArray();
+        $requestsLists = DB::table('list_GPT_chat_request')->where([['status_working', '=', 1]])->get()->toArray();
 
         if ($this->status_log) {
-            $this->log->info('Задачи на генерацию текста: ' . json_encode($contentIds));
+            $this->log->info('Получили запросы на генерацию');
         }
 
-        if (empty($contentIds)) {
-            $this->log->info('Нет задач на генерацию текста');
+        if (empty($requestsLists)) {
+            $this->log->info('Нет запросов на генерацию');
             exec($cmd);
             return 0;
         }
 
-        $contentId = $contentIds[0]->id;
+        $requestList = $requestsLists[0];
 
         try {
 
             if ($this->status_log) {
-                $this->log->info('Контент взят на генерацию текста: ' . $contentId);
+                $this->log->info('Запрос взят на отправку: ' . $requestList->id);
             }
+            ListRequestGPTCabinet::changeStatus($requestList->id, 2);
 
-            ContentVideo::changeStatus($contentId, 7);
+            $request = GPTChatRequests::findOne($requestList->id_request);
+          //  ContentVideo::changeStatus($request['content_id'], 7);
 
-            $gptRequest = GPTChatRequests::findByContentId($contentId);
+            $cabinet = GPTChatCabinet::findOne($requestList->id_cabinet);
+            var_dump($cabinet);
+            $proxy = ListCabinetGPTForProxy::findProxyByCabinetId($cabinet->id);
+            var_dump($proxy);
+            $response = $this->response($proxy['ip_address'], $proxy['port'], $proxy['user_name'], $proxy['password'], $cabinet->api_key, $request->text_request);
 
-            if (!empty($gptRequest)) {
-
-                $gptRequest = $gptRequest[0];
-
-                if ($this->status_log) {
-                    $this->log->info('Запрос взят на генерацию: ' . $gptRequest['id']);
-                }
-
-                if (empty($gptRequest["text_request"])) {
-                    $this->log->error('Запрос для генерации текста пустой: ' . $gptRequest['text_request']);
-                    ContentVideo::changeStatus($contentId, 5);
-                    exec($cmd);
-                    return 0;
-                }
-
-                $client = new Client();
-
-                $response = $client->post('http://45.92.176.207:4749/api/main',
-                    [
-                        'headers' => [
-                            'Content-Type' => 'application/json'
-                        ],
-                        'json' => [
-                            'title' => $gptRequest['text_request']
-                        ]
-                    ]);
-
-                $responseData = json_decode($response->getBody()->getContents(), true);
-
-                if (is_null($responseData)) {
-                    ContentVideo::changeStatus($contentId, 6);
-                    exec($cmd);
-                    return 0;
-                }
-
-                if ($responseData['status'] == 'Ok') {
-                    $text = $responseData['response'];
-
-                    if (empty($text)) {
-
-                        $this->log->error('Результат запроса пустой текст контент поставлен в очередь'. $contentId);
-                        GPTChatRequests::changeStatusError($gptRequest['id'], 3, 'Ответ пустой');
-                        ContentVideo::changeStatus($contentId, 6);
-                        exec($cmd);
-                        return 0;
-
-                    } else {
-
-                        $this->log->error('Успех. Получили результат запроса '. $gptRequest['id']);
-                        GPTChatRequests::changeStatusAndContent($gptRequest['id'], 2, $text);
-                        ContentVideo::changeStatus($contentId, 8);
-                        exec($cmd);
-                        return 0;
-                    }
-
-                } else {
-                    GPTChatRequests::changeStatusError($gptRequest['id'], 3, $responseData['response']);
-                    ContentVideo::changeStatus($contentId, 6);
-                    $this->log->info('Ошика при получении текста: ' . $responseData['response']);
-                    exec($cmd);
-                    return 0;
-                }
-
+            if ($response['status'] == 'ok') {
+                GPTChatCabinet::changeStatusCabinet($cabinet->id, true);
+                ListRequestGPTCabinet::changeStatus($requestList->id, 4);
+                GPTChatRequests::changeStatusAndContent($requestList->id_request, 4, $response['response']);
+              //  ContentVideo::changeStatus($request->content_id, 6);
             } else {
-                if ($this->status_log) {
-                    $this->log->info('Не найден запрос на генерацию контента: ' . json_encode($contentIds));
-                    ContentVideo::changeStatus($contentId, 8);
-                    exec($cmd);
-                    return 0;
-                }
-                ContentVideo::changeStatus($contentId, 8);
+                ListRequestGPTCabinet::changeStatus($requestList->id, 3);
+                GPTChatRequests::changeStatusAndError($requestList->id_request, 3, $response['response']);
             }
 
         } catch (Exception $e) {
             $this->log->error($e->getMessage());
-            $this->log->info('Контент опять поставлен в очередь на получении текста: ' . $contentId);
-            ContentVideo::changeStatus($contentId, 6);
+            $this->log->info('Контент опять поставлен в очередь на получении текста');
+           // ContentVideo::changeStatus($request->content_id, 6);
         }
 
         if ($this->status_log) {
@@ -155,5 +101,38 @@ class GeneratorChatGPTText extends Command
 
         exec($cmd);
         return 0;
+    }
+
+    private function response($proxyIP, $proxyPort, $proxyUsername, $proxyPassword, $apiKey, $quire): array
+    {
+        $url = 'https://api.openai.com/v1/chat/completions';
+        $headers = [
+            "Authorization: Bearer " . $apiKey,
+            "Content-Type: application/json"
+        ];
+        $post_data = [
+            "model" => "gpt-3.5-turbo",
+            "messages" => [["role" => "user", "content" => "" . $quire]],
+            "temperature" => 0.7
+        ];
+
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5_HOSTNAME);
+        curl_setopt($ch, CURLOPT_PROXY, $proxyIP);
+        curl_setopt($ch, CURLOPT_PROXYPORT, $proxyPort);
+        curl_setopt($ch, CURLOPT_PROXYUSERPWD, $proxyUsername . ':' . $proxyPassword);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post_data));
+
+        $response = curl_exec($ch);
+
+        if (curl_errno($ch)) {
+            return ['status' => 'error', 'response' => curl_error($ch)];
+        } else {
+            return ['status' => 'ok', 'response' => $response];
+        }
     }
 }

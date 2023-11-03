@@ -9,6 +9,7 @@ use App\Helpers\Speechkit;
 use App\Helpers\UploadFile;
 use App\Models\ColorBackground;
 use App\Models\ContentVideo;
+use App\Models\GPTChatRequests;
 use App\Models\ListImage;
 use App\Models\ListMusic;
 use App\Models\ListVideo;
@@ -47,6 +48,9 @@ class TestController extends UserController
         $this->log = $log;
         $this->status_log = true;
 
+        $request = GPTChatRequests::findOne(17);
+        var_dump($request->id);
+        exit();
         $this->client = new Client();
 
         $this->log->info('Начало ' . date('Y-m-s H:i:s'));

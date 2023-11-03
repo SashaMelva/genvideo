@@ -123,6 +123,10 @@ return static function(App $app):void
 //            $group->get('/delete-video/{id:[0-9]+}', DeleteAdditionalVideo::class);
         });
 
+        $group->group('/file', function (RouteCollectorProxyInterface $group) {
+            //добавление кабинета добавление прокси, свчязи
+        });
+
 //        $group->group('/integration', function (RouteCollectorProxyInterface $group) {
             $group->get('/token/{id:[0-9]+}', GetToken::class);
             $group->get('/token-callback', TokenCallBack::class);

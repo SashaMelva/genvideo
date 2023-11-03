@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use App\Console\DistributionChatGPTRequest;
 use App\Console\FormatTextFromChatGptCommand;
 use App\Console\GeneratorChatGPTText;
 use App\Console\GeneratorImage;
@@ -10,6 +11,7 @@ use App\Console\GeneratorVideoCommand;
 use App\Console\GeneratorVoiceAndSubtitlesCommand;
 use App\Console\GetYandexAimToken;
 use App\Console\ImportDataExcelCommand;
+use App\Console\NewTestGPTRequest;
 use App\Console\TestGPTRequest;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Application;
@@ -49,11 +51,16 @@ try {
     $cli->add(new GeneratorVideoCommand()); //первый скрипт генерации видео
     $cli->add(new GetYandexAimToken()); // получение токена для синтеза текста
     $cli->add(new ImportDataExcelCommand()); //импорт данных с файлов excel
+
+    $cli->add(new DistributionChatGPTRequest()); //отправка запроса на получеие текста т чата gpt
     $cli->add(new GeneratorChatGPTText()); //отправка запроса на получеие текста т чата gpt
+
+
     $cli->add(new FormatTextFromChatGptCommand()); //форматирование ответа, полученного от чата
     $cli->add(new GeneratorImage()); // Получение картинок по описанию, полученного с чата
     $cli->add(new GeneratorVoiceAndSubtitlesCommand()); //генерация озвучки и субтитров ОТКЛЮЧЁН
     $cli->add(new GeneratorManyVideoCommand()); //новый скрипт для перегенерации видео генерации видео
+    $cli->add(new NewTestGPTRequest());
 
     $cli->add(new TestGPTRequest());
 
