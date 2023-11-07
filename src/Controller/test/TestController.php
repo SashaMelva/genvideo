@@ -75,7 +75,7 @@ class TestController extends UserController
         ];
         $result = $this->spillSubtitlesOffers($text);
 
-        $data = $this->SplitMp3($result, 'RESULT_end', $voiceSetting, $voiceSetting['delay_between_offers_ms']);
+        $data = $this->SplitMp3($result, 'RESULT_туц', $voiceSetting, $voiceSetting['delay_between_offers_ms']);
 
         return $this->respondWithData($data);
     }
