@@ -88,17 +88,17 @@ class TestController extends UserController
             $subtitles = [];
             $nameAudio = [];
 
-            $this->log->info('Отправка запросов на синтез' );
+            $this->log->info('Отправка запросов на синтез');
             foreach ($Mp3Files as $key => $item) {
 
-                $this->log->info($item['text'] );
+                $this->log->info($item['text']);
                 $response = $this->response($item['text'], $voiceSetting);
                 $length = file_put_contents(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3', $response);
 
                 $getID3 = new getID3;
                 $file = $getID3->analyze(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3');
                 $seconds = $file['playtime_seconds'];
-                $this->log->info('Начало ' );
+                $this->log->info('Начало ');
                 $subtitles[] = [
                     'text' => $item['text'],
                     'time' => $seconds * 1000,
@@ -112,9 +112,9 @@ class TestController extends UserController
                 $tmp_array[] = DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3';
                 $nameAudio[] = ['nameAudio' => $number . '_' . $key, 'merge' => $item['merge']];
             }
-            $this->log->info('Названия полученныйх видео '  . json_encode($tmp_array, true));
+            $this->log->info('Названия полученныйх видео ' . json_encode($tmp_array, true));
             $this->log->info('Название файлов на удаление ' . json_encode($nameAudio, true));
-            $this->log->info('Получили массив субтитров '  . json_encode($subtitles, true));
+            $this->log->info('Получили массив субтитров ' . json_encode($subtitles, true));
             $voices = implode('|', $tmp_array);
 
             $this->log->info('Начало склейки аудио с задержкой');
@@ -132,18 +132,19 @@ class TestController extends UserController
                         $mergesAudio[] = DIRECTORY_SPEECHKIT . $audio['nameAudio'] . '.mp3';
                         $this->log->info('Масиив с файлами для склейки' . json_encode($mergesAudio, true));
 
-                        $this->log->info('Это последний фал для склеки? ' . !$nameAudio[$key + 1]['merge']);
-                        if (!$nameAudio[$key + 1]['merge']) {
-                            $audioName = $audio['nameAudio'] . '_merges.mp3';
+                        if (isset($nameAudio[$key + 1])) {
+                            $this->log->info('Это последний фал для склеки? ' . !$nameAudio[$key + 1]['merge']);
+                            if (!$nameAudio[$key + 1]['merge']) {
+                                $audioName = $audio['nameAudio'] . '_merges.mp3';
 
-                            $ffmpeg = 'ffmpeg -i "concat:' . implode('|', $mergesAudio) . '"  -acodec copy -c:a libmp3lame ' .DIRECTORY_SPEECHKIT . $audioName;
-                            $this->log->info($ffmpeg);
-                            shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+                                $ffmpeg = 'ffmpeg -i "concat:' . implode('|', $mergesAudio) . '"  -acodec copy -c:a libmp3lame ' . DIRECTORY_SPEECHKIT . $audioName;
+                                $this->log->info($ffmpeg);
+                                shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
-                            $mergesAudio = [];
-                            $arrayLongAudio[] = DIRECTORY_SPEECHKIT . $audioName;
+                                $mergesAudio = [];
+                                $arrayLongAudio[] = DIRECTORY_SPEECHKIT . $audioName;
+                            }
                         }
-
                         continue;
                     }
 
@@ -161,7 +162,7 @@ class TestController extends UserController
             }
 
             $this->log->info('Склеиваеи все аудио ');
-            $resultNameAllFiles = $number. '_all';
+            $resultNameAllFiles = $number . '_all';
             $ffmpeg = 'ffmpeg -i "concat:' . $voices . '"  -acodec copy -c:a libmp3lame ' . DIRECTORY_SPEECHKIT . $resultNameAllFiles . '.mp3';
             $this->log->info($ffmpeg);
             shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
@@ -169,13 +170,13 @@ class TestController extends UserController
 
             $this->log->info('Отрезаем спереди файла пустоту');
             $cutFrontVideo = $resultNameAllFiles . '_cut';
-            $ffmpegShortAudio = 'ffmpeg -i '.DIRECTORY_SPEECHKIT . $resultNameAllFiles. '.mp3 -ss ' . (int)($delayBetween / 1000) . ' -acodec copy -y ' . DIRECTORY_SPEECHKIT . $cutFrontVideo. '.mp3';
+            $ffmpegShortAudio = 'ffmpeg -i ' . DIRECTORY_SPEECHKIT . $resultNameAllFiles . '.mp3 -ss ' . (int)($delayBetween / 1000) . ' -acodec copy -y ' . DIRECTORY_SPEECHKIT . $cutFrontVideo . '.mp3';
             $this->log->info($ffmpegShortAudio);
             shell_exec($ffmpegShortAudio . ' -hide_banner -loglevel error 2>&1');
             $tmp_array[] = DIRECTORY_SPEECHKIT . $cutFrontVideo . '.mp3';
 
             $this->log->info('Добавлям в конец файла две секунды');
-            $ffmpegShortAudioResult = 'ffmpeg -i '.DIRECTORY_SPEECHKIT . $cutFrontVideo. '.mp3 -af "apad=pad_dur=3" -y ' . DIRECTORY_SPEECHKIT . $number. '.mp3';
+            $ffmpegShortAudioResult = 'ffmpeg -i ' . DIRECTORY_SPEECHKIT . $cutFrontVideo . '.mp3 -af "apad=pad_dur=3" -y ' . DIRECTORY_SPEECHKIT . $number . '.mp3';
             $this->log->info($ffmpegShortAudioResult);
             shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
@@ -204,7 +205,7 @@ class TestController extends UserController
                 $sumText .= ' ' . $text['text'];
 
                 if (!$texts[$key + 1]['merge']) {
-                    $result[] = ['text' => $sumText , 'time' =>  $sumTime];
+                    $result[] = ['text' => $sumText, 'time' => $sumTime];
                     $sumTime = 0;
                     $sumText = '';
                 }
@@ -250,7 +251,7 @@ class TestController extends UserController
                         . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($item['time'] + $allTime)) . "\r\n" . $item['text'] . "\r\n";
                 } else {
                     $arr[] = ($key + 1) . "\r\n" . '00:00:00,000 --> '
-                        . str_replace('.', ',', $this->formatMilliseconds($item['time']+ $allTime)) . "\r\n" . $item['text'] . "\r\n";
+                        . str_replace('.', ',', $this->formatMilliseconds($item['time'] + $allTime)) . "\r\n" . $item['text'] . "\r\n";
                 }
             }
 
