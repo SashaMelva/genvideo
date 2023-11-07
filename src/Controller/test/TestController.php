@@ -148,6 +148,7 @@ class TestController extends UserController
                             $this->log->info('Добавление файлу паузу в начале');
                             $ffmpegPause =  'ffmpeg -i ' . $audioName . ' -af adelay=' . $delayBetween . ' '  . $outputAudio;
                             $this->log->info($ffmpegPause);
+                            shell_exec($ffmpegPause . ' -hide_banner -loglevel error 2>&1');
 
                             $mergesAudio = [];
                             $arrayLongAudio[] = $outputAudio;
@@ -168,13 +169,13 @@ class TestController extends UserController
                         shell_exec($ffmpegPause . ' -hide_banner -loglevel error 2>&1');
 
                         $mergesAudio = [];
-                        $arrayLongAudio[] = $audioName;
+                        $arrayLongAudio[] = $outputAudio;
                     }
 
                     continue;
                 }
 
-                $this->log->info('Формирование аудио с пустотой спереди ');
+                $this->log->info('Формирование аудио с пустотой спереди');
                 $outputAudio = $audio['nameAudio'] . '_long.mp3';
                 $ffmpeg = 'ffmpeg -i ' . $audioName . ' -af adelay=' . $delayBetween . ' ' . DIRECTORY_SPEECHKIT . $outputAudio;
                 $this->log->info($ffmpeg);
