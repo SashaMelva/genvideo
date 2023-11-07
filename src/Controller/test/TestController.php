@@ -75,7 +75,7 @@ class TestController extends UserController
         ];
         $result = $this->spillSubtitlesOffers($text);
 
-        $data = $this->SplitMp3($result, 'test_resultEnd', $voiceSetting, $voiceSetting['delay_between_offers_ms']);
+        $data = $this->SplitMp3($result, 'RESULT', $voiceSetting, $voiceSetting['delay_between_offers_ms']);
 
         return $this->respondWithData($data);
     }
@@ -146,6 +146,7 @@ class TestController extends UserController
                                 $arrayLongAudio[] = $audioName;
                             }
                             $this->log->info('Это не последний файлм для склеки');
+                            continue;
                         } else {
                             $this->log->info('Последние файлы для склеки' . json_encode($mergesAudio, true));
                             $audioName =DIRECTORY_SPEECHKIT .  $audio['nameAudio'] . '_merges.mp3';
@@ -188,7 +189,7 @@ class TestController extends UserController
             $this->log->info('Добавлям в конец файла две секунды');
             $ffmpegShortAudioResult = 'ffmpeg -i ' . DIRECTORY_SPEECHKIT . $cutFrontVideo . '.mp3 -af "apad=pad_dur=2" -y ' . DIRECTORY_SPEECHKIT . $number . '.mp3';
             $this->log->info($ffmpegShortAudioResult);
-            shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+            shell_exec($ffmpegShortAudioResult . ' -hide_banner -loglevel error 2>&1');
 
 
             $this->log->info('Генерируем файл субтитрв');
