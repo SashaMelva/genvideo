@@ -75,7 +75,7 @@ class TestController extends UserController
         ];
         $result = $this->spillSubtitlesOffers($text);
 
-        $data = $this->SplitMp3($result, 'RESULT_туц', $voiceSetting, $voiceSetting['delay_between_offers_ms']);
+        $data = $this->SplitMp3($result, 'RESULT_endNew', $voiceSetting, $voiceSetting['delay_between_offers_ms']);
 
         return $this->respondWithData($data);
     }
@@ -88,43 +88,42 @@ class TestController extends UserController
             $subtitles = [];
             $nameAudio = [];
 
-//            $this->log->info('Отправка запросов на синтез');
-//            foreach ($Mp3Files as $key => $item) {
-//
-//                $this->log->info($item['text']);
-//                $response = $this->response($item['text'], $voiceSetting);
-//                $length = file_put_contents(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3', $response);
-//
-//                $getID3 = new getID3;
-//                $file = $getID3->analyze(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3');
-//                $seconds = $file['playtime_seconds'];
-//                $this->log->info('Начало ');
-//                $subtitles[] = [
-//                    'text' => $item['text'],
-//                    'time' => $seconds * 1000,
-//                    'merge' => $item['merge'],
-//                ];
-//
-//                if (!$length) {
-//                    return ['status' => false, 'files' => []];
-//                }
-//
-//                $tmp_array[] = DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3';
-//                $nameAudio[] = ['nameAudio' => $number . '_' . $key, 'merge' => $item['merge']];
-//            }
-//            $this->log->info('Названия полученныйх видео ' . json_encode($tmp_array, true));
-//            $this->log->info('Название файлов на удаление ' . json_encode($nameAudio, true));
-//            $this->log->info('Получили массив субтитров ' . json_encode($subtitles, true));
-//            $voices = implode('|', $tmp_array);
-//
-//            $this->log->info('Начало склейки аудио с задержкой');
-//            if ($delayBetween > 0) {
-//                $arrayLongAudio = [];
-//                $mergesAudio = [];
-//                $this->log->info(json_encode($nameAudio, JSON_UNESCAPED_UNICODE));
+            $this->log->info('Отправка запросов на синтез');
+            foreach ($Mp3Files as $key => $item) {
 
-            $nameAudio = [["nameAudio" => "RESULT_end_0", "merge" => true], ["nameAudio" => "RESULT_end_1", "merge" => true], ["nameAudio" => "RESULT_end_2", "merge" => true], ["nameAudio" => "RESULT_end_3", "merge" => false], ["nameAudio" => "RESULT_end_4", "merge" => false], ["nameAudio" => "RESULT_end_5", "merge" => false], ["nameAudio" => "RESULT_end_6", "merge" => false], ["nameAudio" => "RESULT_end_7", "merge" => true], ["nameAudio" => "RESULT_end_8", "merge" => true]];
-            foreach ($nameAudio as $key => $audio) {
+                $this->log->info($item['text']);
+                $response = $this->response($item['text'], $voiceSetting);
+                $length = file_put_contents(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3', $response);
+
+                $getID3 = new getID3;
+                $file = $getID3->analyze(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3');
+                $seconds = $file['playtime_seconds'];
+                $this->log->info('Начало ');
+                $subtitles[] = [
+                    'text' => $item['text'],
+                    'time' => $seconds * 1000,
+                    'merge' => $item['merge'],
+                ];
+
+                if (!$length) {
+                    return ['status' => false, 'files' => []];
+                }
+
+                $tmp_array[] = DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3';
+                $nameAudio[] = ['nameAudio' => $number . '_' . $key, 'merge' => $item['merge']];
+            }
+            $this->log->info('Названия полученныйх видео ' . json_encode($tmp_array, true));
+            $this->log->info('Название файлов на удаление ' . json_encode($nameAudio, true));
+            $this->log->info('Получили массив субтитров ' . json_encode($subtitles, true));
+            $voices = implode('|', $tmp_array);
+
+            $this->log->info('Начало склейки аудио с задержкой');
+            if ($delayBetween > 0) {
+                $arrayLongAudio = [];
+                $mergesAudio = [];
+                $this->log->info(json_encode($nameAudio, JSON_UNESCAPED_UNICODE));
+
+           foreach ($nameAudio as $key => $audio) {
                 $audioName = DIRECTORY_SPEECHKIT . $audio['nameAudio'] . '.mp3';
                 $this->log->info('Название файла ' . $audioName);
 
@@ -186,7 +185,7 @@ class TestController extends UserController
 
             $tmp_array = array_merge($tmp_array, $arrayLongAudio);
             $voices = implode('|', $arrayLongAudio);
-//            }
+           }
 
             $this->log->info('Склеиваеи все аудио ');
             $resultNameAllFiles = $number . '_all';
