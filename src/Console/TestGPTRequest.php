@@ -3,7 +3,10 @@
 namespace App\Console;
 
 use App\Models\ContentVideo;
+use App\Models\GPTChatCabinet;
 use App\Models\GPTChatRequests;
+use App\Models\ListCabinetGPTForProxy;
+use App\Models\ListRequestGPTCabinet;
 use App\Models\TextVideo;
 use Exception;
 use GuzzleHttp\Client;
@@ -49,9 +52,22 @@ class TestGPTRequest  extends Command
 
         try {
 
-            $query = "Напиши текст на тему: Важность медитации для жизни человека";
+            $requestsLists = DB::table('list_GPT_chat_request')->where([['status_working', '=', 1]])->get()->toArray();
 
-            $client = new Client();
+            $requestList = $requestsLists[0];
+            ListRequestGPTCabinet::changeStatus($requestList->id, 2);
+
+            $request = GPTChatRequests::findOne($requestList->id_request);
+            //  ContentVideo::changeStatus($request['content_id'], 7);
+
+            $cabinet = GPTChatCabinet::findOne($requestList->id_cabinet);
+            $proxy = ListCabinetGPTForProxy::findProxyByCabinetId($cabinet->id);
+            $response = $this->response($proxy['ip_address'], $proxy['port'], $proxy['user_name'], $proxy['password'], $cabinet->api_key, $request->text_request);
+
+
+//            $query = "Напиши текст на тему: Важность медитации для жизни человека";
+//
+//            $client = new Client();
 //            $response = $client->post('http://45.92.176.207:4749/api/main',
 //                [
 //                    'headers' => [
@@ -71,29 +87,29 @@ class TestGPTRequest  extends Command
 
 //            $url = "https://api.openai.com/v1/usage?date=2023-11-03";
 
-            $url = "https://api.openai.com/v1/usage?date=2023-11-03";
-
-            $ch = curl_init($url);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                "Authorization: Bearer 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"
-            ));
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-            $response = curl_exec($ch);
-            curl_close($ch);
-
-            var_dump($response);
-            if ($response) {
-                $data = json_decode($response, true);
-                if (isset($data['usage']) && isset($data['usage']['total_tokens'])) {
-                    $remaining_tokens = $data['usage']['total_tokens'];
-                    echo "Оставшиеся токены: " . $remaining_tokens;
-                } else {
-                    echo "Не удалось получить информацию о балансе токенов.";
-                }
-            } else {
-                echo "Ошибка при выполнении запроса к API OpenAI.";
-            }
+//            $url = "https://api.openai.com/v1/usage?date=2023-11-03";
+//
+//            $ch = curl_init($url);
+//            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+//                "Authorization: Bearer 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"
+//            ));
+//            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+//
+//            $response = curl_exec($ch);
+//            curl_close($ch);
+//
+//            var_dump($response);
+//            if ($response) {
+//                $data = json_decode($response, true);
+//                if (isset($data['usage']) && isset($data['usage']['total_tokens'])) {
+//                    $remaining_tokens = $data['usage']['total_tokens'];
+//                    echo "Оставшиеся токены: " . $remaining_tokens;
+//                } else {
+//                    echo "Не удалось получить информацию о балансе токенов.";
+//                }
+//            } else {
+//                echo "Ошибка при выполнении запроса к API OpenAI.";
+//            }
 
 //            $headers = [
 //                "Authorization: Bearer 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",
@@ -137,5 +153,42 @@ class TestGPTRequest  extends Command
 
         exec($cmd);
         return 0;
+    }
+
+    private function response($proxyIP, $proxyPort, $proxyUsername, $proxyPassword, $apiKey, $quire): array
+    {
+        $url = 'https://api.openai.com/v1/chat/completions';
+        $headers = [
+            "Authorization: Bearer " . $apiKey,
+            "Content-Type: application/json"
+        ];
+        $post_data = [
+            "model" => "gpt-3.5-turbo",
+            "messages" => [["role" => "user", "content" => "" . $quire]],
+            "temperature" => 0.7
+        ];
+
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5_HOSTNAME);
+        curl_setopt($ch, CURLOPT_PROXY, $proxyIP);
+        curl_setopt($ch, CURLOPT_PROXYPORT, $proxyPort);
+        curl_setopt($ch, CURLOPT_PROXYUSERPWD, $proxyUsername . ':' . $proxyPassword);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post_data));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $response = curl_exec($ch);
+        var_dump($response);
+
+        if (curl_errno($ch)) {
+            return ['status' => 'errorConnection', 'response' => curl_error($ch)];
+        } elseif(isset(json_decode($response, true)['error']) ) {
+            return ['status' => 'error', 'response' => $response];
+        } else {
+            return ['status' => 'ok', 'response' => $response];
+        }
     }
 }
