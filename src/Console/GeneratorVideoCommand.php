@@ -126,9 +126,7 @@ class GeneratorVideoCommand extends Command
                     'voice_speed' => is_null($video['voice_speed']) ? '1.0' : $video['voice_speed'],
                 ];
 
-
-                $voiceData = (new Speechkit())->generatorWithSubtitles($video['text'], $fileNameVoice, $voiceSetting);
-
+                $voiceData = (new Speechkit($this->log))->generatorWithSubtitles($video['text'], $fileNameVoice, $voiceSetting);
 
                 if ($voiceData['status']) {
 
@@ -139,6 +137,7 @@ class GeneratorVideoCommand extends Command
                     $this->log->info('Успех генерации аудио озвучки, id текста ' . $video['text_id']);
 
                 } else {
+
                     if (isset($voiceData['command'])) {
                         $this->log->error($voiceData['command'] . $video['text_id']);
                     }
