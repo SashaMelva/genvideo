@@ -8,7 +8,6 @@ use App\Models\GPTChatRequests;
 use App\Models\ListCabinetGPTForProxy;
 use App\Models\ListRequestGPTCabinet;
 use Exception;
-use GuzzleHttp\Client;
 use Illuminate\Database\Capsule\Manager as DB;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\StreamHandler;
@@ -71,28 +70,49 @@ class GeneratorChatGPTText extends Command
             ListRequestGPTCabinet::changeStatus($requestList->id, 2);
 
             $request = GPTChatRequests::findOne($requestList->id_request);
-          //  ContentVideo::changeStatus($request['content_id'], 7);
+            ContentVideo::changeStatus($request['content_id'], 7);
 
             $cabinet = GPTChatCabinet::findOne($requestList->id_cabinet);
-            var_dump($cabinet);
             $proxy = ListCabinetGPTForProxy::findProxyByCabinetId($cabinet->id);
-            var_dump($proxy);
             $response = $this->response($proxy['ip_address'], $proxy['port'], $proxy['user_name'], $proxy['password'], $cabinet->api_key, $request->text_request);
+            $this->log->info('Получили ответ со статусом: ' . $response['status']);
 
             if ($response['status'] == 'ok') {
+
                 GPTChatCabinet::changeStatusCabinet($cabinet->id, true);
                 ListRequestGPTCabinet::changeStatus($requestList->id, 4);
                 GPTChatRequests::changeStatusAndContent($requestList->id_request, 4, $response['response']);
-              //  ContentVideo::changeStatus($request->content_id, 6);
-            } else {
+                ContentVideo::changeStatus($request->content_id, 8);
+
+            } elseif ($response['status'] == 'errorConnection') {
+
+                $this->log->info('Фиксируем ошибку в кабинете  ' . $cabinet->id . ' и отправляем запрос на получение нового кабинета ' . $requestList->id_request);
+                GPTChatCabinet::changeStatusWorkCabinet($cabinet->id, 5, $response['response']);
                 ListRequestGPTCabinet::changeStatus($requestList->id, 3);
-                GPTChatRequests::changeStatusAndError($requestList->id_request, 3, $response['response']);
+                GPTChatRequests::changeStatus($requestList->id_request, 3);
+
+            } else {
+
+                $this->log->info('Фиксируем ошибку в кабинете  ' . $cabinet->id . ' и отправляем запрос на получение нового кабинета ' . $requestList->id_request);
+                $textError = $response['response'];
+
+                if (stripos($textError, 'Incorrect API key provided') !== false) {
+                    GPTChatCabinet::changeStatusWorkCabinet($cabinet->id, 4, $response['response']);
+                } elseif (stripos($textError, 'Rate limit reached for requests') || stripos($textError, 'Too Many Requests') !== false) {
+                    GPTChatCabinet::changeStatusWorkCabinet($cabinet->id, 3, $response['response']);
+                } else {
+                    GPTChatCabinet::changeStatusWorkCabinet($cabinet->id, 2, $response['response']);
+                }
+
+                ListRequestGPTCabinet::changeStatus($requestList->id, 3);
+                GPTChatRequests::changeStatus($requestList->id_request, 5);
             }
 
         } catch (Exception $e) {
             $this->log->error($e->getMessage());
-            $this->log->info('Контент опять поставлен в очередь на получении текста');
-           // ContentVideo::changeStatus($request->content_id, 6);
+            $this->log->info('Запрос поставлен в очередь на получение нового кабинета');
+            ListRequestGPTCabinet::changeStatus($requestList->id, 3);
+            GPTChatRequests::changeStatus($requestList->id_request, 5);
         }
 
         if ($this->status_log) {
@@ -126,11 +146,14 @@ class GeneratorChatGPTText extends Command
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post_data));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
         $response = curl_exec($ch);
 
         if (curl_errno($ch)) {
-            return ['status' => 'error', 'response' => curl_error($ch)];
+            return ['status' => 'errorConnection', 'response' => curl_error($ch)];
+        } elseif (isset(json_decode($response, true)['error'])) {
+            return ['status' => 'error', 'response' => $response];
         } else {
             return ['status' => 'ok', 'response' => $response];
         }

@@ -49,6 +49,13 @@ class GPTChatCabinet extends Model
             ->update(['status_cabinet' => $flag]);
     }
 
+    public static function changeStatusWorkCabinet(int $id, bool $flag, string $error): void
+    {
+        self::query()
+            ->where([['id', '=', $id]])
+            ->update(['status_work' => $flag, 'error' => $error]);
+    }
+
     public static function findOne(int $id): Model|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Builder|array|null
     {
         return self::query()->find($id)->getModel();

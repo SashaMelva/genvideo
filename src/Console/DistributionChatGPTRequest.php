@@ -62,35 +62,33 @@ class DistributionChatGPTRequest extends Command
                 $this->log->info('Контент взят на генерацию текста: ' . $request->id);
             }
 
-            GPTChatRequests::changeStatus($request->id,6);
+            GPTChatRequests::changeStatus($request->id, 6);
 
             if (!empty($request->text_request)) {
-                var_dump(1);
                 $cabinet = GPTChatCabinet::findAllFreeCabinetAndWork();
 
-                var_dump($cabinet);
                 if (!empty($cabinet)) {
 
                     $cabinet = $cabinet[0];
                     if ($this->status_log) {
-                        $this->log->info('Найдены свободные кабинеты для отправки запроса' );
+                        $this->log->info('Найдены свободные кабинеты для отправки запроса');
                     }
 
                     GPTChatCabinet::changeStatusCabinet($cabinet['id'], false);
-                    ListRequestGPTCabinet::addNewList($request->id,$cabinet['id'], 1);
-                    GPTChatRequests::changeStatus($request->id,1);
+                    ListRequestGPTCabinet::addNewList($request->id, $cabinet['id'], 1);
+                    GPTChatRequests::changeStatus($request->id, 1);
 
                     if ($this->status_log) {
-                        $this->log->info('Задача добавлена' );
+                        $this->log->info('Задача добавлена');
                     }
 
                 } else {
 
                     if ($this->status_log) {
-                        $this->log->info('Нет свободных кабинетов для отправки запроса, запос поставлен обратно в очередь' );
+                        $this->log->info('Нет свободных кабинетов для отправки запроса, запрос поставлен обратно в очередь');
                     }
 
-                    GPTChatRequests::changeStatus($request->id,5);
+                    GPTChatRequests::changeStatus($request->id, 5);
                     exec($cmd);
                     return 0;
                 }
@@ -99,7 +97,7 @@ class DistributionChatGPTRequest extends Command
                 if ($this->status_log) {
                     $this->log->info('Не найден запрос на генерацию контента: ' . json_encode($requests));
                 }
-
+                GPTChatRequests::changeStatus($request->id, 3);
                 ContentVideo::changeStatus($request, 8);
                 exec($cmd);
                 return 0;
