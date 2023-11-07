@@ -75,7 +75,7 @@ class TestController extends UserController
         ];
         $result = $this->spillSubtitlesOffers($text);
 
-        $data = $this->SplitMp3($result, 'test_Qwere', $voiceSetting, $voiceSetting['delay_between_offers_ms']);
+        $data = $this->SplitMp3($result, 'test_end', $voiceSetting, $voiceSetting['delay_between_offers_ms']);
 
         return $this->respondWithData($data);
     }
@@ -135,6 +135,7 @@ class TestController extends UserController
                         if (isset($nameAudio[$key + 1])) {
                             $this->log->info('Это последний фал для склеки? ' . !$nameAudio[$key + 1]['merge']);
                             if (!$nameAudio[$key + 1]['merge']) {
+                                $this->log->info('Последний файл для склеки');
                                 $audioName = $audio['nameAudio'] . '_merges.mp3';
 
                                 $ffmpeg = 'ffmpeg -i "concat:' . implode('|', $mergesAudio) . '"  -acodec copy -c:a libmp3lame ' . DIRECTORY_SPEECHKIT . $audioName;
@@ -144,6 +145,15 @@ class TestController extends UserController
                                 $mergesAudio = [];
                                 $arrayLongAudio[] = DIRECTORY_SPEECHKIT . $audioName;
                             }
+                            $this->log->info('Это не последний файлм для склеки');
+                        } else {
+                            $this->log->info('Последние файлы для склеки' . json_encode($mergesAudio, true));
+
+                            $ffmpeg = 'ffmpeg -i "concat:' . implode('|', $mergesAudio) . '"  -acodec copy -c:a libmp3lame ' . DIRECTORY_SPEECHKIT . $audioName;
+                            $this->log->info($ffmpeg);
+                            shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+                            $mergesAudio = [];
+                            $arrayLongAudio[] = DIRECTORY_SPEECHKIT . $audioName;
                         }
                         continue;
                     }
@@ -176,7 +186,7 @@ class TestController extends UserController
             $tmp_array[] = DIRECTORY_SPEECHKIT . $cutFrontVideo . '.mp3';
 
             $this->log->info('Добавлям в конец файла две секунды');
-            $ffmpegShortAudioResult = 'ffmpeg -i ' . DIRECTORY_SPEECHKIT . $cutFrontVideo . '.mp3 -af "apad=pad_dur=3" -y ' . DIRECTORY_SPEECHKIT . $number . '.mp3';
+            $ffmpegShortAudioResult = 'ffmpeg -i ' . DIRECTORY_SPEECHKIT . $cutFrontVideo . '.mp3 -af "apad=pad_dur=2" -y ' . DIRECTORY_SPEECHKIT . $number . '.mp3';
             $this->log->info($ffmpegShortAudioResult);
             shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
