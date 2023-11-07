@@ -48,15 +48,15 @@ try {
     $cli = new Application('Console');
     (require __DIR__ . '/../src/config/eloquent_console.php')($cli, $container);
 
-    $cli->add(new GeneratorVideoCommand()); //первый скрипт генерации видео
-    $cli->add(new GetYandexAimToken()); // получение токена для синтеза текста
-    $cli->add(new ImportDataExcelCommand()); //импорт данных с файлов excel
+    $cli->add(new GeneratorVideoCommand()); //первый скрипт генерации видео на кроне
+    $cli->add(new GetYandexAimToken()); // получение токена для синтеза текста на кроне
+    $cli->add(new ImportDataExcelCommand()); //импорт данных с файлов excel на кроне
 
-    $cli->add(new DistributionChatGPTRequest()); //отправка запроса на получеие текста т чата gpt
-    $cli->add(new GeneratorChatGPTText()); //отправка запроса на получеие текста т чата gpt
+    $cli->add(new DistributionChatGPTRequest()); //отправка запроса на получеие текста т чата gpt на кроне
+    $cli->add(new GeneratorChatGPTText()); //отправка запроса на получеие текста т чата gpt на кроне
 
 
-    $cli->add(new FormatTextFromChatGptCommand()); //форматирование ответа, полученного от чата
+    $cli->add(new FormatTextFromChatGptCommand()); //форматирование ответа, полученного от чата на кроне
     $cli->add(new GeneratorImage()); // Получение картинок по описанию, полученного с чата
     $cli->add(new GeneratorVoiceAndSubtitlesCommand()); //генерация озвучки и субтитров ОТКЛЮЧЁН
     $cli->add(new GeneratorManyVideoCommand()); //новый скрипт для перегенерации видео генерации видео

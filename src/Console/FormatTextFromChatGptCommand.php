@@ -78,7 +78,12 @@ class FormatTextFromChatGptCommand  extends Command
                     $this->log->info('Ответ запроса взят на обработку: ' . $gptRequest['id']);
                 }
 
-                $resultText = $gptRequest["response"];
+                $replaceString = str_replace("\n", ' ', $gptRequest["response"]);
+                $replaceString = str_replace('\n', '\\\n', $replaceString);
+                $replaceString = str_replace('\r', '\\\r', $replaceString);
+                $replaceString = str_replace('\t', '\\\t', $replaceString);
+                $resultTextArray = json_decode($replaceString, true);
+                $resultText = $resultTextArray['choices'][0]['message']['content'];
 
                 if (empty($resultText)) {
                     $this->log->error('Ответ запроса путой, контент поставлен в очередь на получение резкльтата запроса: ' . $contentId);
@@ -86,8 +91,6 @@ class FormatTextFromChatGptCommand  extends Command
                     exec($cmd);
                     return 0;
                 }
-
-                $this->log->info('Начало форматирования запроса');
 
                 $this->log->info('Соранение результата');
                 TextVideo::updatedContentData($gptRequest['text_id'], $resultText);
