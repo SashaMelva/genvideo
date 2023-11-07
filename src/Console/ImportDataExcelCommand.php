@@ -373,7 +373,7 @@ class ImportDataExcelCommand extends Command
             [
                 'content_id' => $contentId,
                 'text_request' => $row['текст для запроса'],
-                'status_working' => 1,
+                'status_working' => 5,
                 'text_id' => $textId,
             ]
         );
