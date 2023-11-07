@@ -89,7 +89,7 @@ class GeneratorChatGPTText extends Command
                 $this->log->info('Фиксируем ошибку в кабинете  ' . $cabinet->id . ' и отправляем запрос на получение нового кабинета ' . $requestList->id_request);
                 GPTChatCabinet::changeStatusWorkCabinet($cabinet->id, 5, $response['response']);
                 ListRequestGPTCabinet::changeStatus($requestList->id, 3);
-                GPTChatRequests::changeStatus($requestList->id_request, 3);
+                GPTChatRequests::changeStatus($requestList->id_request, 5);
 
             } else {
 
@@ -152,7 +152,7 @@ class GeneratorChatGPTText extends Command
 
         if (curl_errno($ch)) {
             return ['status' => 'errorConnection', 'response' => curl_error($ch)];
-        } elseif (isset(json_decode($response, true)['error'])) {
+        } elseif(isset(json_decode($response, true)['error']) ) {
             return ['status' => 'error', 'response' => $response];
         } else {
             return ['status' => 'ok', 'response' => $response];
