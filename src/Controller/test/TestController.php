@@ -121,7 +121,7 @@ class TestController extends UserController
             if ($delayBetween > 0) {
                 $arrayLongAudio = [];
                 $mergesAudio = [];
-
+                $this->log->info(json_encode($nameAudio, JSON_UNESCAPED_UNICODE));
                 foreach ($nameAudio as $key => $audio) {
                     $audioName = DIRECTORY_SPEECHKIT . $audio['nameAudio'] . '.mp3';
                     $this->log->info('Название файла ' . $audioName);
@@ -136,7 +136,7 @@ class TestController extends UserController
                             $this->log->info('Это последний фал для склеки? ' . !$nameAudio[$key + 1]['merge']);
                             if (!$nameAudio[$key + 1]['merge']) {
                                 $this->log->info('Последний файл для склеки');
-                                $audioName = DIRECTORY_SPEECHKIT .  $audio['nameAudio'] . '_merges.mp3';
+                                $audioName = DIRECTORY_SPEECHKIT . $audio['nameAudio'] . '_merges.mp3';
 
                                 $ffmpeg = 'ffmpeg -i "concat:' . implode('|', $mergesAudio) . '"  -acodec copy -c:a libmp3lame ' . $audioName;
                                 $this->log->info($ffmpeg);
@@ -146,10 +146,9 @@ class TestController extends UserController
                                 $arrayLongAudio[] = $audioName;
                             }
                             $this->log->info('Это не последний файлм для склеки');
-                            continue;
                         } else {
                             $this->log->info('Последние файлы для склеки' . json_encode($mergesAudio, true));
-                            $audioName =DIRECTORY_SPEECHKIT .  $audio['nameAudio'] . '_merges.mp3';
+                            $audioName = DIRECTORY_SPEECHKIT . $audio['nameAudio'] . '_merges.mp3';
 
                             $ffmpeg = 'ffmpeg -i "concat:' . implode('|', $mergesAudio) . '"  -acodec copy -c:a libmp3lame ' . $audioName;
                             $this->log->info($ffmpeg);
