@@ -136,27 +136,26 @@ class TestController extends UserController
                             $this->log->info('Это последний фал для склеки? ' . !$nameAudio[$key + 1]['merge']);
                             if (!$nameAudio[$key + 1]['merge']) {
                                 $this->log->info('Последний файл для склеки');
-                                $audioName = $audio['nameAudio'] . '_merges.mp3';
+                                $audioName = DIRECTORY_SPEECHKIT .  $audio['nameAudio'] . '_merges.mp3';
 
-                                $ffmpeg = 'ffmpeg -i "concat:' . implode('|', $mergesAudio) . '"  -acodec copy -c:a libmp3lame ' . DIRECTORY_SPEECHKIT . $audioName;
+                                $ffmpeg = 'ffmpeg -i "concat:' . implode('|', $mergesAudio) . '"  -acodec copy -c:a libmp3lame ' . $audioName;
                                 $this->log->info($ffmpeg);
                                 shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
                                 $mergesAudio = [];
-                                $arrayLongAudio[] = DIRECTORY_SPEECHKIT . $audioName;
+                                $arrayLongAudio[] = $audioName;
                             }
                             $this->log->info('Это не последний файлм для склеки');
                         } else {
                             $this->log->info('Последние файлы для склеки' . json_encode($mergesAudio, true));
-                            $audioName = $audio['nameAudio'] . '_merges.mp3';
+                            $audioName =DIRECTORY_SPEECHKIT .  $audio['nameAudio'] . '_merges.mp3';
 
-                            $ffmpeg = 'ffmpeg -i "concat:' . implode('|', $mergesAudio) . '"  -acodec copy -c:a libmp3lame ' . DIRECTORY_SPEECHKIT . $audioName;
+                            $ffmpeg = 'ffmpeg -i "concat:' . implode('|', $mergesAudio) . '"  -acodec copy -c:a libmp3lame ' . $audioName;
                             $this->log->info($ffmpeg);
                             shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
                             $mergesAudio = [];
-                            $arrayLongAudio[] = DIRECTORY_SPEECHKIT . $audioName;
+                            $arrayLongAudio[] = $audioName;
                         }
-                        continue;
                     }
 
                     $this->log->info('Формирование аудио с пустотой спереди ');
