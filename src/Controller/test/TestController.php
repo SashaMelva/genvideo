@@ -148,6 +148,7 @@ class TestController extends UserController
                             $this->log->info('Это не последний файлм для склеки');
                         } else {
                             $this->log->info('Последние файлы для склеки' . json_encode($mergesAudio, true));
+                            $audioName = $audio['nameAudio'] . '_merges.mp3';
 
                             $ffmpeg = 'ffmpeg -i "concat:' . implode('|', $mergesAudio) . '"  -acodec copy -c:a libmp3lame ' . DIRECTORY_SPEECHKIT . $audioName;
                             $this->log->info($ffmpeg);
