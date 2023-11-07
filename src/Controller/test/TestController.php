@@ -48,9 +48,6 @@ class TestController extends UserController
         $this->log = $log;
         $this->status_log = true;
 
-        $request = GPTChatRequests::findOne(17);
-        var_dump($request->id);
-        exit();
         $this->client = new Client();
 
         $this->log->info('Начало ' . date('Y-m-s H:i:s'));
@@ -253,7 +250,7 @@ class TestController extends UserController
                         . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($item['time'] + $allTime)) . "\r\n" . $item['text'] . "\r\n";
                 } else {
                     $arr[] = ($key + 1) . "\r\n" . '00:00:00,000 --> '
-                        . str_replace('.', ',', $this->formatMilliseconds($item['time'])) . "\r\n" . $item['text'] . "\r\n";
+                        . str_replace('.', ',', $this->formatMilliseconds($item['time']+ $allTime)) . "\r\n" . $item['text'] . "\r\n";
                 }
             }
 
