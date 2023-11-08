@@ -118,9 +118,9 @@ class TestController extends UserController
         var_dump($timeVideo);
         if ($timeVoice > $timeVideo) {
             $loop = ceil($timeVoice / $timeVideo);
-            $ffmpeg = 'ffmpeg  -stream_loop ' . $loop . ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -t ' . $timeVoice . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 ' . DIRECTORY_VIDEO . $resultName . '_new.mp4';
+            $ffmpeg = 'ffmpeg  -stream_loop ' . $loop . ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -t ' . ceil($timeVoice) . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 ' . DIRECTORY_VIDEO . $resultName . '_new.mp4';
         } else {
-            $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -t ' . $timeVoice . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 ' . DIRECTORY_VIDEO . $resultName . '_new.mp4';
+            $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -t ' . ceil($timeVoice) . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 ' . DIRECTORY_VIDEO . $resultName . '_new.mp4';
         }
 
         $this->log->info($ffmpeg);
