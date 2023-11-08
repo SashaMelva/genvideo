@@ -95,7 +95,7 @@ class TestController extends UserController
     }
     public function generatorBackgroundVideoAndMusic(string $nameVideo, string $sound_name, string $timeVoice): array
     {
-        $resultName = 123 . '_music';
+        $resultName = 11111111 . '_music';
         $errors = '';
         $getID3 = new getID3;
         $fileSound = $getID3->analyze(DIRECTORY_MUSIC . $sound_name);
@@ -125,14 +125,15 @@ class TestController extends UserController
 
         $this->log->info($ffmpeg);
         $errors .= shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
-        if (!is_null($errors)) {
-            return ['status' => false, 'command' => $ffmpeg];
-        }
+        var_dump($ffmpeg);
+//        if (!is_null($errors)) {
+//            return ['status' => false, 'command' => $ffmpeg];
+//        }
 
         //$timeFormat = $this->formatMilliseconds($timeVoice * 1000);
-        $ffmpeg = "ffmpeg -i " . DIRECTORY_VIDEO . $resultName . "_new.mp4 -t " . $timeVoice . " -c:v h264_nvenc -c:a aac " . DIRECTORY_VIDEO . $resultName . '.mp4';
-        $this->log->info($ffmpeg);
-        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+//        $ffmpeg = "ffmpeg -i " . DIRECTORY_VIDEO . $resultName . "_new.mp4 -t " . $timeVoice . " -c:v h264_nvenc -c:a aac " . DIRECTORY_VIDEO . $resultName . '.mp4';
+//        $this->log->info($ffmpeg);
+//        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         if (!is_null($errors)) {
             return ['status' => false, 'command' => $ffmpeg];
