@@ -44,14 +44,12 @@ class Speechkit
                 if ($voiceSetting['delay_between_offers_ms'] > 0) {
                     $resultText = $this->spillSubtitlesOffers($text);
                     $data = $this->SplitMp3New($resultText, $fileName, $voiceSetting, $voiceSetting['delay_between_offers_ms']);
+                }
+                if ($voiceSetting['delay_between_paragraphs_ms'] > 0) {
+                    $resultText = $this->spillSubtitles($text);
+                    $data = $this->SplitMp3New($resultText, $fileName, $voiceSetting, $voiceSetting['delay_between_paragraphs_ms']);
                 } else {
-                    $resultText = $this->spillSubtitlesParagraph($text);
-
-                    if ($voiceSetting['delay_between_paragraphs_ms'] > 0) {
-                        $data = $this->SplitMp3New($resultText, $fileName, $voiceSetting, $voiceSetting['delay_between_paragraphs_ms']);
-                    } else {
-                        $data = $this->SplitMp3($resultText, $fileName, $voiceSetting);
-                    }
+                    $data = $this->SplitMp3($resultText, $fileName, $voiceSetting);
                 }
 
                 $filesName = $data['files'];
@@ -89,10 +87,11 @@ class Speechkit
     /**
      * Разбиваем текст по абзацам
      */
-    private function spillSubtitlesParagraph(string $text): array
+    private function spillSubtitles(string $text): array
     {
         $desc = $text . ' ';
-        $desc = preg_replace("[\r\n]", " ", $desc);
+        $desc = preg_replace("[\r\n]", ' ', $desc);
+        $desc = str_replace('\n', '', $desc);
         $textArray = explode('.', $desc);
         $countChar = 250;
         $result = [];
@@ -153,6 +152,8 @@ class Speechkit
         $this->log->info('Форматирование текста по предложениям');
         $desc = trim($text);
         $desc = preg_replace("[\r\n]", " ", $desc);
+        $desc = preg_replace("[\n]", " ", $desc);
+        $desc = str_replace('\n', '', $desc);
         $textArray = explode('.', $desc);
 
         if (iconv_strlen($textArray[count($textArray) - 1]) >= 0 && iconv_strlen($textArray[count($textArray) - 1]) < 2) {
@@ -340,7 +341,6 @@ class Speechkit
     {
         try {
             $delayBetweenParagraphMs = $voiceSetting['delay_between_paragraphs'] ?? 0;
-            $delayBetweenOffersMs = $voiceSetting['delay_between_offers_ms'] ?? 0;
 
             $tmp_array = [];
             $subtitles = [];
