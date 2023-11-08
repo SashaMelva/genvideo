@@ -42,14 +42,22 @@ class Speechkit
             } else {
 
                 if ($voiceSetting['delay_between_offers_ms'] > 0) {
+
                     $resultText = $this->spillSubtitlesOffers($text);
                     $data = $this->SplitMp3New($resultText, $fileName, $voiceSetting, $voiceSetting['delay_between_offers_ms']);
-                }
-                if ($voiceSetting['delay_between_paragraphs_ms'] > 0) {
-                    $resultText = $this->spillSubtitles($text);
+                    $this->log->info('Получили данные по генерации озвучки и субтитров' . json_encode($data));
+
+                } elseif ($voiceSetting['delay_between_paragraphs_ms'] > 0) {
+
+                    $resultText = $this->spillSubtitlesParagraph($text);
                     $data = $this->SplitMp3New($resultText, $fileName, $voiceSetting, $voiceSetting['delay_between_paragraphs_ms']);
+                    $this->log->info('Получили данные по генерации озвучки и субтитров' . json_encode($data));
+
                 } else {
+
+                    $resultText = $this->spillSubtitles($text);
                     $data = $this->SplitMp3($resultText, $fileName, $voiceSetting);
+                    $this->log->info('Получили данные по генерации озвучки и субтитров' . json_encode($data));
                 }
 
                 $filesName = $data['files'];
@@ -194,6 +202,66 @@ class Speechkit
         return $result;
     }
 
+    private function spillSubtitlesParagraph(string $text): array
+    {
+        $this->log->info('Форматирование текста по предложениям');
+        $desc = trim($text);
+        $textArray = explode('\n', $desc);
+
+
+        foreach ($textArray as $value) {
+            print_r([iconv_strlen($value), $value]);
+        }
+        $countChar = 250;
+        $result = [];
+
+
+        for ($l = 0; $l < count($textArray); $l++) {
+
+            if (iconv_strlen(trim($textArray[$l])) > $countChar) {
+                $textLongArrayParagraph = explode('.', trim($textArray[$l]));
+                if (iconv_strlen($textLongArrayParagraph[count($textLongArrayParagraph) - 1]) >= 0 && iconv_strlen($textLongArrayParagraph[count($textLongArrayParagraph) - 1]) < 2) {
+                    unset($textLongArrayParagraph[count($textLongArrayParagraph) - 1]);
+                }
+                $countLongParagraph = count($textLongArrayParagraph);
+
+                /** Проверка остальных предложения на количество символов */
+                for ($i = 0; $i < $countLongParagraph; $i++) {
+
+                    if (iconv_strlen(trim($textLongArrayParagraph[$i])) > $countChar) {
+                        $textLongArray = explode(',', trim($textLongArrayParagraph[$i]));
+                        $textLong = trim($textLongArray[0]) . ', ';
+                        unset($textLongArray[0]);
+
+                        $countLong = count($textLongArray);
+
+                        for ($j = 1; $j <= $countLong; $j++) {
+                            if (iconv_strlen($textLong) + iconv_strlen($textLongArray[$j]) > $countChar) {
+                                $result[] = ['text' => trim($textLong), 'merge' => true];
+                                $textLong = '';
+                            }
+
+                            $textLong .= trim($textLongArray[$j]) . ', ';
+
+                            if ($j == $countLong) {
+                                $result[] = ['text' => trim($textLong), 'merge' => true];
+                            }
+                        }
+                    } else {
+                        $result[] = ['text' => trim($textLongArrayParagraph[$i]) . '.', 'merge' => true];
+                    }
+                }
+            } else {
+                $result[] = ['text' => trim($textArray[$l]), 'merge' => false, 'len' => iconv_strlen(trim($textArray[$l]))];
+            }
+
+        }
+
+        $this->log->info("Получили отформатированный текст");
+        $this->log->info(json_encode($result, true));
+        return $result;
+    }
+
     private function SplitMp3New($Mp3Files, $number, array $voiceSetting, int $delayBetween): array
     {
         try {
@@ -323,11 +391,12 @@ class Speechkit
 
             $this->log->info('Генерируем файл субтитрв');
             /**для субтитров*/
-            $length = file_put_contents(DIRECTORY_TEXT . $number . '.srt', $this->getFilesSrt($this->mergesSubtitles($subtitles), $delayBetween));
+            file_put_contents(DIRECTORY_TEXT . $number . '.srt', $this->getFilesSrt($this->mergesSubtitles($subtitles), $delayBetween));
 
             $this->log->info('Преабразуем файл субтитров в формат ass');
             $ffmpeg = 'ffmpeg -i ' . DIRECTORY_TEXT . $number . '.srt -y ' . DIRECTORY_TEXT . $number . '.ass';
-            $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+            shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+
             return ['status' => true, 'files' => $tmp_array, 'command' => $ffmpeg];
         } catch (Exception $e) {
             throw new Exception($e->getMessage());

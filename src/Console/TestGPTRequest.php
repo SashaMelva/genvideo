@@ -62,6 +62,8 @@ class TestGPTRequest  extends Command
 
             $cabinet = GPTChatCabinet::findOne($requestList->id_cabinet);
             $proxy = ListCabinetGPTForProxy::findProxyByCabinetId($cabinet->id);
+            var_dump($proxy['ip_address']);
+            var_dump($proxy['port']);
             $response = $this->response($proxy['ip_address'], $proxy['port'], $proxy['user_name'], $proxy['password'], $cabinet->api_key, $request->text_request);
 
 

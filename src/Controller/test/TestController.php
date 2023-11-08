@@ -53,19 +53,10 @@ class TestController extends UserController
         $this->log->info('Начало ' . date('Y-m-s H:i:s'));
 
 
-
-        $this->generatorBackgroundVideoAndMusic('фон.mp4', 'droplets.mp3', '155.92800369288');
-        exit();
-
-
-
         $texxtData = TextVideo::findOne(207);
-        var_dump($texxtData['text']);
-//        $desc = preg_replace('\n\n', " ", $texxtData['text']);
-        $desc = str_replace('\n', "", $texxtData['text']);
-        var_dump($desc);
-        exit();
-        $result = $this->spillSubtitlesParagraph($texxtData['text']);
+
+        $text = str_replace('\n\n', '\n', $texxtData['text']);
+        $result = $this->spillSubtitlesParagraph($text);
         exit();
         $text = 'Я встречался с девушкой около года Всё была хорошо, но в один момент она просто сказала что меня не любит, Причину она не могла назвать потому что не знала, Пообсуждая с ней это мы пришли к выводу что у неё много проблем и она их не кому не доверяет ( даже мне когда был её парнем) и это так накопилось что взорвала её. Она сказала что может года через 2 когда всё пройдёт, она ещё напишит мне и мы снова всё начнём, но чтобы я не надеелся и отпустил . А я не могу её отпустить хотя прошло 3 месяца, но вот не могу. Мы не общаемся ничего. Но вчера вечером мы как-то по переписывались. Она сказала что к ней много кто подкатывает и она всех отшивает и что однажды она целовалась с пацаном и он её лапал и она была не против и хотела большего , но этого не случилось. Ранее СМИ писали, что он просил подчинённых делать фейковые аккаунты в Твиттере, чтобы отвечать критикам  Блойс рассказал, что ему важно чтобы шоу HBO любили все, поэтому одно время негативные отзывы его сильно расстраивали его сильно расстраивали его сильно расстраивали      ';
         var_dump(1);
@@ -92,58 +83,6 @@ class TestController extends UserController
         $data = $this->SplitMp3($result, 'RESULT_endNew', $voiceSetting, $voiceSetting['delay_between_offers_ms']);
 
         return $this->respondWithData($data);
-    }
-    public function generatorBackgroundVideoAndMusic(string $nameVideo, string $sound_name, string $timeVoice): array
-    {
-        $resultName = 11111111 . '_music';
-        $errors = '';
-        $getID3 = new getID3;
-        $fileSound = $getID3->analyze(DIRECTORY_MUSIC . $sound_name);
-        $timeSound = $fileSound['playtime_seconds'];
-
-        var_dump($timeSound);
-        var_dump($timeVoice);
-        if ($timeVoice > $timeSound) {
-            $sound_name_long = explode('.', $sound_name)[0] . '_long.mp3';
-            $loop = ceil($timeVoice / $timeSound);
-            $ffmpeg = 'ffmpeg -stream_loop ' . $loop . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -c copy -t ' . ceil($timeVoice) . ' ' . DIRECTORY_MUSIC . $sound_name_long;
-            $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
-            $sound_name = $sound_name_long;
-        }
-
-        $getID3 = new getID3;
-        $file = $getID3->analyze(DIRECTORY_ADDITIONAL_VIDEO . $nameVideo);
-        $timeVideo = $file['playtime_seconds'];
-
-        var_dump($timeVideo);
-        if ($timeVoice > $timeVideo) {
-            $loop = ceil($timeVoice / $timeVideo);
-            $ffmpeg = 'ffmpeg  -stream_loop ' . $loop . ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -t ' . ceil($timeVoice) . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 ' . DIRECTORY_VIDEO . $resultName . '_new.mp4';
-        } else {
-            $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -t ' . ceil($timeVoice) . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 ' . DIRECTORY_VIDEO . $resultName . '_new.mp4';
-        }
-
-        $this->log->info($ffmpeg);
-        $errors .= shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
-        var_dump($ffmpeg);
-//        if (!is_null($errors)) {
-//            return ['status' => false, 'command' => $ffmpeg];
-//        }
-
-        //$timeFormat = $this->formatMilliseconds($timeVoice * 1000);
-//        $ffmpeg = "ffmpeg -i " . DIRECTORY_VIDEO . $resultName . "_new.mp4 -t " . $timeVoice . " -c:v h264_nvenc -c:a aac " . DIRECTORY_VIDEO . $resultName . '.mp4';
-//        $this->log->info($ffmpeg);
-//        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
-
-        if (!is_null($errors)) {
-            return ['status' => false, 'command' => $ffmpeg];
-        }
-
-        if (file_exists(DIRECTORY_MUSIC . $sound_name)) {
-            unlink(DIRECTORY_MUSIC . $sound_name);
-        }
-        unlink(DIRECTORY_VIDEO . $nameVideo . '.mp4');
-        return ['fileName' => $resultName, 'status' => true, 'command' => $ffmpeg];
     }
 
     private function SplitMp3($Mp3Files, $number, array $voiceSetting, int $delayBetween): array
@@ -403,8 +342,12 @@ class TestController extends UserController
     {
         $this->log->info('Форматирование текста по предложениям');
         $desc = trim($text);
-        $textArray = explode('\n\n', $desc);
+        $textArray = explode('\n', $desc);
 
+
+        foreach ($textArray as $value) {
+            print_r([iconv_strlen($value), $value]);
+        }
         $countChar = 250;
         $result = [];
 
@@ -413,46 +356,44 @@ class TestController extends UserController
 
             if (iconv_strlen(trim($textArray[$l])) > $countChar) {
                 $textLongArrayParagraph = explode('.', trim($textArray[$l]));
-                $textLongParagraph = trim($textLongArrayParagraph[0]) . '. ';
-                unset($textLongArrayParagraph[0]);
+                if (iconv_strlen($textLongArrayParagraph[count($textLongArrayParagraph) - 1]) >= 0 && iconv_strlen($textLongArrayParagraph[count($textLongArrayParagraph) - 1]) < 2) {
+                    unset($textLongArrayParagraph[count($textLongArrayParagraph) - 1]);
+                }
                 $countLongParagraph = count($textLongArrayParagraph);
 
                 /** Проверка остальных предложения на количество символов */
                 for ($i = 0; $i < $countLongParagraph; $i++) {
 
-                    if (iconv_strlen($textLongParagraph) + iconv_strlen(trim($textArray[$i])) > $countChar) {
-                        if (iconv_strlen(trim($textArray[$i])) > $countChar) {
-                            $textLongArray = explode(',', trim($textArray[$i]));
-                            $textLong = trim($textLongArray[0]) . ', ';
-                            unset($textLongArray[0]);
+                    if (iconv_strlen(trim($textLongArrayParagraph[$i])) > $countChar) {
+                        $textLongArray = explode(',', trim($textLongArrayParagraph[$i]));
+                        $textLong = trim($textLongArray[0]) . ', ';
+                        unset($textLongArray[0]);
 
-                            $countLong = count($textLongArray);
+                        $countLong = count($textLongArray);
 
-                            for ($j = 1; $j <= $countLong; $j++) {
-                                if (iconv_strlen($textLong) + iconv_strlen($textLongArray[$j]) > $countChar) {
-                                    $result[] = ['text' => trim($textLong), 'merge' => true];
-                                    $textLong = '';
-                                }
-
-                                $textLong .= trim($textLongArray[$j]) . ', ';
-
-                                if ($j == $countLong) {
-                                    $result[] = ['text' => trim($textLong), 'merge' => true];
-                                }
+                        for ($j = 1; $j <= $countLong; $j++) {
+                            if (iconv_strlen($textLong) + iconv_strlen($textLongArray[$j]) > $countChar) {
+                                $result[] = ['text' => trim($textLong), 'merge' => true];
+                                $textLong = '';
                             }
-                        } else {
-                            $result[] = ['text' => trim($textArray[$i]) . '.', 'merge' => true];
+
+                            $textLong .= trim($textLongArray[$j]) . ', ';
+
+                            if ($j == $countLong) {
+                                $result[] = ['text' => trim($textLong), 'merge' => true];
+                            }
                         }
+                    } else {
+                        $result[] = ['text' => trim($textLongArrayParagraph[$i]) . '.', 'merge' => true];
                     }
                 }
             } else {
-                $result[] = ['text' => trim($textArray[$l]), 'merge' => false];
+                $result[] = ['text' => trim($textArray[$l]), 'merge' => false, 'len' => iconv_strlen(trim($textArray[$l]))];
             }
 
         }
-        var_dump($result);
-        exit();
-        $this->log->info("Получили отворматированный текст");
+
+        $this->log->info("Получили отформатированный текст");
         $this->log->info(json_encode($result, true));
         return $result;
     }
