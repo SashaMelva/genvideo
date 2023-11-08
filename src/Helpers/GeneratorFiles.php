@@ -17,19 +17,27 @@ class GeneratorFiles
     }
 
     /**Генерируем субтитры*/
-    public function generatorText(string $videoName, string $titerName, string $formatVideo): array
+    public function generatorText(string $videoName, string $titerName, string $formatVideo, array $textData): array
     {
         $resultName = $this->contentId . '_text';
         $stringDirectory = str_replace('\\', '\\\\', DIRECTORY_TEXT);
         $stringDirectory = str_replace(':', '\\:', $stringDirectory);
 
+        if ($textData['text_color_background'] == 'Нет') {
+            $colorOutline = '&HFF000000';
+        } else {
+            $colorOutline = is_null($textData['text_color_background']) || !str_contains($textData['text_color_background'], '&H') ? '&H80000000' : $textData['text_color_background'];
+        }
+
+        $colorText = is_null($textData['text_color']) || !str_contains($textData['text_color'], '&H') ? '&H00FFFFFF' : $textData['text_color'];
+
         if ($formatVideo == '9/16') {
             $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -filter_complex "subtitles=\'' . $stringDirectory . $titerName . '.ass' . '\':force_style=' .
-                "'OutlineColour=&H80000000,BorderStyle=3,Outline=1,FontSize=12,Shadow=0,MarginV=110'" .
+                "'force_style='OutlineColour=' .$colorOutline .',PrimaryColour=' . $colorText .',BorderStyle=3,Outline=1,FontSize=12,Shadow=0,MarginV=110'" .
                 '" -c:v h264_nvenc -c:a copy -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
         } else {
             $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -filter_complex "subtitles=\'' . $stringDirectory . $titerName . '.ass' . '\':force_style=' .
-                "'OutlineColour=&H80000000,BorderStyle=3,Outline=1,Shadow=0,MarginV=110'" .
+                "'force_style='OutlineColour=&H82202060,PrimaryColour=&H00FF00FF,BorderStyle=3,Outline=1,Shadow=0,MarginV=110'" .
                 '" -c:v h264_nvenc -c:a copy -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
         }
 
