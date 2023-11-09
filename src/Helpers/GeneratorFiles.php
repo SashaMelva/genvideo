@@ -33,11 +33,11 @@ class GeneratorFiles
 
         if ($formatVideo == '9/16') {
             $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -filter_complex "subtitles=\'' . $stringDirectory . $titerName . '.ass' . '\':force_style=' .
-                "'force_style='OutlineColour=' .$colorOutline .',PrimaryColour=' . $colorText .',BorderStyle=3,Outline=1,FontSize=12,Shadow=0,MarginV=110'" .
+                "'OutlineColour=' .$colorOutline .',PrimaryColour=' . $colorText .',BorderStyle=3,Outline=1,FontSize=12,Shadow=0,MarginV=110'" .
                 '" -c:v h264_nvenc -c:a copy -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
         } else {
             $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -filter_complex "subtitles=\'' . $stringDirectory . $titerName . '.ass' . '\':force_style=' .
-                "'force_style='OutlineColour=&H82202060,PrimaryColour=&H00FF00FF,BorderStyle=3,Outline=1,Shadow=0,MarginV=110'" .
+                "'OutlineColour=&H82202060,PrimaryColour=&H00FF00FF,BorderStyle=3,Outline=1,Shadow=0,MarginV=110'" .
                 '" -c:v h264_nvenc -c:a copy -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
         }
 
@@ -239,6 +239,49 @@ class GeneratorFiles
         return ['fileName' => $resultName, 'status' => true];
     }
 
+    public function generatorAdditionalVideoFormatMp4(string $nameVideo): array
+    {
+        $resultName = $nameVideo . '_format';
+
+        if (file_exists(DIRECTORY_ADDITIONAL_VIDEO . $resultName . '.ts')) {
+            return ['fileName' => $resultName, 'status' => true];
+        }
+
+        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . '.mp4 -vf "crop=((9*in_h)/16):in_h:in_w/2-((9*in_h)/16)/2:0" -c:v h264_nvenc -c:a copy -y ' . DIRECTORY_ADDITIONAL_VIDEO . $resultName . '.mp4';
+        $this->log->info($ffmpeg);
+        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+
+        if (!is_null($errors)) {
+            return ['status' => false];
+        }
+
+        //unlink(DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . '.mp4');
+        return ['fileName' => $resultName, 'status' => true];
+    }
+
+    public function bringingVideoSameSize(string $nameVideo, string $directory): array
+    {
+        $resultNameScale = $nameVideo . '_scale';
+        $resultNameSetsar = $nameVideo . '_setsar';
+
+        $this->log->info('Увлечение размера видео');
+        $ffmpeg = 'ffmpeg -i ' . $directory . $nameVideo . '.mp4  -vf "scale=1920:1080" -c:v h264_nvenc -c:a copy -y ' . $directory . $resultNameScale . '.mp4';
+        $this->log->info($ffmpeg);
+        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+
+        $this->log->info('Изменение соотношенияя сторон');
+        $ffmpeg = 'ffmpeg -i ' . $directory . $resultNameScale . '.mp4  -vf "setsar=1:1" -c:v h264_nvenc -c:a copy -y ' . $directory . $resultNameSetsar . '.mp4';
+        $this->log->info($ffmpeg);
+        $errors .= shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+
+        if (!is_null($errors)) {
+            return ['status' => false];
+        }
+
+        //unlink(DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . '.mp4');
+        return ['fileName' => $resultNameSetsar, 'status' => true];
+    }
+
     /**Склеиваем видео*/
     public function mergeVideo(string $nameVideoContent, string $format, ?string $nameVideoStart = null, ?string $nameVideoEnd = null): array
     {
@@ -302,6 +345,94 @@ class GeneratorFiles
                     return ['status' => false, 'command' => $ffmpeg];
                 }
             }
+        }
+
+        $this->log->info('Количество видео для склейки ' . $countVideo);
+        if ($countVideo == 2) {
+            $ffmpeg .= ' -filter_complex "[0:v] [0:a] [1:v] [1:a] concat=n=2:v=1:a=1 [v] [a]" -map "[v]" -map "[a]" ' . DIRECTORY_VIDEO . $fileName . '.mp4';
+        }
+
+        if ($countVideo == 3) {
+            $ffmpeg .= ' -filter_complex "[0:v] [0:a] [1:v] [1:a] [2:v] [2:a] concat=n=3:v=1:a=1 [v] [a]" -map "[v]" -map "[a]" ' . DIRECTORY_VIDEO . $fileName . '.mp4';
+        }
+        $this->log->info($ffmpeg);
+        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+
+        if (!is_null($errors)) {
+            return ['status' => false, 'command' => $ffmpeg];
+        }
+
+        return ['fileName' => $fileName, 'status' => true];
+    }
+
+    public function mergeVideoWithSize(string $nameVideoContent, string $format, ?string $nameVideoStart = null, ?string $nameVideoEnd = null): array
+    {
+        $fileName = $this->contentId . '_result';
+        $ffmpeg = 'ffmpeg ';
+        $countVideo = 1;
+
+        if (!is_null($nameVideoStart)) {
+            $countVideo += 1;
+            $fileNameStart = str_replace('.mp4', '', $nameVideoStart);
+
+
+            if ($format == '9/16') {
+                $this->log->info('Форматирование стартовое видео под разрешение 9/16');
+                $dataStartVideo = $this->generatorAdditionalVideoFormatMp4($fileNameStart);
+
+                if ($dataStartVideo['status']) {
+                    $ffmpeg .= ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $dataStartVideo['fileName'] . '.ts';
+                } else {
+                    return ['status' => false, 'command' => $ffmpeg];
+                }
+
+            }
+            $this->log->info('Форматирование начального видео');
+            $fileStartVideoFormat = $this->bringingVideoSameSize($fileNameStart, DIRECTORY_ADDITIONAL_VIDEO);
+
+            if ($fileStartVideoFormat['status']) {
+                $ffmpeg .= ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $fileStartVideoFormat['fileName'] . '.mp4';
+            } else {
+                return ['status' => false, 'command' => $ffmpeg];
+            }
+
+        }
+
+        $this->log->info('Преобразование основного видео в формат');
+        $fileMainVideoFormat = $this->bringingVideoSameSize($nameVideoContent, DIRECTORY_VIDEO);
+
+        if ($fileMainVideoFormat['status']) {
+            $ffmpeg .= ' -i ' . DIRECTORY_VIDEO . $fileMainVideoFormat['fileName'] . '.mp4';
+        } else {
+            return ['status' => false, 'command' => $ffmpeg];
+        }
+
+
+        if (!is_null($nameVideoEnd)) {
+            $countVideo += 1;
+            $fileNameEnd = str_replace('.mp4', '', $nameVideoEnd);
+
+            if ($format == '9/16') {
+                $this->log->info('Форматирование конечное видео под разрешение 9/16');
+                $dataEndVideo = $this->generatorAdditionalVideoFormatMp4($fileNameEnd);
+
+                if ($dataEndVideo['status']) {
+                    $ffmpeg .= ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $dataEndVideo['fileName'] . '.mp4';
+                } else {
+                    return ['status' => false, 'command' => $ffmpeg];
+                }
+
+            }
+
+            $this->log->info('Форматирование конечного видео');
+            $fileEndVideoFormat = $this->bringingVideoSameSize($fileNameEnd, DIRECTORY_ADDITIONAL_VIDEO);
+
+            if ($fileEndVideoFormat['status']) {
+                $ffmpeg .= ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $fileEndVideoFormat['fileName'] . '.mp4';
+            } else {
+                return ['status' => false, 'command' => $ffmpeg];
+            }
+
         }
 
         $this->log->info('Количество видео для склейки ' . $countVideo);

@@ -30,6 +30,7 @@ use Monolog\Logger;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
+use Spatie\SimpleExcel\SimpleExcelReader;
 
 class TestController extends UserController
 {
@@ -47,6 +48,48 @@ class TestController extends UserController
         $log->pushHandler(new StreamHandler('php://stdout'));
         $this->log = $log;
         $this->status_log = true;
+
+        $videoId = 174;
+        $resultName = '174_text';
+        $video = ContentVideo::findAllDataByID($videoId);
+        $video['video'] = ListVideo::findAllByContentId($videoId);
+
+        foreach ($video['video'] as $additionalVideo) {
+            if ($additionalVideo['type'] == 'content') {
+                $videoBackground[] = $additionalVideo['file_name'];
+            }
+
+            if ($additionalVideo['type'] == 'start') {
+                $videoStart[] = $additionalVideo['file_name'];
+            }
+
+            if ($additionalVideo['type'] == 'end') {
+                $videoEnd[] = $additionalVideo['file_name'];
+            }
+        }
+
+        $generatorFiles = new GeneratorFiles($videoId, $this->log);
+        if ($video['type_background'] == 'video') {
+            $backgroundVideo = $generatorFiles->mergeVideo($resultName, $video['content_format'], $videoStart[0] ?? null, $videoEnd[0] ?? null);
+        } else {
+            $backgroundVideo = $generatorFiles->mergeVideoWithSize($resultName, $video['content_format'], $videoStart[0] ?? null, $videoEnd[0] ?? null);
+        }
+
+        var_dump($backgroundVideo);
+
+//        $path = DIRECTORY_EXCEL_IMPORT . '123.xlsx';
+//        $excelRows = SimpleExcelReader::create($path)->formatHeadersUsing(fn($header) => mb_strtolower(trim($header)));
+//        $allRows = $excelRows->getRows()->toArray();
+//
+//        foreach ($allRows as $item) {
+//            DB::table('GPT_chat_cabinet')->insert(['email' => $item['почта'], 'password' => $item['пароль'], 'api_key' => $item['api'], 'status_work' => 1, 'status_cabinet' => true]);
+//        }
+
+//        for ($i = 1; $i < 52; $i ++) {
+//            DB::table('list_cabinet_for_proxy')->insert(['id_cabinet' => $i, 'id_proxy' => 1]);
+//        }
+        exit();
+
 
         $this->client = new Client();
 
