@@ -77,7 +77,7 @@ class GeneratorFiles
         if ($timeVoice > $timeSound) {
             $sound_name_long = explode('.', $sound_name)[0] . '_long.mp3';
             $loop = ceil($timeVoice / $timeSound);
-            $ffmpeg = 'ffmpeg -stream_loop ' . $loop . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -c copy -t ' . ceil($timeVoice) . ' ' . DIRECTORY_MUSIC . $sound_name_long;
+            $ffmpeg = 'ffmpeg -stream_loop ' . $loop . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -c copy -t ' . ceil($timeVoice) . ' -y  ' . DIRECTORY_MUSIC . $sound_name_long;
             $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
             $sound_name = $sound_name_long;
         }
@@ -89,7 +89,7 @@ class GeneratorFiles
         if ($timeVoice > $timeVideo) {
             $resultName = $resultName . '_new.mp4';
             $loop = ceil($timeVoice / $timeVideo);
-            $ffmpeg = 'ffmpeg  -stream_loop ' . $loop . ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -t ' . ceil($timeVoice) . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 ' . DIRECTORY_VIDEO . $resultName;
+            $ffmpeg = 'ffmpeg  -stream_loop ' . $loop . ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -t ' . ceil($timeVoice) . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 -y ' . DIRECTORY_VIDEO . $resultName;
         } else {
             $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -t ' . ceil($timeVoice) . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 ' . DIRECTORY_VIDEO . $resultName;
         }
@@ -478,7 +478,7 @@ class GeneratorFiles
         if ($sound_time > $timeSound) {
             $sound_name_long = explode('.', $sound_name)[0] . '_long.mp3';
             $loop = ceil($sound_time / $timeSound);
-            $ffmpeg = 'ffmpeg -stream_loop ' . $loop . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -c copy -t ' . ceil($sound_time) . ' ' . DIRECTORY_MUSIC . $sound_name_long;
+            $ffmpeg = 'ffmpeg -stream_loop ' . $loop . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -c copy -t ' . ceil($sound_time) . ' -y ' . DIRECTORY_MUSIC . $sound_name_long;
             $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
             $sound_name = $sound_name_long;
         }
