@@ -403,6 +403,7 @@ class GeneratorFiles
         $fileMainVideoFormat = $this->bringingVideoSameSize($nameVideoContent, DIRECTORY_VIDEO);
 
         $this->log->info('Статус форматирования ' . $fileMainVideoFormat['status']);
+        $this->log->info(json_encode($fileMainVideoFormat));
         if ($fileMainVideoFormat['status']) {
             $ffmpeg .= ' -i ' . DIRECTORY_VIDEO . $fileMainVideoFormat['fileName'] . '.mp4';
         } else {
