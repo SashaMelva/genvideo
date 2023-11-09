@@ -13,6 +13,7 @@ use App\Console\GetYandexAimToken;
 use App\Console\ImportDataExcelCommand;
 use App\Console\NewTestGPTRequest;
 use App\Console\TestGPTRequest;
+use App\Console\TestScript;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Application;
 
@@ -63,6 +64,7 @@ try {
     $cli->add(new NewTestGPTRequest());
 
     $cli->add(new TestGPTRequest());
+    $cli->add(new TestScript());
 
     $cli->run();
 
