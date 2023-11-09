@@ -43,9 +43,9 @@ class TestScript extends Command
             $this->log->info('Начало ' . date('Y-m-s H:i:s'));
         }
 
-        $contentIds = DB::table('content')->select('id')->where([['status_id', '=', 20]])->get()->toArray();
+        $contentIds = DB::table('content')->select('id')->where([['status_id', '=', 3]])->get()->toArray();
         $videoId = $contentIds[0]->id;
-        ContentVideo::changeStatus($videoId, 3);
+        ContentVideo::changeStatus($videoId, 20);
 
         if ($this->status_log) {
             $this->log->info('Задачи на генерацию: ' . json_encode($contentIds));
