@@ -87,10 +87,11 @@ class GeneratorFiles
         $timeVideo = $file['playtime_seconds'];
 
         if ($timeVoice > $timeVideo) {
+            $resultName = $resultName . '_new.mp4';
             $loop = ceil($timeVoice / $timeVideo);
-            $ffmpeg = 'ffmpeg  -stream_loop ' . $loop . ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -t ' . ceil($timeVoice) . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 ' . DIRECTORY_VIDEO . $resultName . '_new.mp4';
+            $ffmpeg = 'ffmpeg  -stream_loop ' . $loop . ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -t ' . ceil($timeVoice) . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 ' . DIRECTORY_VIDEO . $resultName;
         } else {
-            $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -t ' . ceil($timeVoice) . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 ' . DIRECTORY_VIDEO . $resultName . '_new.mp4';
+            $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -t ' . ceil($timeVoice) . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 ' . DIRECTORY_VIDEO . $resultName;
         }
 
         $this->log->info($ffmpeg);
