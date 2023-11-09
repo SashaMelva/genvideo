@@ -390,7 +390,7 @@ class GeneratorFiles
             }
             $this->log->info('Форматирование начального видео');
             $fileStartVideoFormat = $this->bringingVideoSameSize($fileNameStart, DIRECTORY_ADDITIONAL_VIDEO);
-
+            $this->log->info(json_encode($fileStartVideoFormat));
             if ($fileStartVideoFormat['status']) {
                 $ffmpeg .= ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $fileStartVideoFormat['fileName'] . '.mp4';
             } else {
