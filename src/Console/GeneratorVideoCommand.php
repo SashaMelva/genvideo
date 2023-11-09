@@ -109,7 +109,7 @@ class GeneratorVideoCommand extends Command
                 }
             }
 
-            ContentVideo::changeStatus($videoId, 3);
+            ContentVideo::changeStatus($videoId, 2);
 
             $generatorFiles = new GeneratorFiles($videoId, $this->log);
 
@@ -132,7 +132,7 @@ class GeneratorVideoCommand extends Command
 
                     TextVideo::updateFileTextAndStatus($video['text_id'], $fileNameVoice, RELATIVE_PATH_TEXT . $fileNameVoice, '1');
                     TextVideo::updateFileVoice($video['text_id'], $fileNameVoice, RELATIVE_PATH_SPEECHKIT . $fileNameVoice . '.' . $voiceSetting['format'], '1', $voiceData['time']);
-                    ContentVideo::changeStatus($videoId, 5);
+                    ContentVideo::changeStatus($videoId, 3);
                     $this->log->info('Успех генерации субтитров, id текста ' . $video['text_id']);
                     $this->log->info('Успех генерации аудио озвучки, id текста ' . $video['text_id']);
 
@@ -144,7 +144,7 @@ class GeneratorVideoCommand extends Command
 
                     TextVideo::changeVoiceStatus($video['text_id'], '3');
                     TextVideo::changeTextStatus($video['text_id'], '3');
-                    ContentVideo::changeStatus($videoId, 1);
+                    ContentVideo::changeStatus($videoId, 14);
                     $this->log->error('Ошибка генерации аудио озвучки, id текста ' . $video['text_id']);
                     $this->log->error('Ошибка генерации субтитров, id текста ' . $video['text_id']);
                     exec($cmd);
@@ -183,7 +183,7 @@ class GeneratorVideoCommand extends Command
                     $slideshow = $generatorFiles->generatorSladeShow($slidesName, $sound[0]['file_name'], $textData['time_voice'], $video['content_format']);
 
                     if (!$slideshow['status']) {
-                        ContentVideo::changeStatus($videoId, 5);
+                        ContentVideo::changeStatus($videoId, 13);
                         $this->log->error($slideshow['command']);
                         $this->log->error('Ошибка генерации слайдшоу');
                         exec($cmd);
@@ -194,7 +194,7 @@ class GeneratorVideoCommand extends Command
                     $this->log->info('Сдайдшоу сгенерировано, имя файла ' . $resultName);
 
                 } else {
-                    ContentVideo::changeStatus($videoId, 5);
+                    ContentVideo::changeStatus($videoId, 13);
                     $this->log->error('Изображения не загружены');
                     exec($cmd);
                     return 0;
@@ -212,7 +212,7 @@ class GeneratorVideoCommand extends Command
                         $formatVideo = $generatorFiles->generatorVideoFormat($additionalVideoName);
 
                         if (!$formatVideo['status']) {
-                            ContentVideo::changeStatus($videoId, 5);
+                            ContentVideo::changeStatus($videoId, 13);
                             $this->log->error('Ошибка преобразования формата видео');
                             exec($cmd);
                             return 0;
@@ -225,7 +225,7 @@ class GeneratorVideoCommand extends Command
                     $backgroundVideo = $generatorFiles->generatorBackgroundVideoAndMusic($additionalVideoName, $sound[0]['file_name'], $textData['time_voice']);
 
                     if (!$backgroundVideo['status']) {
-                        ContentVideo::changeStatus($videoId, 5);
+                        ContentVideo::changeStatus($videoId, 13);
                         $this->log->error('Ошибка генерации фонового видео ' . $backgroundVideo['command']);
                         exec($cmd);
                         return 0;
@@ -235,7 +235,7 @@ class GeneratorVideoCommand extends Command
                     $this->log->info('Фоновое видео сгенерировано, имя файла ' . $resultName);
 
                 } else {
-                    ContentVideo::changeStatus($videoId, 5);
+                    ContentVideo::changeStatus($videoId, 13);
                     $this->log->error('Видео не загружено');
                     exec($cmd);
                     return 0;
@@ -248,7 +248,7 @@ class GeneratorVideoCommand extends Command
                 $background = $generatorFiles->generatorBackground($colorBackground['file_name'], $resultName);
 
                 if (!$background['status']) {
-                    ContentVideo::changeStatus($videoId, 5);
+                    ContentVideo::changeStatus($videoId, 13);
                     $this->log->error('Ошибка наложения фона видео');
                     exec($cmd);
                     return 0;
@@ -262,7 +262,7 @@ class GeneratorVideoCommand extends Command
                 $logoForVideo = $generatorFiles->generatorLogo($logo[0], $resultName);
 
                 if (!$logoForVideo['status']) {
-                    ContentVideo::changeStatus($videoId, 5);
+                    ContentVideo::changeStatus($videoId, 13);
                     $this->log->error('Ошибка прикрепления логотипа');
                     exec($cmd);
                     return 0;
@@ -277,7 +277,7 @@ class GeneratorVideoCommand extends Command
                 $voice = $generatorFiles->generatorMusic($textData['file_name_voice'], $resultName);
 
                 if (!$voice['status']) {
-                    ContentVideo::changeStatus($videoId, 5);
+                    ContentVideo::changeStatus($videoId, 13);
                     $this->log->error($voice['command']);
                     $this->log->error('Ошибка наложения озвучки текста');
                     exec($cmd);
@@ -294,7 +294,7 @@ class GeneratorVideoCommand extends Command
                 $titers = $generatorFiles->generatorText($resultName, $textData['file_name_voice'], $video['content_format'], $textData);
 
                 if (!$titers['status']) {
-                    ContentVideo::changeStatus($videoId, 5);
+                    ContentVideo::changeStatus($videoId, 13);
                     $this->log->error('Ошибка наложения субтитров');
                     $this->log->error($titers['command']);
                     exec($cmd);
@@ -315,7 +315,7 @@ class GeneratorVideoCommand extends Command
                 }
 
                 if (!$backgroundVideo['status']) {
-                    ContentVideo::changeStatus($videoId, 5);
+                    ContentVideo::changeStatus($videoId, 13);
                     $this->log->error('Ошибка склеивания видео ' . $backgroundVideo['command']);
                     exec($cmd);
                     return 0;
@@ -325,7 +325,7 @@ class GeneratorVideoCommand extends Command
                 $this->log->info('Видое склеились, имя файла ' . $resultName);
             } else {
                 $this->log->error('Видео не найдено');
-                ContentVideo::changeStatus($videoId, 5);
+                ContentVideo::changeStatus($videoId, 13);
             }
 
             ContentVideo::updateContent($videoId, $resultName . '.mp4', RELATIVE_PATH_VIDEO . $resultName . '.mp4', 4);

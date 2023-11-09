@@ -87,7 +87,7 @@ class FormatTextFromChatGptCommand  extends Command
 
                 if (empty($resultText)) {
                     $this->log->error('Ответ запроса путой, контент поставлен в очередь на получение резкльтата запроса: ' . $contentId);
-                    ContentVideo::changeStatus($contentId, 5);
+                    ContentVideo::changeStatus($contentId, 12);
                     exec($cmd);
                     return 0;
                 }
@@ -101,7 +101,7 @@ class FormatTextFromChatGptCommand  extends Command
 
                 if ($this->status_log) {
                     $this->log->info('Не найден запрос на генерацию контента: ' . $contentId);
-                    ContentVideo::changeStatus($contentId, 5);
+                    ContentVideo::changeStatus($contentId, 12);
                     exec($cmd);
                     return 0;
                 }
@@ -112,7 +112,7 @@ class FormatTextFromChatGptCommand  extends Command
         } catch (Exception $e) {
             $this->log->error($e->getMessage());
             $this->log->info('Ошибка форматирования текста: ' . $contentId);
-            ContentVideo::changeStatus($contentId, 5);
+            ContentVideo::changeStatus($contentId, 12);
         }
 
         if ($this->status_log) {
