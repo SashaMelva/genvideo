@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Models\ContentVideo;
 use Illuminate\Database\Capsule\Manager as DB;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\StreamHandler;
@@ -49,7 +50,9 @@ class TestScript extends Command
         }
         $videoId = $contentIds[0]->id;
         $this->log->info('Взяли задачу ' . $videoId);
+        ContentVideo::changeStatus($videoId, 20);
 
+        $this->log->info('Поменяли статус ' . $videoId);
         sleep(5);
         $this->log->info('Конец');
 
