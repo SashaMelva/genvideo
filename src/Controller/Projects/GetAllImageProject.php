@@ -21,6 +21,8 @@ class GetAllImageProject extends UserController
         $access_token = $this->request->getHeaderLine('Token');
         $projectId = $this->request->getAttribute('id');
 
+        ini_set('memory_limit', '-1');
+
         if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
 
             try {
