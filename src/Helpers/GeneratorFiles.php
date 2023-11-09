@@ -37,7 +37,7 @@ class GeneratorFiles
                 '" -c:v h264_nvenc -c:a copy -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
         } else {
             $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -filter_complex "subtitles=\'' . $stringDirectory . $titerName . '.ass' . '\':force_style=' .
-                "'OutlineColour=&H82202060,PrimaryColour=&H00FF00FF,BorderStyle=3,Outline=1,Shadow=0,MarginV=110'" .
+                "'OutlineColour=' .$colorOutline .',PrimaryColour=' . $colorText .',BorderStyle=3,Outline=1,Shadow=0,MarginV=110'" .
                 '" -c:v h264_nvenc -c:a copy -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
         }
 
@@ -216,7 +216,7 @@ class GeneratorFiles
             return ['status' => false, 'command' => $ffmpeg];
         }
 
-        unlink(DIRECTORY_VIDEO . $videoName . '.mp4');
+        unlink(DIRECTORY_VIDEO . $videoName);
         return ['fileName' => $resultName, 'status' => true];
     }
 
