@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use Illuminate\Database\Capsule\Manager as DB;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -41,10 +42,19 @@ class TestScript extends Command
             $this->log->info('Начало ' . date('Y-m-s H:i:s'));
         }
 
-        while(true){
-            sleep(5);
-        }
+        $contentIds = DB::table('content')->select('id')->where([['status_id', '=', 3]])->get()->toArray();
 
+        if ($this->status_log) {
+            $this->log->info('Задачи на генерацию: ' . json_encode($contentIds));
+        }
+        $videoId = $contentIds[0]->id;
+        $this->log->info('Взяли задачу ' . $videoId);
+
+        sleep(5);
+        $this->log->info('Конец');
+
+        exec($cmd);
+        return 0;
     }
 
 }
