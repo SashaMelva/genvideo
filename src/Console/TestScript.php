@@ -44,13 +44,14 @@ class TestScript extends Command
         }
 
         $contentIds = DB::table('content')->select('id')->where([['status_id', '=', 20]])->get()->toArray();
+        $videoId = $contentIds[0]->id;
+        ContentVideo::changeStatus($videoId, 3);
 
         if ($this->status_log) {
             $this->log->info('Задачи на генерацию: ' . json_encode($contentIds));
         }
-        $videoId = $contentIds[0]->id;
         $this->log->info('Взяли задачу ' . $videoId);
-        ContentVideo::changeStatus($videoId, 3);
+
 
         $this->log->info('Поменяли статус ' . $videoId);
         sleep(5);
