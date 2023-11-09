@@ -382,16 +382,16 @@ class GeneratorFiles
                 $this->log->info('Форматирование стартовое видео под разрешение 9/16');
                 $dataStartVideo = $this->generatorAdditionalVideoFormatMp4($fileNameStart);
 
-                if ($dataStartVideo['status']) {
-                    $ffmpeg .= ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $dataStartVideo['fileName'] . '.ts';
-                } else {
+                if (!$dataStartVideo['status']) {
                     return ['status' => false, 'command' => $ffmpeg];
                 }
 
             }
+
             $this->log->info('Форматирование начального видео');
             $fileStartVideoFormat = $this->bringingVideoSameSize($fileNameStart, DIRECTORY_ADDITIONAL_VIDEO);
             $this->log->info(json_encode($fileStartVideoFormat));
+
             if ($fileStartVideoFormat['status']) {
                 $ffmpeg .= ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $fileStartVideoFormat['fileName'] . '.mp4';
             } else {
@@ -405,12 +405,12 @@ class GeneratorFiles
 
         $this->log->info('Статус форматирования ' . $fileMainVideoFormat['status']);
         $this->log->info(json_encode($fileMainVideoFormat));
+
         if ($fileMainVideoFormat['status']) {
             $ffmpeg .= ' -i ' . DIRECTORY_VIDEO . $fileMainVideoFormat['fileName'] . '.mp4';
         } else {
             return ['status' => false, 'command' => $ffmpeg];
         }
-
 
         if (!is_null($nameVideoEnd)) {
             $countVideo += 1;
@@ -420,9 +420,7 @@ class GeneratorFiles
                 $this->log->info('Форматирование конечное видео под разрешение 9/16');
                 $dataEndVideo = $this->generatorAdditionalVideoFormatMp4($fileNameEnd);
 
-                if ($dataEndVideo['status']) {
-                    $ffmpeg .= ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $dataEndVideo['fileName'] . '.mp4';
-                } else {
+                if (!$dataEndVideo['status']) {
                     return ['status' => false, 'command' => $ffmpeg];
                 }
 
@@ -430,8 +428,8 @@ class GeneratorFiles
 
             $this->log->info('Форматирование конечного видео');
             $fileEndVideoFormat = $this->bringingVideoSameSize($fileNameEnd, DIRECTORY_ADDITIONAL_VIDEO);
-
             $this->log->info('Статус форматирования ' . $fileMainVideoFormat['status']);
+
             if ($fileEndVideoFormat['status']) {
                 $ffmpeg .= ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $fileEndVideoFormat['fileName'] . '.mp4';
             } else {
