@@ -506,18 +506,4 @@ class GeneratorFiles
 
         return 'ffmpeg' . $images . $sound . '-filter_complex "' . $scale . $v;
     }
-
-    private function formatMilliseconds($milliseconds): string
-    {
-        $seconds = floor($milliseconds / 1000);
-        $minutes = floor($seconds / 60);
-        $hours = floor($minutes / 60);
-        $milliseconds = $milliseconds % 1000;
-        $seconds = $seconds % 60;
-        $minutes = $minutes % 60;
-
-        $format = '%u:%02u:%02u.%03u';
-
-        return sprintf($format, $hours, $minutes, $seconds, $milliseconds);
-    }
 }
