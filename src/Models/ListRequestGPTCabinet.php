@@ -55,4 +55,15 @@ class ListRequestGPTCabinet extends Model
             ])
             ->update(['status_working' => $statusWorking]);
     }
+
+    public static function changeStatusWithError(int $Id, int $statusWorking, string $error): void
+    {
+        self::query()
+            ->where([
+                ['id', '=', $Id],
+                ['error', '=', $error],
+                ['updated_at', '=', date('Y-m-d H:i:s')],
+            ])
+            ->update(['status_working' => $statusWorking]);
+    }
 }

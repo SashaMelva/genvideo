@@ -87,8 +87,8 @@ class GeneratorChatGPTText extends Command
             } elseif ($response['status'] == 'errorConnection') {
 
                 $this->log->info('Фиксируем ошибку в кабинете  ' . $cabinet->id . ' и отправляем запрос на получение нового кабинета ' . $requestList->id_request);
-                GPTChatCabinet::changeStatusWorkCabinet($cabinet->id, 5, $response['response']);
-                ListRequestGPTCabinet::changeStatus($requestList->id, 3);
+                GPTChatCabinet::changeStatusCabinet($cabinet->id, true);
+                ListRequestGPTCabinet::changeStatusWithError($requestList->id, 3, $response['response']);
                 GPTChatRequests::changeStatus($requestList->id_request, 5);
 
             } else {
@@ -100,11 +100,13 @@ class GeneratorChatGPTText extends Command
                     GPTChatCabinet::changeStatusWorkCabinet($cabinet->id, 4, $response['response']);
                 } elseif (stripos($textError, 'Rate limit reached for requests') || stripos($textError, 'Too Many Requests') !== false) {
                     GPTChatCabinet::changeStatusWorkCabinet($cabinet->id, 3, $response['response']);
+                } elseif (stripos($textError, 'Service Unavailable') || stripos($textError, 'Bad gateway') !== false) {
+                    GPTChatCabinet::changeStatusCabinet($cabinet->id, true);
                 } else {
                     GPTChatCabinet::changeStatusWorkCabinet($cabinet->id, 2, $response['response']);
                 }
 
-                ListRequestGPTCabinet::changeStatus($requestList->id, 3);
+                ListRequestGPTCabinet::changeStatusWithError($requestList->id, 3, $response['response']);
                 GPTChatRequests::changeStatus($requestList->id_request, 5);
             }
 
