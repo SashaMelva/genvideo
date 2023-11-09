@@ -274,6 +274,7 @@ class GeneratorFiles
         $this->log->info($ffmpeg);
         $errors .= shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
+        $this->log->info($errors);
         if (!is_null($errors)) {
             return ['status' => false];
         }
@@ -401,6 +402,7 @@ class GeneratorFiles
         $this->log->info('Преобразование основного видео в формат');
         $fileMainVideoFormat = $this->bringingVideoSameSize($nameVideoContent, DIRECTORY_VIDEO);
 
+        $this->log->info('Статус форматирования ' . $fileMainVideoFormat['status']);
         if ($fileMainVideoFormat['status']) {
             $ffmpeg .= ' -i ' . DIRECTORY_VIDEO . $fileMainVideoFormat['fileName'] . '.mp4';
         } else {
@@ -427,6 +429,7 @@ class GeneratorFiles
             $this->log->info('Форматирование конечного видео');
             $fileEndVideoFormat = $this->bringingVideoSameSize($fileNameEnd, DIRECTORY_ADDITIONAL_VIDEO);
 
+            $this->log->info('Статус форматирования ' . $fileMainVideoFormat['status']);
             if ($fileEndVideoFormat['status']) {
                 $ffmpeg .= ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $fileEndVideoFormat['fileName'] . '.mp4';
             } else {
