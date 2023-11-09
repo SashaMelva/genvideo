@@ -263,11 +263,12 @@ class GeneratorFiles
     {
         $resultNameScale = $nameVideo . '_scale';
         $resultNameSetsar = $nameVideo . '_setsar';
+        $errors = '';
 
         $this->log->info('Увлечение размера видео');
         $ffmpeg = 'ffmpeg -i ' . $directory . $nameVideo . '.mp4  -vf "scale=1920:1080" -c:v h264_nvenc -c:a copy -y ' . $directory . $resultNameScale . '.mp4';
         $this->log->info($ffmpeg);
-        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+        $errors .= shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         $this->log->info('Изменение соотношенияя сторон');
         $ffmpeg = 'ffmpeg -i ' . $directory . $resultNameScale . '.mp4  -vf "setsar=1:1" -c:v h264_nvenc -c:a copy -y ' . $directory . $resultNameSetsar . '.mp4';
@@ -275,7 +276,7 @@ class GeneratorFiles
         $errors .= shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         $this->log->info($errors);
-        if (!is_null($errors)) {
+        if (!empty($errors)) {
             return ['status' => false];
         }
 
