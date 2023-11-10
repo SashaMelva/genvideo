@@ -206,6 +206,14 @@ class GeneratorVideoCommand extends Command
                     $this->log->info('Начало формирования новго видео');
 
                     $additionalVideoName = $videoBackground[0];
+
+                    if (file_exists(DIRECTORY_ADDITIONAL_VIDEO . $sound[0]['file_name'] == false)) {
+                        ContentVideo::changeStatus($videoId, 13);
+                        $this->log->info('Не найдено основное видео');
+                        exec($cmd);
+                        return 0;
+                    }
+
                     /**Подгоняем видео под формат*/
                     if ($video['content_format'] == '9/16') {
                         $this->log->info('Перобразование формата');
@@ -220,6 +228,13 @@ class GeneratorVideoCommand extends Command
 
                         $additionalVideoName = $formatVideo['fileName'];
                         $this->log->info('Успех преобразования формата видео, имя файла ' . $additionalVideoName);
+                    }
+
+                    if (file_exists(DIRECTORY_MUSIC . $sound[0]['file_name'] == false)) {
+                        ContentVideo::changeStatus($videoId, 13);
+                        $this->log->info('Не найдено аудио');
+                        exec($cmd);
+                        return 0;
                     }
 
                     $backgroundVideo = $generatorFiles->generatorBackgroundVideoAndMusic($additionalVideoName, $sound[0]['file_name'], $textData['time_voice']);

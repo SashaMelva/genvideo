@@ -194,6 +194,13 @@ class CorrectionErrorsVideoGeneration  extends UserController
                     $this->log->info('Начало формирования новго видео');
 
                     $additionalVideoName = $videoBackground[0];
+
+                    if (file_exists(DIRECTORY_ADDITIONAL_VIDEO . $sound[0]['file_name'] == false)) {
+                        ContentVideo::changeStatus($videoId, 13);
+                        $this->log->info('Не найдено основное видео');
+                        return $this->respondWithError(400,'Ошибка генерации');
+                    }
+
                     /**Подгоняем видео под формат*/
                     if ($video['content_format'] == '9/16') {
                         $this->log->info('Перобразование формата');
@@ -208,6 +215,12 @@ class CorrectionErrorsVideoGeneration  extends UserController
 
                         $additionalVideoName = $formatVideo['fileName'];
                         $this->log->info('Успех преобразования формата видео, имя файла ' . $additionalVideoName);
+                    }
+
+                    if (file_exists(DIRECTORY_MUSIC . $sound[0]['file_name'] == false)) {
+                        ContentVideo::changeStatus($videoId, 13);
+                        $this->log->info('Не найдено аудио');
+                        return $this->respondWithError(400,'Ошибка генерации');
                     }
 
                     $backgroundVideo = $generatorFiles->generatorBackgroundVideoAndMusic($additionalVideoName, $sound[0]['file_name'], $textData['time_voice']);

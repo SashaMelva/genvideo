@@ -74,6 +74,7 @@ class GeneratorFiles
         $fileSound = $getID3->analyze(DIRECTORY_MUSIC . $sound_name);
         $timeSound = $fileSound['playtime_seconds'];
 
+        $this->log->info('Время озвучки текста ' . $timeVoice . ' Время фоновой музыки ' . $timeSound);
         if ($timeVoice > $timeSound) {
             $sound_name_long = explode('.', $sound_name)[0] . '_long.mp3';
             $loop = ceil($timeVoice / $timeSound);
@@ -86,6 +87,7 @@ class GeneratorFiles
         $file = $getID3->analyze(DIRECTORY_ADDITIONAL_VIDEO . $nameVideo);
         $timeVideo = $file['playtime_seconds'];
 
+        $this->log->info('Время фоновго видео ' . $timeVideo . ' Время фоновой музыки ' . $timeSound);
         if ($timeVoice > $timeVideo) {
             $resultName = $resultName . '_new.mp4';
             $loop = ceil($timeVoice / $timeVideo);
@@ -101,10 +103,10 @@ class GeneratorFiles
 //            return ['status' => false, 'command' => $ffmpeg];
 //        }
 
-        if (file_exists(DIRECTORY_MUSIC . $sound_name)) {
-            unlink(DIRECTORY_MUSIC . $sound_name);
-        }
-        unlink(DIRECTORY_VIDEO . $nameVideo . '.mp4');
+//        if (file_exists(DIRECTORY_MUSIC . $sound_name)) {
+//            unlink(DIRECTORY_MUSIC . $sound_name);
+//        }
+//        unlink(DIRECTORY_VIDEO . $nameVideo . '.mp4');
         return ['fileName' => $resultName, 'status' => true, 'command' => $ffmpeg];
     }
 
