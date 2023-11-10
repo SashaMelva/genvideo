@@ -292,6 +292,13 @@ class CorrectionErrorsVideoGeneration  extends UserController
             if (is_null($textData['subtitles']) || $textData['subtitles']) {
 
                 $this->log->info('Название файла субтитров  ' . $textData['file_name_voice']);
+
+                if (!file_exists(DIRECTORY_TEXT . $textData['file_name_voice'] . '.ass')) {
+                    $this->log->info('Файл субтиров не найден  ' . DIRECTORY_TEXT . $textData['file_name_voice'] . '.ass');
+                    ContentVideo::changeStatus($videoId, 14);
+                    return $this->respondWithError(400,'Ошибка генерации');
+                }
+
                 $titers = $generatorFiles->generatorText($resultName, $textData['file_name_voice'], $video['content_format'], $textData);
 
                 if (!$titers['status']) {
