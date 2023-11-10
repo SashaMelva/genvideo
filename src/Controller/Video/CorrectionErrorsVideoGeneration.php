@@ -47,7 +47,7 @@ class CorrectionErrorsVideoGeneration  extends UserController
         $this->log = $log;
         $this->status_log = true;
         $access_token = $this->request->getHeaderLine('token');
-        $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
+       // $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
         $videoId = $this->request->getAttribute('id');
 
         if ($this->status_log) {
