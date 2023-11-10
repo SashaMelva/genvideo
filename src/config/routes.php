@@ -37,6 +37,7 @@ use App\Controller\Users\ChangePassword;
 use App\Controller\Users\ChangePasswordViaMail;
 use App\Controller\Users\GetUserInfo;
 use App\Controller\Video\CollectionDataVideo;
+use App\Controller\Video\CorrectionErrorsVideoGeneration;
 use App\Controller\Video\DownloadVideo;
 use App\Controller\Video\GeneratorVideo;
 use App\Controller\Video\GetAllContent;
@@ -101,7 +102,7 @@ return static function(App $app):void
             //$group->get('/generate/{id:[0-9]+}', GeneratorVideo::class);
             $group->get('/test', TestController::class);
 
-
+            $group->get('/correction-errors/{id:[0-9]+}', CorrectionErrorsVideoGeneration::class);
         });
 
         $group->group('/file', function (RouteCollectorProxyInterface $group) {

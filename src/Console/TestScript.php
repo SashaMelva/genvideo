@@ -3,10 +3,13 @@
 namespace App\Console;
 
 use App\Models\ContentVideo;
+use GuzzleHttp\Promise\Promise;
 use Illuminate\Database\Capsule\Manager as DB;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use React\ChildProcess\Process;
+use React\EventLoop\Factory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -52,6 +55,7 @@ class TestScript extends Command
         }
         $this->log->info('Взяли задачу ' . $videoId);
 
+        $loop = Factory::create();
 
         $this->log->info('Поменяли статус ' . $videoId);
         sleep(5);
@@ -59,6 +63,60 @@ class TestScript extends Command
 
         exec($cmd);
         return 0;
+
+// Функция для отправки запроса
+
+
+// Массив URL-адресов для отправки запросов
+        $urls = [
+            'https://example.com/api/1'
+        ];
+
+        $promises = [];
+
+// Создаем Promise-объекты для каждого URL-адреса
+        foreach ($urls as $url) {
+            $promise = $this->sendRequest($url);
+            $promises[] = $promise;
+        }
+
+// Ждем выполнения всех Promise-объектов
+        React\Promise\all($promises)->done(function ($results) {
+            // Выводим результаты успешных запросов
+            echo "Successful requests:\n";
+            foreach ($results as $result) {
+                echo "$result\n";
+            }
+        }, function ($error) {
+            // Выводим ошибки запросов
+            echo "Error in request:\n";
+            echo "$error\n";
+        });
+
+        $loop->run();
+    }
+
+    function sendRequest($qwere, $loop)
+    {
+        // Создаем новый Promise
+        $promise = new Promise(function ($resolve, $reject) use ($loop, $qwere) {
+            $process = new Process('curl -X GET ' . $qwere);
+
+            // Подписываемся на событие 'exit'
+            $process->on('exit', function ($exitCode, $termSignal) use ($resolve, $reject, $qwere) {
+                if ($exitCode === 0) {
+                    // Возвращаем результат успешного выполнения запроса
+                    $resolve("Success: $qwere");
+                } else {
+                    // Возвращаем ошибку выполнения запроса
+                    $reject("Error: $qwere");
+                }
+            });
+
+            $process->start($loop);
+        });
+
+        return $promise;
     }
 
 }

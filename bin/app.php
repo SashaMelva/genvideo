@@ -5,6 +5,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use App\Console\DistributionChatGPTRequest;
 use App\Console\FormatTextFromChatGptCommand;
 use App\Console\GeneratorChatGPTText;
+use App\Console\GeneratorChatGPTTextPromise;
 use App\Console\GeneratorImage;
 use App\Console\GeneratorManyVideoCommand;
 use App\Console\GeneratorVideoCommand;
@@ -62,6 +63,8 @@ try {
     $cli->add(new GeneratorVoiceAndSubtitlesCommand()); //генерация озвучки и субтитров ОТКЛЮЧЁН
     $cli->add(new GeneratorManyVideoCommand()); //новый скрипт для перегенерации видео генерации видео
     $cli->add(new NewTestGPTRequest());
+
+    $cli->add(new GeneratorChatGPTTextPromise());
 
     $cli->add(new TestGPTRequest());
     $cli->add(new TestScript());

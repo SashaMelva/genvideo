@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Console;
+namespace App\Controller\Video;
 
+use App\Controller\UserController;
+use App\Helpers\CheckTokenExpiration;
 use App\Helpers\GeneratorFiles;
 use App\Helpers\Speechkit;
 use App\Models\ColorBackground;
@@ -11,58 +13,39 @@ use App\Models\ListMusic;
 use App\Models\ListVideo;
 use App\Models\TextVideo;
 use Exception;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use GuzzleHttp\Exception\GuzzleException;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Illuminate\Database\Capsule\Manager as DB;
-use Monolog\Logger;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Psr\Http\Message\ResponseInterface;
 
-class GeneratorVideoCommand extends Command
+class CorrectionErrorsVideoGeneration  extends UserController
 {
-    private Logger $log;
-    private bool $status_log;
-
-    protected function configure(): void
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function action(): ResponseInterface
     {
+
         $log = new Logger('info');
-        $log->pushHandler(new RotatingFileHandler('../var/log/generator-video.log', 2, Logger::INFO));
+        $log->pushHandler(new RotatingFileHandler('../var/log/corrector-error.log', 2, Logger::INFO));
         $log->pushHandler(new StreamHandler('php://stdout'));
 
         $this->log = $log;
         $this->status_log = true;
-
-        parent::configure();
-
-        $this
-            ->setName('generator-video')
-            ->setDescription('generator-video');
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        date_default_timezone_set('Europe/Moscow');
-        $cmd = '/usr/bin/supervisorctl stop generator-video';
+        $access_token = $this->request->getHeaderLine('token');
+        $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
+        $videoId = $this->request->getAttribute('id');
 
         if ($this->status_log) {
             $this->log->info('Начало ' . date('Y-m-s H:i:s'));
         }
-
-        $contentIds = DB::table('content')->select('id')->where([['status_id', '=', 1]])->get()->toArray();
-
-        if ($this->status_log) {
-            $this->log->info('Задачи на генерацию: ' . json_encode($contentIds));
-        }
-
-        if (empty($contentIds)) {
-            $this->log->info('Нет задач на генерацию');
-            exec($cmd);
-            return 0;
-        }
-
-        $videoId = $contentIds[0]->id;
 
         try {
 
@@ -147,8 +130,7 @@ class GeneratorVideoCommand extends Command
                     ContentVideo::changeStatus($videoId, 14);
                     $this->log->error('Ошибка генерации аудио озвучки, id текста ' . $video['text_id']);
                     $this->log->error('Ошибка генерации субтитров, id текста ' . $video['text_id']);
-                    exec($cmd);
-                    return 0;
+                     return $this->respondWithError(400,'Ошибка генерации');
                 }
             }
 
@@ -186,8 +168,7 @@ class GeneratorVideoCommand extends Command
                         ContentVideo::changeStatus($videoId, 13);
                         $this->log->error($slideshow['command']);
                         $this->log->error('Ошибка генерации слайдшоу');
-                        exec($cmd);
-                        return 0;
+                         return $this->respondWithError(400,'Ошибка генерации');
                     }
 
                     $resultName = $slideshow['fileName'];
@@ -196,8 +177,8 @@ class GeneratorVideoCommand extends Command
                 } else {
                     ContentVideo::changeStatus($videoId, 13);
                     $this->log->error('Изображения не загружены');
-                    exec($cmd);
-                    return 0;
+
+                    return $this->respondWithError(400,'Ошибка генерации');
                 }
             }
 
@@ -214,8 +195,8 @@ class GeneratorVideoCommand extends Command
                         if (!$formatVideo['status']) {
                             ContentVideo::changeStatus($videoId, 13);
                             $this->log->error('Ошибка преобразования формата видео');
-                            exec($cmd);
-                            return 0;
+
+                            return $this->respondWithError(400,'Ошибка генерации');
                         }
 
                         $additionalVideoName = $formatVideo['fileName'];
@@ -227,8 +208,8 @@ class GeneratorVideoCommand extends Command
                     if (!$backgroundVideo['status']) {
                         ContentVideo::changeStatus($videoId, 13);
                         $this->log->error('Ошибка генерации фонового видео ' . $backgroundVideo['command']);
-                        exec($cmd);
-                        return 0;
+
+                        return $this->respondWithError(400,'Ошибка генерации');
                     }
 
                     $resultName = $backgroundVideo['fileName'];
@@ -237,8 +218,8 @@ class GeneratorVideoCommand extends Command
                 } else {
                     ContentVideo::changeStatus($videoId, 13);
                     $this->log->error('Видео не загружено');
-                    exec($cmd);
-                    return 0;
+
+                    return $this->respondWithError(400,'Ошибка генерации');
                 }
             }
 
@@ -250,8 +231,8 @@ class GeneratorVideoCommand extends Command
                 if (!$background['status']) {
                     ContentVideo::changeStatus($videoId, 13);
                     $this->log->error('Ошибка наложения фона видео');
-                    exec($cmd);
-                    return 0;
+
+                    return $this->respondWithError(400,'Ошибка генерации');
                 }
 
                 $resultName = $background['fileName'];
@@ -264,8 +245,8 @@ class GeneratorVideoCommand extends Command
                 if (!$logoForVideo['status']) {
                     ContentVideo::changeStatus($videoId, 13);
                     $this->log->error('Ошибка прикрепления логотипа');
-                    exec($cmd);
-                    return 0;
+
+                    return $this->respondWithError(400,'Ошибка генерации');
                 }
 
                 $resultName = $logoForVideo['fileName'];
@@ -280,8 +261,8 @@ class GeneratorVideoCommand extends Command
                     ContentVideo::changeStatus($videoId, 13);
                     $this->log->error($voice['command']);
                     $this->log->error('Ошибка наложения озвучки текста');
-                    exec($cmd);
-                    return 0;
+
+                    return $this->respondWithError(400,'Ошибка генерации');
                 }
 
                 $resultName = $voice['fileName'];
@@ -297,8 +278,8 @@ class GeneratorVideoCommand extends Command
                     ContentVideo::changeStatus($videoId, 13);
                     $this->log->error('Ошибка наложения субтитров');
                     $this->log->error($titers['command']);
-                    exec($cmd);
-                    return 0;
+
+                    return $this->respondWithError(400,'Ошибка генерации');
                 }
 
                 $resultName = $titers['fileName'];
@@ -317,8 +298,8 @@ class GeneratorVideoCommand extends Command
                 if (!$backgroundVideo['status']) {
                     ContentVideo::changeStatus($videoId, 13);
                     $this->log->error('Ошибка склеивания видео ' . $backgroundVideo['command']);
-                    exec($cmd);
-                    return 0;
+
+                    return $this->respondWithError(400,'Ошибка генерации');
                 }
 
                 $resultName = $backgroundVideo['fileName'];
@@ -331,8 +312,7 @@ class GeneratorVideoCommand extends Command
             ContentVideo::updateContent($videoId, $resultName . '.mp4', RELATIVE_PATH_VIDEO . $resultName . '.mp4', 4);
             $this->log->info('Видео сгенерировано, имя файла ' . $resultName . 'file_path: ' . RELATIVE_PATH_VIDEO . $resultName . '.mp4');
 
-        } catch
-        (Exception $e) {
+        } catch (Exception $e) {
             $this->log->error($e->getMessage());
             ContentVideo::changeStatus($videoId, 5);
         } catch (GuzzleException $e) {
@@ -344,7 +324,7 @@ class GeneratorVideoCommand extends Command
             $this->log->info('Выполнено ' . date('Y-m-s H:i:s'));
         }
 
-        exec($cmd);
-        return 0;
+
+        return $this->respondWithData('Успешно');
     }
 }
