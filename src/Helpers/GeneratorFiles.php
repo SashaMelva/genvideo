@@ -350,7 +350,7 @@ class GeneratorFiles
         }
 
         $this->log->info('Количество видео для склейки ' . $countVideo);
-        $ffmpeg .= '" -vcodec  h264_nvenc copy -acodec copy -y ' . DIRECTORY_VIDEO . $fileName . '.mp4';
+        $ffmpeg .= '" -vcodec  h264_nvenc -acodec copy -y ' . DIRECTORY_VIDEO . $fileName . '.mp4';
 
 //        if ($countVideo == 2) {
 //            $ffmpeg .= ' -filter_complex "[0:v] [0:a] [1:v] [1:a] concat=n=2:v=1:a=1 [v] [a]" -map "[v]" -map "[a]" -y ' . DIRECTORY_VIDEO . $fileName . '.mp4';
@@ -393,7 +393,6 @@ class GeneratorFiles
                 if (!$dataStartVideo['status']) {
                     return ['status' => false, 'command' => $ffmpeg];
                 }
-
             }
 
             $this->log->info('Форматирование начального видео');
@@ -415,7 +414,7 @@ class GeneratorFiles
         $this->log->info(json_encode($fileMainVideoFormat));
 
         if ($fileMainVideoFormat['status']) {
-            $ffmpeg .= ' -i ' . DIRECTORY_VIDEO . $fileMainVideoFormat['fileName'] . '.mp4';
+            $ffmpeg .= DIRECTORY_VIDEO . $fileMainVideoFormat['fileName'] . '.mp4';
         } else {
             return ['status' => false, 'command' => $ffmpeg];
         }
@@ -447,7 +446,7 @@ class GeneratorFiles
         }
 
         $this->log->info('Количество видео для склейки ' . $countVideo);
-        $ffmpeg .= '" -vcodec  h264_nvenc copy -acodec copy -y ' . DIRECTORY_VIDEO . $fileName . '.mp4';
+        $ffmpeg .= '" -vcodec  h264_nvenc -acodec copy -y ' . DIRECTORY_VIDEO . $fileName . '.mp4';
 
 
 //        if ($countVideo == 2) {
