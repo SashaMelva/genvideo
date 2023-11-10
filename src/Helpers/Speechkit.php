@@ -26,28 +26,78 @@ class Speechkit
     public function generatorWithSubtitles(string $text, string $fileName, array $voiceSetting): array
     {
         try {
+            $filePath = DIRECTORY_SPEECHKIT . $fileName . '.' . $voiceSetting['format'];
+            $result = false;
+            $filesName = [];
 
-            if ($voiceSetting['delay_between_offers_ms'] > 0) {
+            if (mb_strlen($text, '8bit') <= 250) {
 
-                $resultText = $this->spillSubtitlesOffers($text);
-                $data = $this->SplitMp3New($resultText, $fileName, $voiceSetting, $voiceSetting['delay_between_offers_ms']);
+                $resultFileName = $filePath = DIRECTORY_SPEECHKIT . $fileName . '_long.' . $voiceSetting['format'];
+                $response = $this->response($text, $voiceSetting);
+                $length = file_put_contents($filePath, $response);
 
-            } elseif ($voiceSetting['delay_between_paragraphs_ms'] > 0) {
+                $getID3 = new getID3;
+                $file = $getID3->analyze($filePath);
+                $seconds = $file['playtime_seconds'];
+                $this->log->info('Начало ');
 
-                $resultText = $this->spillSubtitlesParagraph($text);
-                $data = $this->SplitMp3New($resultText, $fileName, $voiceSetting, $voiceSetting['delay_between_paragraphs_ms']);
+                $subtitles[] = [
+                    'text' => $text,
+                    'time' => $seconds * 1000
+                ];
+
+                $seconds = 2;
+                $this->log->info('Добавлям в конец файла Задержку');
+                if ($voiceSetting['delay_between_offers_ms'] > 0) {
+                    $seconds = ceil($voiceSetting['delay_between_offers_ms'] / 1000);
+                    $ffmpegShortAudioResult = 'ffmpeg -i ' . $filePath . ' -af "apad=pad_dur=' . $seconds . '" -y ' . $resultFileName;
+                } elseif ($voiceSetting['delay_between_paragraphs_ms'] > 0) {
+                    $seconds = ceil($voiceSetting['delay_between_paragraphs_ms'] / 1000);
+                    $ffmpegShortAudioResult = 'ffmpeg -i ' . $filePath . ' -af "apad=pad_dur=' . $seconds . '" -y ' . $resultFileName;
+                } else {
+                    $ffmpegShortAudioResult = 'ffmpeg -i ' . $filePath . ' -af "apad=pad_dur=' . $seconds . '" -y ' . $resultFileName;
+                }
+                $this->log->info($ffmpegShortAudioResult);
+                shell_exec($ffmpegShortAudioResult . ' -hide_banner -loglevel error 2>&1');
+
+
+                $this->log->info('Генерируем файл субтитрв');
+                /**для субтитров*/
+                file_put_contents(DIRECTORY_TEXT . $fileName . '.srt', $this->getFilesSrt($subtitles, $seconds));
+
+                $this->log->info('Преабразуем файл субтитров в формат ass');
+                $ffmpeg = 'ffmpeg -i ' . DIRECTORY_TEXT . $fileName . '.srt -y ' . DIRECTORY_TEXT . $fileName . '.ass';
+                shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+
+                if ($length !== false) {
+                    $result = true;
+                }
 
             } else {
 
-                $resultText = $this->spillSubtitles($text);
-                $data = $this->SplitMp3($resultText, $fileName, $voiceSetting);
+                if ($voiceSetting['delay_between_offers_ms'] > 0) {
+
+                    $resultText = $this->spillSubtitlesOffers($text);
+                    $data = $this->SplitMp3New($resultText, $fileName, $voiceSetting, $voiceSetting['delay_between_offers_ms']);
+                    $this->log->info('Получили данные по генерации озвучки и субтитров' . json_encode($data));
+
+                } elseif ($voiceSetting['delay_between_paragraphs_ms'] > 0) {
+
+                    $resultText = $this->spillSubtitlesParagraph($text);
+                    $data = $this->SplitMp3New($resultText, $fileName, $voiceSetting, $voiceSetting['delay_between_paragraphs_ms']);
+                    $this->log->info('Получили данные по генерации озвучки и субтитров' . json_encode($data));
+
+                } else {
+
+                    $resultText = $this->spillSubtitles($text);
+                    $data = $this->SplitMp3($resultText, $fileName, $voiceSetting);
+                    $this->log->info('Получили данные по генерации озвучки и субтитров' . json_encode($data));
+                }
+
+                $filesName = $data['files'];
+                $result = $data['status'];
+                $filePath = DIRECTORY_SPEECHKIT . $fileName . '.mp3';
             }
-
-            $this->log->info('Получили данные по генерации озвучки и субтитров' . json_encode($data));
-            $filesName = $data['files'];
-            $result = $data['status'];
-            $filePath = DIRECTORY_SPEECHKIT . $fileName . '.mp3';
-
 
             if ($result) {
                 // узнать длину звуковой дорожки
