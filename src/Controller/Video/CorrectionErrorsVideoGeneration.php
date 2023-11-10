@@ -26,6 +26,12 @@ use Psr\Http\Message\ResponseInterface;
 
 class CorrectionErrorsVideoGeneration  extends UserController
 {
+    private Logger $log;
+    /**
+     * @var true
+     */
+    private bool $status_log;
+
     /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
@@ -37,6 +43,7 @@ class CorrectionErrorsVideoGeneration  extends UserController
         $log->pushHandler(new RotatingFileHandler('../var/log/corrector-error.log', 2, Logger::INFO));
         $log->pushHandler(new StreamHandler('php://stdout'));
 
+        var_dump(1);
         $this->log = $log;
         $this->status_log = true;
         $access_token = $this->request->getHeaderLine('token');
