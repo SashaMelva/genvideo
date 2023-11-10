@@ -310,7 +310,7 @@ class GeneratorFiles
                 $this->log->info('Преобразование начального видео в формат ts');
 
                 if ($this->mergeFiles($fileNameStart, DIRECTORY_ADDITIONAL_VIDEO)) {
-                    $ffmpeg .=  DIRECTORY_ADDITIONAL_VIDEO . $fileNameStart . '.ts' . '|';
+                    $ffmpeg .= DIRECTORY_ADDITIONAL_VIDEO . $fileNameStart . '.ts' . '|';
                 } else {
                     return ['status' => false, 'command' => $ffmpeg];
                 }
@@ -319,7 +319,7 @@ class GeneratorFiles
 
         $this->log->info('Преобразование основного видео в формат ts');
         if ($this->mergeFiles($nameVideoContent, DIRECTORY_VIDEO)) {
-            $ffmpeg .= ' -i ' . DIRECTORY_VIDEO . $nameVideoContent . '.ts';
+            $ffmpeg .= DIRECTORY_VIDEO . $nameVideoContent . '.ts';
         } else {
             return ['status' => false, 'command' => $ffmpeg];
         }
