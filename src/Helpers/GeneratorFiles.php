@@ -214,9 +214,9 @@ class GeneratorFiles
         $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -i ' . DIRECTORY_SPEECHKIT . $nameFileVoice . '.mp3 -filter_complex "[0]volume=0.4[a];[1]volume=1.8[b];[a][b]amix=inputs=2:duration=longest" -c:v h264_nvenc -c:a libmp3lame -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
-        if (!is_null($errors)) {
-            return ['status' => false, 'command' => $ffmpeg];
-        }
+//        if (!is_null($errors)) {
+//            return ['status' => false, 'command' => $ffmpeg];
+//        }
 
         unlink(DIRECTORY_VIDEO . $videoName . '.mp4');
         return ['fileName' => $resultName, 'status' => true];
