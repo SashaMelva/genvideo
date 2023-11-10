@@ -366,11 +366,23 @@ class GeneratorFiles
             return ['status' => false, 'command' => $ffmpeg];
         }
 
+//        if (file_exists(DIRECTORY_ADDITIONAL_VIDEO . $dataEndVideo['fileName'] . '.ts')) {
+//            unlink(DIRECTORY_ADDITIONAL_VIDEO . $dataEndVideo['fileName'] . '.ts');
+//        }
+//        if (file_exists(DIRECTORY_VIDEO . $nameVideoContent . '.ts')) {
+//            unlink(DIRECTORY_VIDEO . $nameVideoContent . '.ts');
+//        }
+//        if (file_exists(DIRECTORY_VIDEO . $nameVideoContent . '.mp4')) {
+//            unlink(DIRECTORY_VIDEO . $nameVideoContent . '.mp4');
+//        }
+//        if (file_exists()) {
+//            unlink();
+//        }
 
-        $this->log->info('Повышаем качество видео');
-        $ffmpeg = ' -filter_complex "[0:v] [0:a] [1:v] [1:a] [2:v] [2:a] concat=n=3:v=1:a=1 [v] [a]" -map "[v]" -map "[a]" -y ' . DIRECTORY_VIDEO . $fileName . '.mp4';
-        $this->log->info($ffmpeg);
-        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+//        $this->log->info('Повышаем качество видео');
+//        $ffmpeg = ' -filter_complex "[0:v] [0:a] [1:v] [1:a] [2:v] [2:a] concat=n=3:v=1:a=1 [v] [a]" -map "[v]" -map "[a]" -y ' . DIRECTORY_VIDEO . $fileName . '.mp4';
+//        $this->log->info($ffmpeg);
+//        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         return ['fileName' => $fileName, 'status' => true];
     }
