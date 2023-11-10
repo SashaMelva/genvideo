@@ -287,6 +287,7 @@ class GeneratorFiles
     /**Склеиваем видео*/
     public function mergeVideo(string $nameVideoContent, string $format, ?string $nameVideoStart = null, ?string $nameVideoEnd = null): array
     {
+        $this->log->info('Видео для склейки ' . $nameVideoContent . $format . $nameVideoStart . $nameVideoEnd);
         $fileName = $this->contentId . '_result';
         $ffmpeg = 'ffmpeg -i "concat:';
         $countVideo = 1;
