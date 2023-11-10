@@ -218,7 +218,7 @@ class GeneratorFiles
             return ['status' => false, 'command' => $ffmpeg];
         }
 
-        unlink(DIRECTORY_VIDEO . $videoName);
+        unlink(DIRECTORY_VIDEO . $videoName. '.mp4');
         return ['fileName' => $resultName, 'status' => true];
     }
 
