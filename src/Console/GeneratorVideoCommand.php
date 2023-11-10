@@ -207,7 +207,7 @@ class GeneratorVideoCommand extends Command
 
                     $additionalVideoName = $videoBackground[0];
 
-                    if (!file_exists(DIRECTORY_ADDITIONAL_VIDEO . $sound[0]['file_name'])) {
+                    if (!file_exists(DIRECTORY_ADDITIONAL_VIDEO . $additionalVideoName)) {
                         ContentVideo::changeStatus($videoId, 13);
                         $this->log->info('Не найдено основное видео');
                         exec($cmd);
