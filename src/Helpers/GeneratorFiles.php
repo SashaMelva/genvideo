@@ -89,7 +89,7 @@ class GeneratorFiles
 
         $this->log->info('Время фоновго видео ' . $timeVideo . ' Время фоновой музыки ' . $timeSound);
         if ($timeVoice > $timeVideo) {
-            $resultName = $resultName . '_new.mp4';
+            $resultName = $resultName . '_new';
             $loop = ceil($timeVoice / $timeVideo);
             $ffmpeg = 'ffmpeg  -stream_loop ' . $loop . ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -t ' . ceil($timeVoice) . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
         } else {
