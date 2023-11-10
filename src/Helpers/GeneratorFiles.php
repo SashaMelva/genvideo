@@ -288,7 +288,7 @@ class GeneratorFiles
     public function mergeVideo(string $nameVideoContent, string $format, ?string $nameVideoStart = null, ?string $nameVideoEnd = null): array
     {
         $fileName = $this->contentId . '_result';
-        $ffmpeg = 'ffmpeg -i "concat: ';
+        $ffmpeg = 'ffmpeg -i "concat:';
         $countVideo = 1;
 
         if (!is_null($nameVideoStart)) {
@@ -301,7 +301,7 @@ class GeneratorFiles
                 $dataStartVideo = $this->generatorAdditionalVideoFormat($fileNameStart);
 
                 if ($dataStartVideo['status']) {
-                    $ffmpeg .= ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $dataStartVideo['fileName'] . '.ts';
+                    $ffmpeg .= DIRECTORY_ADDITIONAL_VIDEO . $dataStartVideo['fileName'] . '.ts' . '|';
                 } else {
                     return ['status' => false, 'command' => $ffmpeg];
                 }
@@ -334,7 +334,7 @@ class GeneratorFiles
                 $dataEndVideo = $this->generatorAdditionalVideoFormat($fileNameEnd);
 
                 if ($dataEndVideo['status']) {
-                    $ffmpeg .= ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $dataEndVideo['fileName'] . '.ts';
+                    $ffmpeg .= '|' . DIRECTORY_ADDITIONAL_VIDEO . $dataEndVideo['fileName'] . '.ts';
                 } else {
                     return ['status' => false, 'command' => $ffmpeg];
                 }
