@@ -392,7 +392,7 @@ class GeneratorFiles
     public function mergeVideoWithSize(string $nameVideoContent, string $format, ?string $nameVideoStart = null, ?string $nameVideoEnd = null): array
     {
         $fileName = $this->contentId . '_result';
-        $ffmpeg = 'ffmpeg -i "concat:';
+        $ffmpeg = 'ffmpeg -i ';
         $countVideo = 1;
 
         if (!is_null($nameVideoStart)) {
@@ -414,7 +414,7 @@ class GeneratorFiles
             $this->log->info(json_encode($fileStartVideoFormat));
 
             if ($fileStartVideoFormat['status']) {
-                $ffmpeg .= DIRECTORY_ADDITIONAL_VIDEO . $fileStartVideoFormat['fileName'] . '.mp4' . '|';
+                $ffmpeg .= ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $fileStartVideoFormat['fileName'] . '.mp4';
             } else {
                 return ['status' => false, 'command' => $ffmpeg];
             }
@@ -428,7 +428,7 @@ class GeneratorFiles
         $this->log->info(json_encode($fileMainVideoFormat));
 
         if ($fileMainVideoFormat['status']) {
-            $ffmpeg .= DIRECTORY_VIDEO . $fileMainVideoFormat['fileName'] . '.mp4';
+            $ffmpeg .= ' -i ' .  DIRECTORY_VIDEO . $fileMainVideoFormat['fileName'] . '.mp4';
         } else {
             return ['status' => false, 'command' => $ffmpeg];
         }
@@ -452,7 +452,7 @@ class GeneratorFiles
             $this->log->info('Статус форматирования ' . $fileMainVideoFormat['status']);
 
             if ($fileEndVideoFormat['status']) {
-                $ffmpeg .= '|' . DIRECTORY_ADDITIONAL_VIDEO . $fileEndVideoFormat['fileName'] . '.mp4';
+                $ffmpeg .= ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $fileEndVideoFormat['fileName'] . '.mp4';
             } else {
                 return ['status' => false, 'command' => $ffmpeg];
             }
@@ -460,16 +460,14 @@ class GeneratorFiles
         }
 
         $this->log->info('Количество видео для склейки ' . $countVideo);
-        $ffmpeg .= '" -vcodec  h264_nvenc -acodec copy -y ' . DIRECTORY_VIDEO . $fileName . '.mp4';
 
+        if ($countVideo == 2) {
+            $ffmpeg .= ' -filter_complex  "[0:0][0:1][1:0][1:1] concat=n=2:v=1:a=1 [v] [a]" -map "[v]" -map "[a]" -vcodec  h264_nvenc -y ' . DIRECTORY_VIDEO . $fileName . '.mp4';
+        }
 
-//        if ($countVideo == 2) {
-//            $ffmpeg .= ' -filter_complex "[0:v] [0:a] [1:v] [1:a] concat=n=2:v=1:a=1 [v] [a]" -map "[v]" -map "[a]" -y ' . DIRECTORY_VIDEO . $fileName . '.mp4';
-//        }
-//
-//        if ($countVideo == 3) {
-//            $ffmpeg .= ' -filter_complex "[0:v] [0:a] [1:v] [1:a] [2:v] [2:a] concat=n=3:v=1:a=1 [v] [a]" -map "[v]" -map "[a]" -y ' . DIRECTORY_VIDEO . $fileName . '.mp4';
-//        }
+        if ($countVideo == 3) {
+            $ffmpeg .= ' -filter_complex  "[0:0][0:1][1:0][1:1][2:0][2:1] concat=n=3:v=1:a=1 [v] [a]" -map "[v]" -map "[a]" -vcodec  h264_nvenc -y ' . DIRECTORY_VIDEO . $fileName . '.mp4';
+        }
 
         $this->log->info($ffmpeg);
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
