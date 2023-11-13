@@ -83,7 +83,6 @@ class Speechkit
         $desc = preg_replace("[\r\n]", ' ', $desc);
         $desc = str_replace('\n', '', $desc);
         $textArray = explode('.', $desc);
-        $this->log->error($desc);
         $countChar = 250;
         $result = [];
         $text = trim($textArray[0]) . '. ';
@@ -134,6 +133,7 @@ class Speechkit
             }
         }
 
+        $this->log->error(json_encode($result));
         return $result;
     }
 
@@ -402,7 +402,7 @@ class Speechkit
 
                 $response = $this->response($item, $voiceSetting);
                 $length = file_put_contents(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3', $response);
-
+                $this->log->error($response);
                 $getID3 = new getID3;
                 $file = $getID3->analyze(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3');
                 $seconds = $file['playtime_seconds'];
