@@ -39,6 +39,7 @@ class DownloadVideo extends UserController
                     }
 
                     header('Access-Control-Allow-Origin: *');
+                    header('Access-Control-Expose-Headers: Content-Disposition');
                     header('Content-Description: File Transfer');
                     header('Content-Type: application/octet-stream');
                     header('Content-Disposition: attachment; filename=' . $video['name'] . '.mp4');
