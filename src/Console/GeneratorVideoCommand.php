@@ -115,6 +115,7 @@ class GeneratorVideoCommand extends Command
 
             if ($video['status_voice'] == 0 || $video['status_voice'] == 'false') {
 
+                $this->log->info('Начало генерации аудио и субтитров');
                 $fileNameVoice = $videoId . '_' . $video['text_id'];
                 $voiceSetting = [
                     'format' => 'mp3',
@@ -126,6 +127,8 @@ class GeneratorVideoCommand extends Command
                     'voice_speed' => is_null($video['voice_speed']) ? '1.0' : $video['voice_speed'],
                 ];
 
+                $this->log->info(json_encode($voiceSetting));
+                exit();
                 $voiceData = (new Speechkit($this->log))->generatorWithSubtitles($video['text'], $fileNameVoice, $voiceSetting);
 
                 if ($voiceData['status']) {
