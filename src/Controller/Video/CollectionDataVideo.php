@@ -86,6 +86,8 @@ class CollectionDataVideo extends UserController
                     foreach ($data['musics_ids'] as $musicId) {
                         ListMusic::addMusic($musicId, $contentId);
                     }
+                } else {
+                    return $this->respondWithError(400, 'Не выбрана фоновая музыка');
                 }
 
                 if (!empty($data['images_ids'])) {
