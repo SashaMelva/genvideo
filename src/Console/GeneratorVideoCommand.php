@@ -338,7 +338,6 @@ class GeneratorVideoCommand extends Command
 
             if ((!empty($videoEnd) || !empty($videoStart)) && (file_exists(DIRECTORY_ADDITIONAL_VIDEO . $videoEnd[0]) || file_exists(DIRECTORY_ADDITIONAL_VIDEO . $videoStart[0]))) {
                 $this->log->info('Склека видео началась ' . $video['type_background']);
-                $this->log->info('Склека видео началась ' . $video['type_background'] == 'slide_show');
                 if ($video['type_background'] == 'video') {
                     $backgroundVideo = $generatorFiles->mergeVideo($resultName, $video['content_format'], $videoStart[0] ?? null, $videoEnd[0] ?? null);
                 }

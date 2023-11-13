@@ -392,7 +392,7 @@ class GeneratorFiles
     public function mergeVideoWithSize(string $nameVideoContent, string $format, ?string $nameVideoStart = null, ?string $nameVideoEnd = null): array
     {
         $fileName = $this->contentId . '_result';
-        $ffmpeg = 'ffmpeg -i ';
+        $ffmpeg = 'ffmpeg';
         $countVideo = 1;
 
         if (!is_null($nameVideoStart)) {
