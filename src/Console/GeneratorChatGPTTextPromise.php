@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Helpers\Multi;
 use App\Models\ContentVideo;
 use App\Models\GPTChatCabinet;
 use App\Models\GPTChatRequests;
@@ -55,6 +56,20 @@ class GeneratorChatGPTTextPromise extends Command
             $this->log->info('Получили запросы на генерацию');
         }
 
+
+        $scripts = [
+            __DIR__ . '\TestScript.php ',
+            __DIR__ . '\TestScript.php ',
+            __DIR__ . '\TestScript.php ',
+        ];
+
+        $callbackFunction = function () {
+            var_dump('WWWWWWWWWWWWWWWWW');
+//          file_get_contents( __DIR__, 'true qqq', FILE_APPEND | LOCK_EX);
+
+        };
+
+        new Multi($scripts, $callbackFunction);
         if (empty($requestsLists)) {
             $this->log->info('Нет запросов на генерацию');
             exec($cmd);
@@ -71,22 +86,22 @@ class GeneratorChatGPTTextPromise extends Command
             $data[$key]['proxy'] = ListCabinetGPTForProxy::findProxyByCabinetId($data[$key]['cabinet']['id']);
         }
 
-        $this->log->info('Начало ' . date('Y-m-s H:i:s'));
+        $this->log->info('Начало синхронный цикл ' . date('Y-m-s H:i:s'));
         foreach ($data as $query) {
             echo $query["request"]['id'] . ' ';
-//            sleep(5);
+            sleep(5);
             echo $query["request"]['id'] . ' | ';
         }
-        if ($this->status_log) {
-            $this->log->info('Конец ' . date('Y-m-s H:i:s'));
-        }
+        $this->log->info('Конец синхронный цикл' . date('Y-m-s H:i:s'));
 
 
 
-        foreach ($data as $query) {
-            $deferred = new Deferred();
+        $this->log->info('Начало асинхронный цикл' . date('Y-m-s H:i:s'));
+        $deferred = new Deferred();
 
-            $promise = $deferred->promise();
+        $promise = $deferred->promise();
+        foreach ($data as $key =>  $query) {
+//
 //            $transformedPromise = $promise
 //                ->then( $onFulfilled = null, $onRejected = null)
 //                ->catch(function (\Throwable $reason) {
@@ -97,7 +112,13 @@ class GeneratorChatGPTTextPromise extends Command
                 ->then(function () use ($query) {
 
                    echo $query["request"]['id'] . ' ';
-                  // sleep(5);
+                   sleep(5);
+                    echo $query["request"]['id'] . ' | ';
+                })
+                ->then(function () use ($query) {
+
+                    echo $query["request"]['id'] . ' ';
+                     sleep(5);
                     echo $query["request"]['id'] . ' | ';
                 })
                 ->catch(function (\Exception $x) {
@@ -107,83 +128,83 @@ class GeneratorChatGPTTextPromise extends Command
 
             $deferred->resolve(1);
         }
-        if ($this->status_log) {
-            $this->log->info('Конец ' . date('Y-m-s H:i:s'));
-        }
-
-//        getAwesomeResultPromise()
-//            ->then(
-//                function ($value) {
-//                    // Deferred resolved, do something with $value
-//                },
-//                function (\Throwable $reason) {
-//                    // Deferred rejected, do something with $reason
+//        if ($this->status_log) {
+//            $this->log->info('Конец асинхронный цикл' . date('Y-m-s H:i:s'));
+//        }
+//
+////        getAwesomeResultPromise()
+////            ->then(
+////                function ($value) {
+////                    // Deferred resolved, do something with $value
+////                },
+////                function (\Throwable $reason) {
+////                    // Deferred rejected, do something with $reason
+////                }
+////            );
+//        exit();
+//        $requestList = $requestsLists[0];
+//
+//        try {
+//
+//            if ($this->status_log) {
+//                $this->log->info('Запрос взят на отправку: ' . $requestList->id);
+//            }
+//            ListRequestGPTCabinet::changeStatus($requestList->id, 2);
+//
+//            $request = GPTChatRequests::findOne($requestList->id_request);
+//            ContentVideo::changeStatus($request['content_id'], 7);
+//
+//            $cabinet = GPTChatCabinet::findOne($requestList->id_cabinet);
+//            $proxy = ListCabinetGPTForProxy::findProxyByCabinetId($cabinet->id);
+//            $response = $this->response($proxy['ip_address'], $proxy['port'], $proxy['user_name'], $proxy['password'], $cabinet->api_key, $request->text_request);
+//            $this->log->info('Получили ответ со статусом: ' . $response['status']);
+//
+//            if ($response['status'] == 'ok') {
+//
+//                GPTChatCabinet::changeStatusCabinet($cabinet->id, true);
+//                ListRequestGPTCabinet::changeStatus($requestList->id, 4);
+//                GPTChatRequests::changeStatusAndContent($requestList->id_request, 4, $response['response']);
+//                ContentVideo::changeStatus($request->content_id, 8);
+//
+//            } elseif ($response['status'] == 'errorConnection') {
+//
+//                $this->log->info('Фиксируем ошибку в кабинете  ' . $cabinet->id . ' и отправляем запрос на получение нового кабинета ' . $requestList->id_request);
+//                GPTChatCabinet::changeStatusCabinet($cabinet->id, true);
+//                ListRequestGPTCabinet::changeStatusWithError($requestList->id, 3, $response['response']);
+//                GPTChatRequests::changeStatus($requestList->id_request, 5);
+//
+//            } else {
+//
+//                $this->log->info('Фиксируем ошибку в кабинете  ' . $cabinet->id . ' и отправляем запрос на получение нового кабинета ' . $requestList->id_request);
+//                $textError = $response['response'];
+//
+//                if (stripos($textError, 'Incorrect API key provided') !== false) {
+//                    GPTChatCabinet::changeStatusWorkCabinet($cabinet->id, 4, $response['response']);
+//                } elseif (stripos($textError, 'Rate limit reached for requests') || stripos($textError, 'Too Many Requests') !== false) {
+//                    GPTChatCabinet::changeStatusWorkCabinet($cabinet->id, 3, $response['response']);
+//                } elseif (stripos($textError, 'Service Unavailable') || stripos($textError, 'Bad gateway') !== false) {
+//                    GPTChatCabinet::changeStatusCabinet($cabinet->id, true);
+//                } else {
+//                    GPTChatCabinet::changeStatusWorkCabinet($cabinet->id, 2, $response['response']);
 //                }
-//            );
-        exit();
-        $requestList = $requestsLists[0];
+//
+//                ListRequestGPTCabinet::changeStatusWithError($requestList->id, 3, $response['response']);
+//                GPTChatRequests::changeStatus($requestList->id_request, 5);
+//            }
+//
+//        } catch (Exception $e) {
+//            $this->log->error($e->getMessage());
+//            $this->log->info('Запрос поставлен в очередь на получение нового кабинета');
+//            ListRequestGPTCabinet::changeStatus($requestList->id, 3);
+//            GPTChatRequests::changeStatus($requestList->id_request, 5);
+//        }
+//
+//        if ($this->status_log) {
+//            $this->log->info('Выполнено ' . date('Y-m-s H:i:s'));
+//        }
 
-        try {
-
-            if ($this->status_log) {
-                $this->log->info('Запрос взят на отправку: ' . $requestList->id);
-            }
-            ListRequestGPTCabinet::changeStatus($requestList->id, 2);
-
-            $request = GPTChatRequests::findOne($requestList->id_request);
-            ContentVideo::changeStatus($request['content_id'], 7);
-
-            $cabinet = GPTChatCabinet::findOne($requestList->id_cabinet);
-            $proxy = ListCabinetGPTForProxy::findProxyByCabinetId($cabinet->id);
-            $response = $this->response($proxy['ip_address'], $proxy['port'], $proxy['user_name'], $proxy['password'], $cabinet->api_key, $request->text_request);
-            $this->log->info('Получили ответ со статусом: ' . $response['status']);
-
-            if ($response['status'] == 'ok') {
-
-                GPTChatCabinet::changeStatusCabinet($cabinet->id, true);
-                ListRequestGPTCabinet::changeStatus($requestList->id, 4);
-                GPTChatRequests::changeStatusAndContent($requestList->id_request, 4, $response['response']);
-                ContentVideo::changeStatus($request->content_id, 8);
-
-            } elseif ($response['status'] == 'errorConnection') {
-
-                $this->log->info('Фиксируем ошибку в кабинете  ' . $cabinet->id . ' и отправляем запрос на получение нового кабинета ' . $requestList->id_request);
-                GPTChatCabinet::changeStatusCabinet($cabinet->id, true);
-                ListRequestGPTCabinet::changeStatusWithError($requestList->id, 3, $response['response']);
-                GPTChatRequests::changeStatus($requestList->id_request, 5);
-
-            } else {
-
-                $this->log->info('Фиксируем ошибку в кабинете  ' . $cabinet->id . ' и отправляем запрос на получение нового кабинета ' . $requestList->id_request);
-                $textError = $response['response'];
-
-                if (stripos($textError, 'Incorrect API key provided') !== false) {
-                    GPTChatCabinet::changeStatusWorkCabinet($cabinet->id, 4, $response['response']);
-                } elseif (stripos($textError, 'Rate limit reached for requests') || stripos($textError, 'Too Many Requests') !== false) {
-                    GPTChatCabinet::changeStatusWorkCabinet($cabinet->id, 3, $response['response']);
-                } elseif (stripos($textError, 'Service Unavailable') || stripos($textError, 'Bad gateway') !== false) {
-                    GPTChatCabinet::changeStatusCabinet($cabinet->id, true);
-                } else {
-                    GPTChatCabinet::changeStatusWorkCabinet($cabinet->id, 2, $response['response']);
-                }
-
-                ListRequestGPTCabinet::changeStatusWithError($requestList->id, 3, $response['response']);
-                GPTChatRequests::changeStatus($requestList->id_request, 5);
-            }
-
-        } catch (Exception $e) {
-            $this->log->error($e->getMessage());
-            $this->log->info('Запрос поставлен в очередь на получение нового кабинета');
-            ListRequestGPTCabinet::changeStatus($requestList->id, 3);
-            GPTChatRequests::changeStatus($requestList->id_request, 5);
-        }
-
-        if ($this->status_log) {
-            $this->log->info('Выполнено ' . date('Y-m-s H:i:s'));
-        }
-
-        exec($cmd);
-        return 0;
+//        exec($cmd);
+//        return 0;
     }
 //    private function getAwesomeResultPromise()
 //    {
