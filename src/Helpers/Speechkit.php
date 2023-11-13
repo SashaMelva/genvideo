@@ -53,7 +53,7 @@ class Speechkit
                 $file = $getID3->analyze($filePath);
                 $seconds = $file['playtime_seconds'];
 
-                if (isset($seconds) && !empty($filesName)) {
+                if (isset($seconds) && !is_null($filesName)) {
                     foreach ($filesName as $item) {
                         unlink($item);
                     }
@@ -61,7 +61,7 @@ class Speechkit
 
                 return ['status' => true, 'time' => $file['playtime_seconds'], 'name' => $fileName, 'command' => $data['command']];
 
-            } elseif (!empty($filesName)) {
+            } elseif (!is_null($filesName)) {
                 foreach ($filesName as $item) {
                     unlink($item);
                 }
