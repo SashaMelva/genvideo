@@ -23,12 +23,12 @@ class DownloadVideo extends UserController
      */
     public function action(): ResponseInterface
     {
-        $access_token = $this->request->getHeaderLine('token');
-        $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
+//        $access_token = $this->request->getHeaderLine('token');
+//        $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
         $contentId = $this->request->getAttribute('id');
         $video = ContentVideo::findByID($contentId);
 
-        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
+//        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
 
             try {
                 $file = DIRECTORY_VIDEO . $video['file_name'];
@@ -70,8 +70,8 @@ class DownloadVideo extends UserController
             } catch (Exception $e) {
                 return $this->respondWithError($e->getCode(), $e->getMessage());
             }
-        } else {
-            return $this->respondWithError(215);
-        }
+//        } else {
+//            return $this->respondWithError(215);
+//        }
     }
 }
