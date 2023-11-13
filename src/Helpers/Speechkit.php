@@ -397,10 +397,10 @@ class Speechkit
             $tmp_array = [];
             $subtitles = [];
             $nameAudio = [];
-
+            $this->log->error($delayBetweenParagraphMs);
             foreach ($Mp3Files as $key => $item) {
 
-                $response = $this->response($item, $voiceSetting);
+                $response = $this->response($item['text'], $voiceSetting);
                 $length = file_put_contents(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3', $response);
                 $this->log->error($response);
                 $getID3 = new getID3;
@@ -408,7 +408,7 @@ class Speechkit
                 $seconds = $file['playtime_seconds'];
 
                 $subtitles[] = [
-                    'text' => $item,
+                    'text' => $item['text'],
                     'time' => $seconds * 1000,
                 ];
 
