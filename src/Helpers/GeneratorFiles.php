@@ -502,6 +502,7 @@ class GeneratorFiles
         $fileSound = $getID3->analyze(DIRECTORY_MUSIC . $sound_name);
         $timeSound = $fileSound['playtime_seconds'];
 
+
         if ($sound_time > $timeSound) {
             $this->log->info('Зацикливание аудио');
             $sound_name_long = explode('.', $sound_name)[0] . '_long.mp3';

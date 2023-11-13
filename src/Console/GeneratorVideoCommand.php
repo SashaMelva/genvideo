@@ -181,6 +181,12 @@ class GeneratorVideoCommand extends Command
                     }
 
                     $this->log->info('Список изображений ' . json_encode($slidesName));
+
+                    if (empty($sound[0]['file_name'])) {
+                        ContentVideo::changeStatus($videoId, 13);
+                        $this->log->error('Фоновая музыка для слайдшоу не указана');
+                    }
+
                     $slideshow = $generatorFiles->generatorSladeShow($slidesName, $sound[0]['file_name'], $textData['time_voice'], $video['content_format']);
 
                     if (!$slideshow['status']) {
