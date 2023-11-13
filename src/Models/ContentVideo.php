@@ -28,7 +28,7 @@ class ContentVideo extends Model
         return self::query()->find($id)->getModel();
     }
 
-    public static function findByList(int $id, int $skip, int $take): array
+    public static function findByList(int $id, int $skip, int $take, string $sort): array
     {
         return self::query()
             ->select(
@@ -49,7 +49,7 @@ class ContentVideo extends Model
             ->leftJoin('status_content', 'content.status_id', '=', 'status_content.id')
 //            ->leftJoin('users', 'content.creator_id', '=', 'users.id')
             ->where([['content.project_id', '=', $id]])
-            ->orderBy('content.id')
+            ->orderBy('content.created_at', $sort ? 'ASC' : 'DESC')
             ->skip($skip)->take($take)
             ->get()->toArray();
     }
