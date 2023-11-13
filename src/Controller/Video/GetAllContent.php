@@ -39,7 +39,9 @@ class GetAllContent extends UserController
                     return $this->respondWithData([
                             'current_page' => $page,
                             'page_size' => $pageSize,
-                            'total_rows' => $countRows,]
+                            'total_rows' => $countRows,
+                            'sort_date_create' => $data['sort_date_create'],
+                            ]
                     );
                 }
 
@@ -58,12 +60,13 @@ class GetAllContent extends UserController
                     'total_page' => $totalPage,
                     'row_start' => $rowStart,
                     'row_end' => $rowEnd,
+                    'sort_date_create' => $data['sort_date_create'],
                     'rows' => [],
                 ];
 
 
                 if ($countRows > 0) {
-                    $resultData['rows'] = ContentVideo::findByList((int)$projectId, ($page - 1) * $pageSize, $pageSize);
+                    $resultData['rows'] = ContentVideo::findByList((int)$projectId, ($page - 1) * $pageSize, $pageSize, $data['sort_date_create']);
                 }
 
                 return $this->respondWithData($resultData);
