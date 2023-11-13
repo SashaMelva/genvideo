@@ -127,8 +127,6 @@ class GeneratorVideoCommand extends Command
                     'voice_speed' => is_null($video['voice_speed']) ? '1.0' : $video['voice_speed'],
                 ];
 
-                $this->log->info(json_encode($voiceSetting));
-                exit();
                 $voiceData = (new Speechkit($this->log))->generatorWithSubtitles($video['text'], $fileNameVoice, $voiceSetting);
 
                 if ($voiceData['status']) {

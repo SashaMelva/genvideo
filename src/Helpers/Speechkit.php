@@ -83,6 +83,7 @@ class Speechkit
         $desc = preg_replace("[\r\n]", ' ', $desc);
         $desc = str_replace('\n', '', $desc);
         $textArray = explode('.', $desc);
+        $this->log->error($desc);
         $countChar = 250;
         $result = [];
         $text = trim($textArray[0]) . '. ';
