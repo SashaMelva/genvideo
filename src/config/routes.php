@@ -39,7 +39,6 @@ use App\Controller\Users\GetUserInfo;
 use App\Controller\Video\CollectionDataVideo;
 use App\Controller\Video\CorrectionErrorsVideoGeneration;
 use App\Controller\Video\DownloadVideo;
-use App\Controller\Video\GeneratorVideo;
 use App\Controller\Video\GetAllContent;
 use App\Controller\Video\GetCollectionDataSettingVideo;
 use App\Controller\Video\GetContent;
@@ -96,7 +95,7 @@ return static function(App $app):void
             $group->post('/get-all', GetAllContent::class);
             $group->get('/get/{id:[0-9]+}', GetContent::class);
 
-            $group->get('/load/{id:[0-9]+}', DownloadVideo::class);
+            $group->get('/load/{id:[0-9]+}/{token}', DownloadVideo::class);
 
             $group->post('/send', SendVideo::class);
             //$group->get('/generate/{id:[0-9]+}', GeneratorVideo::class);
@@ -111,7 +110,7 @@ return static function(App $app):void
             $group->post('/add-video', UploadAdditionalVideo::class);
 
 
-            $group->get('/load-video/{id:[0-9]+}', LoadVideo::class);
+            $group->get('/load-video/{id:[0-9]+}/{token}', LoadVideo::class);
             $group->get('/load-music/{id:[0-9]+}', LoadMusic::class);
 
             $group->post('/import/excel', ImportDataForExcel::class);

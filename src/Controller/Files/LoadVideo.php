@@ -18,11 +18,12 @@ class LoadVideo extends UserController
      */
     public function action(): ResponseInterface
     {
-//        $access_token = $this->request->getHeaderLine('token');
         $videoId = $this->request->getAttribute('id');
+        $token = $this->request->getAttribute('token');
+
         $video = AdditionalVideo::findByID($videoId);
 
-//        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
+        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $token)) {
 
             try {
                 $file = DIRECTORY_ADDITIONAL_VIDEO . $video['file_name'];
@@ -64,8 +65,8 @@ class LoadVideo extends UserController
             } catch (Exception $e) {
                 return $this->respondWithError($e->getCode(), $e->getMessage());
             }
-//        } else {
-//            return $this->respondWithError(215);
-//        }
+        } else {
+            return $this->respondWithError(215);
+        }
     }
 }
