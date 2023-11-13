@@ -56,6 +56,7 @@ class GeneratorFiles
     {
         $ffmpeg = $this->getSlideShowCode($images, $sound_name, $time, $format);
 
+        $this->log->info($ffmpeg);
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         if (!is_null($errors)) {
@@ -502,9 +503,11 @@ class GeneratorFiles
         $timeSound = $fileSound['playtime_seconds'];
 
         if ($sound_time > $timeSound) {
+            $this->log->info('Зацикливание аудио');
             $sound_name_long = explode('.', $sound_name)[0] . '_long.mp3';
             $loop = ceil($sound_time / $timeSound);
             $ffmpeg = 'ffmpeg -stream_loop ' . $loop . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -c copy -t ' . ceil($sound_time) . ' -y ' . DIRECTORY_MUSIC . $sound_name_long;
+            $this->log->info($ffmpeg);
             $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
             $sound_name = $sound_name_long;
         }
