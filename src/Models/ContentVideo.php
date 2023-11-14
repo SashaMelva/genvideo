@@ -50,6 +50,7 @@ class ContentVideo extends Model
 //            ->leftJoin('users', 'content.creator_id', '=', 'users.id')
             ->where([['content.project_id', '=', $id]])
             ->orderBy('content.created_at', $sort ? 'ASC' : 'DESC')
+            ->orderBy('content.id')
             ->skip($skip)->take($take)
             ->get()->toArray();
     }
