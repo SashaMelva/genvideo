@@ -24,12 +24,12 @@ class GetToken extends UserController
             if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
 
                 $client->setAccessToken($_SESSION['access_token']);
-                $redirect_uri = 'http://localhost:8080/api/add-token/' . $userId;
+                $redirect_uri = 'https://api.genvi.pro/api/add-token/' . $userId;
                 return $this->response->withHeader('Location', filter_var($redirect_uri, FILTER_SANITIZE_URL));
 
             } else {
 
-                $redirect_uri = 'http://localhost:8080/api/token-callback';
+                $redirect_uri = 'https://api.genvi.pro/api/token-callback';
                 return $this->response->withHeader('Location', filter_var($redirect_uri, FILTER_SANITIZE_URL));
 
             }

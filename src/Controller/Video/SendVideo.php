@@ -94,7 +94,7 @@ class SendVideo extends UserController
 //            }
         } else {
 
-            $redirect_uri = 'http://localhost:8080/api/token/' . $userId;
+            $redirect_uri = 'https://api.genvi.pro/api/token/' . $userId;
             return $this->response->withHeader('Location', filter_var($redirect_uri, FILTER_SANITIZE_URL));
         }
 
