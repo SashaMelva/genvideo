@@ -22,14 +22,14 @@ class GetAllContent extends UserController
      */
     public function action(): ResponseInterface
     {
-        $access_token = $this->request->getHeaderLine('Token');
+//        $access_token = $this->request->getHeaderLine('Token');
         $data = json_decode($this->request->getBody()->getContents(), true);
-        $projectId = $data['project_id'];
+        $projectId = 36;// $data['project_id'];
 
-        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
+//        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
 
             try {
-                $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
+//                $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
                 $page = $data['page'] ?? 1;
                 $pageSize = $data['page_size'] ?? 30;
                 $countRows = ContentVideo::countContent((int)$projectId);
@@ -74,8 +74,8 @@ class GetAllContent extends UserController
             } catch (Throwable $e) {
                 return $this->respondWithError($e->getCode(), $e->getMessage());
             }
-        } else {
-            return $this->respondWithError(215);
-        }
+//        } else {
+//            return $this->respondWithError(215);
+//        }
     }
 }
