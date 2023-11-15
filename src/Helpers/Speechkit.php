@@ -47,6 +47,10 @@ class Speechkit
             $result = $data['status'];
             $filePath = DIRECTORY_SPEECHKIT . $fileName . '.mp3';
 
+            if (is_null($filesName)) {
+                return ['status' => false, 'command' => 'command'];
+            }
+
             if ($result) {
                 // узнать длину звуковой дорожки
                 $getID3 = new getID3;
@@ -85,9 +89,16 @@ class Speechkit
         $textArray = explode('.', $desc);
         $countChar = 250;
         $result = [];
+
+        if (count($textArray) == 1 || (count($textArray) == 2 && empty(trim($textArray[1])))) {
+            return ['text' => trim($textArray[0]) . '. ', 'merge' => false];
+        }
+
+
         $text = trim($textArray[0]) . '. ';
         unset($textArray[0]);
         $count = count($textArray);
+
 
         for ($i = 1; $i <= $count; $i++) {
 
@@ -132,6 +143,7 @@ class Speechkit
                 $result[] = ['text' => str_replace('?.', '?', $rep), 'merge' => false];
             }
         }
+
 
         return $result;
     }
@@ -190,13 +202,12 @@ class Speechkit
         $desc = trim($text);
         $textArray = explode('\n', $desc);
 
-
         foreach ($textArray as $value) {
             print_r([iconv_strlen($value), $value]);
         }
+
         $countChar = 250;
         $result = [];
-
 
         for ($l = 0; $l < count($textArray); $l++) {
 
