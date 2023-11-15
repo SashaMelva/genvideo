@@ -29,7 +29,7 @@ class GeneratorFiles
             $colorOutline = is_null($textData['text_color_background']) || !str_contains($textData['text_color_background'], '&H') ? '&H80000000' : $textData['text_color_background'];
         }
 
-        $colorText = is_null($textData['text_color']) || !str_contains($textData['text_color'], '&H') ? '&H00FFFFFF' : $textData['text_color'];
+        $colorText = is_null($textData['text_color']) || !str_contains($textData['text_color'], '&H') || !str_contains($textData['text_color'], '&h') ? '&H00FFFFFF' : $textData['text_color'];
 
         if ($formatVideo == '9/16') {
             $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -filter_complex "subtitles=\'' . $stringDirectory . $titerName . '.ass' . '\':force_style=' .
@@ -41,13 +41,14 @@ class GeneratorFiles
                 '" -c:v h264_nvenc -c:a copy -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
         }
 
+        $this->log->info($ffmpeg);
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         if (!is_null($errors)) {
             return ['status' => false, 'command' => $ffmpeg];
         }
 
-        unlink(DIRECTORY_VIDEO . $videoName . '.mp4');
+//        unlink(DIRECTORY_VIDEO . $videoName . '.mp4');
         return ['fileName' => $resultName, 'status' => true];
     }
 
@@ -103,7 +104,7 @@ class GeneratorFiles
         } else {
             $ffmpegForVideoArray = [];
             $timeVideoForLong = 0;
-            $resultArrayVideo =  [];
+            $resultArrayVideo = [];
 
             $this->log->info('Пользователь выбрал несколько фоновых видео');
             foreach ($nameVideos as $nameVideo) {
@@ -113,7 +114,7 @@ class GeneratorFiles
                 if ($this->mergeFiles($nameVideoNoExtension, DIRECTORY_ADDITIONAL_VIDEO)) {
                     $getID3 = new getID3;
                     $file = $getID3->analyze(DIRECTORY_ADDITIONAL_VIDEO . $nameVideo);
-                    $this->log->info($nameVideoNoExtension . '.ts Время файла '. $file['playtime_seconds']);
+                    $this->log->info($nameVideoNoExtension . '.ts Время файла ' . $file['playtime_seconds']);
                     $ffmpegForVideoArray[] = ['filePath' => DIRECTORY_ADDITIONAL_VIDEO . $nameVideoNoExtension . '.ts', 'time' => $file['playtime_seconds']];
                 } else {
                     return ['status' => false];
@@ -255,7 +256,9 @@ class GeneratorFiles
     {
         $resultName = $this->contentId . '_sound';
 
+        $this->log->info('Начало наложения озвучки');
         $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -i ' . DIRECTORY_SPEECHKIT . $nameFileVoice . '.mp3 -filter_complex "[0]volume=0.4[a];[1]volume=1.8[b];[a][b]amix=inputs=2:duration=longest" -c:v h264_nvenc -c:a libmp3lame -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
+        $this->log->info($ffmpeg);
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         if (!is_null($errors)) {
