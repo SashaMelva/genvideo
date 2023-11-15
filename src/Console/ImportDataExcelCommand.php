@@ -81,6 +81,8 @@ class ImportDataExcelCommand extends Command
                 'задержка между предложениями в миллисекундах',
                 'фоновое затемнение',
                 'тип фона',
+                'глубина тени',
+                'цвет тени',
                 'сгенерировать картинки',
                 'id картинок',
                 'id видео',
@@ -351,6 +353,8 @@ class ImportDataExcelCommand extends Command
                 'delay_between_paragraphs' => $row['задержка между абзацами в миллисекундах'],
                 'updated_at' => date('Y-m-d H:i:s'),
                 'created_at' => date('Y-m-d H:i:s'),
+                'shadow' => $row['глубина тени'],
+                'back_colour' => $row['цвет тени'],
             ]
         );
     }

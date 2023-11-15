@@ -22,6 +22,7 @@ class GeneratorFiles
         $resultName = $this->contentId . '_text';
         $stringDirectory = str_replace('\\', '\\\\', DIRECTORY_TEXT);
         $stringDirectory = str_replace(':', '\\:', $stringDirectory);
+        $fontSize = 16;
 
         if ($textData['text_color_background'] == 'Нет') {
             $colorOutline = '&HFF000000';
@@ -32,12 +33,16 @@ class GeneratorFiles
         $colorText = is_null($textData['text_color']) ? '&H00FFFFFF' : $textData['text_color'];
 
         if ($formatVideo == '9/16') {
+            $fontSize = 12;
+        }
+
+        if (is_null($textData['shadow']) || $textData['shadow'] == '0') {
             $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -filter_complex "subtitles=\'' . $stringDirectory . $titerName . '.ass' . '\':force_style=' .
-                "'OutlineColour=$colorOutline,PrimaryColour=$colorText,BorderStyle=3,Outline=1,FontSize=12,LineSpacing=2,Shadow=0,MarginV=110'" .
+                "'OutlineColour=$colorOutline,PrimaryColour=$colorText,BorderStyle=3,Outline=1,FontSize=$fontSize,Shadow=0,MarginV=110'" .
                 '" -c:v h264_nvenc -c:a copy -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
         } else {
             $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -filter_complex "subtitles=\'' . $stringDirectory . $titerName . '.ass' . '\':force_style=' .
-                "'OutlineColour=$colorOutline,PrimaryColour=$colorText,BorderStyle=3,Outline=1,Shadow=0,LineSpacing=2,MarginV=110'" .
+                "'PrimaryColour=$colorText,Outline=0,FontSize=$fontSize,Shadow=" . $textData['shadow'] . ",BackColour=" . $textData['back_colour'] . ",MarginV=110'" .
                 '" -c:v h264_nvenc -c:a copy -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
         }
 
