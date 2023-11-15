@@ -113,19 +113,22 @@ class GeneratorFiles
                 if ($this->mergeFiles($nameVideoNoExtension, DIRECTORY_ADDITIONAL_VIDEO)) {
                     $getID3 = new getID3;
                     $file = $getID3->analyze(DIRECTORY_ADDITIONAL_VIDEO . $nameVideo);
-
+                    $this->log->info($nameVideoNoExtension . '.ts Время файла '. $file['playtime_seconds']);
                     $ffmpegForVideoArray[] = ['filePath' => DIRECTORY_ADDITIONAL_VIDEO . $nameVideoNoExtension . '.ts', 'time' => $file['playtime_seconds']];
                 } else {
                     return ['status' => false];
                 }
             }
 
-            foreach ($ffmpegForVideoArray as $value) {
-                $timeVideoForLong += $value['time'];
-                $resultArrayVideo[] = $value['filePath'];
+            $counter = 0;
 
-                if ($timeVideoForLong >= ceil($timeVoice)) {
-                    break;
+            while ($timeVideoForLong < ceil($timeVoice)) {
+                $timeVideoForLong += $ffmpegForVideoArray[$counter]['time'];
+                $resultArrayVideo[] = $ffmpegForVideoArray[$counter]['filePath'];
+                $counter += 1;
+
+                if ($counter == count($resultArrayVideo)) {
+                    $counter = 0;
                 }
             }
 
