@@ -317,6 +317,7 @@ class GeneratorVideoCommand extends Command
                 $this->log->info('Озвучка наложена, имя файла ' . $resultName);
             }
 
+            $this->log->info('Начало наложения субтитров для файла ' . $resultName . $textData['subtitles']);
             if (is_null($textData['subtitles']) || $textData['subtitles']) {
 
                 $this->log->info('Название файла субтитров  ' . $textData['file_name_voice']);
