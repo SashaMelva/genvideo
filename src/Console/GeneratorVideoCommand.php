@@ -212,9 +212,10 @@ class GeneratorVideoCommand extends Command
                 if (!empty($videoBackground) && file_exists(DIRECTORY_ADDITIONAL_VIDEO . $videoBackground[0])) {
                     $this->log->info('Начало формирования новго видео');
 
-                    $additionalVideoName = $videoBackground[0];
+                    $this->log->info('Видео для склейки ' . json_encode($videoBackground));
+                    $additionalVideoName = $videoBackground;
 
-                    if (!file_exists(DIRECTORY_ADDITIONAL_VIDEO . $additionalVideoName)) {
+                    if (!file_exists(DIRECTORY_ADDITIONAL_VIDEO . $videoBackground[0])) {
                         ContentVideo::changeStatus($videoId, 13);
                         $this->log->info('Не найдено основное видео');
                         exec($cmd);
@@ -224,17 +225,22 @@ class GeneratorVideoCommand extends Command
                     /**Подгоняем видео под формат*/
                     if ($video['content_format'] == '9/16') {
                         $this->log->info('Перобразование формата');
-                        $formatVideo = $generatorFiles->generatorVideoFormat($additionalVideoName);
+                        $additionalVideoName = [];
 
-                        if (!$formatVideo['status']) {
-                            ContentVideo::changeStatus($videoId, 13);
-                            $this->log->error('Ошибка преобразования формата видео');
-                            exec($cmd);
-                            return 0;
+                        foreach ($videoBackground as $video) {
+                            $formatVideo = $generatorFiles->generatorVideoFormat($video);
+
+                            if (!$formatVideo['status']) {
+                                ContentVideo::changeStatus($videoId, 13);
+                                $this->log->error('Ошибка преобразования формата видео');
+                                exec($cmd);
+                                return 0;
+                            }
+
+                            $additionalVideoName[] = $formatVideo['fileName'];
                         }
 
-                        $additionalVideoName = $formatVideo['fileName'];
-                        $this->log->info('Успех преобразования формата видео, имя файла ' . $additionalVideoName);
+                        $this->log->info('Успех преобразования формата видео, имя файла ' . json_encode($additionalVideoName));
                     }
 
                     if (!file_exists(DIRECTORY_MUSIC . $sound[0]['file_name'])) {

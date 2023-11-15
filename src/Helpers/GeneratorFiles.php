@@ -67,13 +67,15 @@ class GeneratorFiles
     }
 
     /**Генерируем видео с фоновой музыкой*/
-    public function generatorBackgroundVideoAndMusic(string $nameVideo, string $sound_name, string $timeVoice): array
+    public function generatorBackgroundVideoAndMusic(array $nameVideos, string $sound_name, string $timeVoice): array
     {
         $resultName = $this->contentId . '_music';
+        $resultNameLongVideo = $this->contentId . '_longVideoResult';
         $errors = '';
         $getID3 = new getID3;
         $fileSound = $getID3->analyze(DIRECTORY_MUSIC . $sound_name);
         $timeSound = $fileSound['playtime_seconds'];
+        $timeVideo = 0;
 
         $this->log->info('Время озвучки текста ' . $timeVoice . ' Время фоновой музыки ' . $timeSound);
         if ($timeVoice > $timeSound) {
@@ -85,17 +87,55 @@ class GeneratorFiles
         }
 
         $getID3 = new getID3;
-        $file = $getID3->analyze(DIRECTORY_ADDITIONAL_VIDEO . $nameVideo);
-        $timeVideo = $file['playtime_seconds'];
+        $file = $getID3->analyze(DIRECTORY_ADDITIONAL_VIDEO . $nameVideos[0]);
+        $timeVideo += $file['playtime_seconds'];
 
         $this->log->info('Время фоновго видео ' . $timeVideo . ' Время фоновой музыки ' . $timeSound);
-        if ($timeVoice > $timeVideo) {
-            $resultName = $resultName . '_new';
-            $loop = ceil($timeVoice / $timeVideo);
-            $ffmpeg = 'ffmpeg  -stream_loop ' . $loop . ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -t ' . ceil($timeVoice) . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
+
+        if (count($nameVideos) == 1) {
+            if ($timeVoice > $timeVideo) {
+                $resultName = $resultName . '_new';
+                $loop = ceil($timeVoice / $timeVideo);
+                $ffmpeg = 'ffmpeg  -stream_loop ' . $loop . ' -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideos[0] . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -t ' . ceil($timeVoice) . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
+            } else {
+                $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideos[0] . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -t ' . ceil($timeVoice) . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
+            }
         } else {
-            $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $nameVideo . ' -i ' . DIRECTORY_MUSIC . $sound_name . ' -t ' . ceil($timeVoice) . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
+            $ffmpegForVideoArray = [];
+            $timeVideoForLong = 0;
+            $resultArrayVideo =  [];
+
+            $this->log->info('Пользователь выбрал несколько фоновых видео');
+            foreach ($nameVideos as $nameVideo) {
+
+                $nameVideoNoExtension = explode('.', $nameVideo)[0];
+                $this->log->info('Преобразование видео ' . $nameVideo . ' в формат ts');
+                if ($this->mergeFiles($nameVideoNoExtension, DIRECTORY_ADDITIONAL_VIDEO)) {
+                    $getID3 = new getID3;
+                    $file = $getID3->analyze(DIRECTORY_ADDITIONAL_VIDEO . $nameVideo);
+
+                    $ffmpegForVideoArray[] = ['filePath' => DIRECTORY_ADDITIONAL_VIDEO . $nameVideoNoExtension . '.ts', 'time' => $file['playtime_seconds']];
+                } else {
+                    return ['status' => false];
+                }
+            }
+
+            foreach ($ffmpegForVideoArray as $value) {
+                $timeVideoForLong += $value['time'];
+                $resultArrayVideo[] = $value['filePath'];
+
+                if ($timeVideoForLong >= ceil($timeVoice)) {
+                    break;
+                }
+            }
+
+            $ffmpegForVideo = 'ffmpeg -i "concat:' . implode('|', $resultArrayVideo) . '" -vcodec  h264_nvenc -acodec copy -y ' . DIRECTORY_ADDITIONAL_VIDEO . $resultNameLongVideo . '.mp4';
+            $this->log->info($ffmpegForVideo);
+            shell_exec($ffmpegForVideo . ' -hide_banner -loglevel error 2>&1');
+
+            $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $resultNameLongVideo . '.mp4 -i ' . DIRECTORY_MUSIC . $sound_name . ' -t ' . ceil($timeVoice) . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
         }
+
 
         $this->log->info($ffmpeg);
         $errors .= shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
@@ -428,7 +468,7 @@ class GeneratorFiles
         $this->log->info(json_encode($fileMainVideoFormat));
 
         if ($fileMainVideoFormat['status']) {
-            $ffmpeg .= ' -i ' .  DIRECTORY_VIDEO . $fileMainVideoFormat['fileName'] . '.mp4';
+            $ffmpeg .= ' -i ' . DIRECTORY_VIDEO . $fileMainVideoFormat['fileName'] . '.mp4';
         } else {
             return ['status' => false, 'command' => $ffmpeg];
         }
