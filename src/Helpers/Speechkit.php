@@ -41,6 +41,7 @@ class Speechkit
             } else {
                 $this->log->info('Задержка не требуется');
                 $resultText = $this->spillSubtitles($text);
+                $this->log->info(json_encode($resultText));
                 $data = $this->SplitMp3($resultText, $fileName, $voiceSetting);
             }
 
