@@ -26,7 +26,7 @@ class GeneratorFiles
         if ($textData['text_color_background'] == 'Нет') {
             $colorOutline = '&HFF000000';
         } else {
-            $colorOutline = is_null($textData['text_color_background']) || !str_contains($textData['text_color_background'], '&H') ? '&H80000000' : $textData['text_color_background'];
+            $colorOutline = is_null($textData['text_color_background']) || !str_contains($textData['text_color_background'], '&H') || !str_contains($textData['text_color_background'], '&h') ? '&H80000000' : $textData['text_color_background'];
         }
 
         $colorText = is_null($textData['text_color']) || !str_contains($textData['text_color'], '&H') || !str_contains($textData['text_color'], '&h') ? '&H00FFFFFF' : $textData['text_color'];
