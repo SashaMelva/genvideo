@@ -28,16 +28,18 @@ class Speechkit
         try {
             if ($voiceSetting['delay_between_offers_ms'] > 0) {
 
+                $this->log->info('Задержка между предложениями');
                 $resultText = $this->spillSubtitlesOffers($text);
                 $data = $this->SplitMp3New($resultText, $fileName, $voiceSetting, $voiceSetting['delay_between_offers_ms']);
 
             } elseif ($voiceSetting['delay_between_paragraphs_ms'] > 0) {
 
+                $this->log->info('Задержка между абзацами');
                 $resultText = $this->spillSubtitlesParagraph($text);
                 $data = $this->SplitMp3New($resultText, $fileName, $voiceSetting, $voiceSetting['delay_between_paragraphs_ms']);
 
             } else {
-
+                $this->log->info('Задержка не требуется');
                 $resultText = $this->spillSubtitles($text);
                 $data = $this->SplitMp3($resultText, $fileName, $voiceSetting);
             }
