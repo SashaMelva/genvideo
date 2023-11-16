@@ -110,7 +110,6 @@ class GeneratorFiles
             }
         } else {
             $ffmpegForVideoArray = [];
-            $timeVideoForLong = 0;
             $resultArrayVideo = [];
 
             foreach ($nameVideos as $nameVideo) {
@@ -128,6 +127,7 @@ class GeneratorFiles
             }
             $this->log->info('Пользователь выбрал несколько фоновых видео' . json_encode($ffmpegForVideoArray));
             $counter = 0;
+            $timeVideoForLong = 0;
 
             while ($timeVideoForLong < ceil($timeVoice)) {
 
@@ -137,7 +137,7 @@ class GeneratorFiles
                 $resultArrayVideo[] = $ffmpegForVideoArray[$counter]['filePath'];
                 $counter += 1;
 
-                if ($counter == count($resultArrayVideo)) {
+                if ($counter == count($ffmpegForVideoArray)) {
                     $counter = 0;
                 }
             }
@@ -249,7 +249,7 @@ class GeneratorFiles
     public function generatorLogo(string $nameFileLogo, string $videoName): array
     {
         $resultName = $this->contentId . '_logo';
-        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -i ' . DIRECTORY_LOGO_IMG . $nameFileLogo . ' -filter_complex "[1:v]scale=270:-1,format=yuva420p [overlay]; [0:v][overlay] overlay=30:30" -c:v h264_nvenc -c:a copy -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
+        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -i ' . DIRECTORY_LOGO_IMG . $nameFileLogo . ' -filter_complex "[1:v]scale=120:-1,format=yuva420p [overlay]; [0:v][overlay] overlay=20:20" -c:v h264_nvenc -c:a copy -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
         shell_exec($ffmpeg);
 
         $this->log->info($ffmpeg);
