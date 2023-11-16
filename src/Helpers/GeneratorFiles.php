@@ -127,7 +127,7 @@ class GeneratorFiles
                 }
             }
             $this->log->info('Пользователь выбрал несколько фоновых видео' . json_encode($ffmpegForVideoArray));
-            $counter = 1;
+            $counter = 0;
 
             while ($timeVideoForLong < ceil($timeVoice)) {
 
