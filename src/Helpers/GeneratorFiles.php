@@ -127,7 +127,7 @@ class GeneratorFiles
                 }
             }
             $this->log->info('Пользователь выбрал несколько фоновых видео' . json_encode($ffmpegForVideoArray));
-            $counter = 0;
+            $counter = 1;
 
             while ($timeVideoForLong < ceil($timeVoice)) {
 
@@ -252,7 +252,7 @@ class GeneratorFiles
         $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -i ' . DIRECTORY_LOGO_IMG . $nameFileLogo . ' -filter_complex "[1:v]scale=270:-1,format=yuva420p [overlay]; [0:v][overlay] overlay=30:30" -c:v h264_nvenc -c:a copy -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
         shell_exec($ffmpeg);
 
-//        $this->log->info($ffmpeg);
+        $this->log->info($ffmpeg);
 //        if (!is_null($errors)) {
 //            return ['status' => false];
 //        }
