@@ -23,6 +23,7 @@ class GeneratorFiles
         $stringDirectory = str_replace('\\', '\\\\', DIRECTORY_TEXT);
         $stringDirectory = str_replace(':', '\\:', $stringDirectory);
         $fontSize = 16;
+        $margin = ',MarginL=45,MarginR=45';
 
         if ($textData['text_color_background'] == 'Нет') {
             $colorOutline = '&HFF000000';
@@ -34,15 +35,16 @@ class GeneratorFiles
 
         if ($formatVideo == '9/16') {
             $fontSize = 12;
+            $margin ='';
         }
 
         if (is_null($textData['shadow']) || $textData['shadow'] == '0') {
             $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -filter_complex "subtitles=\'' . $stringDirectory . $titerName . '.ass' . '\':force_style=' .
-                "'OutlineColour=$colorOutline,PrimaryColour=$colorText,BorderStyle=3,Outline=1,FontSize=$fontSize,Shadow=0,MarginV=110'" .
+                "'OutlineColour=$colorOutline,PrimaryColour=$colorText,BorderStyle=3,Outline=1,FontSize=$fontSize,Shadow=0,MarginV=110$margin'" .
                 '" -c:v h264_nvenc -c:a copy -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
         } else {
             $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -filter_complex "subtitles=\'' . $stringDirectory . $titerName . '.ass' . '\':force_style=' .
-                "'PrimaryColour=$colorText,Outline=0,FontSize=$fontSize,Shadow=" . $textData['shadow'] . ",BackColour=" . $textData['back_colour'] . ",MarginV=110'" .
+                "'PrimaryColour=$colorText,Outline=0,FontSize=$fontSize,Shadow=" . $textData['shadow'] . ",BackColour=" . $textData['back_colour'] . ",MarginV=110$margin'" .
                 '" -c:v h264_nvenc -c:a copy -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
         }
 
@@ -111,7 +113,7 @@ class GeneratorFiles
             $timeVideoForLong = 0;
             $resultArrayVideo = [];
 
-            $this->log->info('Пользователь выбрал несколько фоновых видео');
+            $this->log->info('Пользователь выбрал несколько фоновых видео' . json_encode($nameVideos));
             foreach ($nameVideos as $nameVideo) {
 
                 $nameVideoNoExtension = explode('.', $nameVideo)[0];
@@ -125,7 +127,7 @@ class GeneratorFiles
                     return ['status' => false];
                 }
             }
-
+            $this->log->info('Пользователь выбрал несколько фоновых видео' . json_encode($ffmpegForVideoArray));
             $counter = 0;
 
             while ($timeVideoForLong < ceil($timeVoice)) {
@@ -247,7 +249,7 @@ class GeneratorFiles
         $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -i ' . DIRECTORY_LOGO_IMG . $nameFileLogo . ' -filter_complex "[1:v]scale=270:-1,format=yuva420p [overlay]; [0:v][overlay] overlay=30:30" -c:v h264_nvenc -c:a copy -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
-        var_dump($ffmpeg);
+        $this->log->info($ffmpeg);
         if (!is_null($errors)) {
             return ['status' => false];
         }
