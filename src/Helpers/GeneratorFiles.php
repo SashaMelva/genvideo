@@ -98,7 +98,7 @@ class GeneratorFiles
         $file = $getID3->analyze(DIRECTORY_ADDITIONAL_VIDEO . $nameVideos[0]);
         $timeVideo += $file['playtime_seconds'];
 
-        $this->log->info('Время фоновго видео ' . $timeVideo . ' Время фоновой музыки ' . $timeSound);
+        $this->log->info('Время фоновго видео ' . $timeVideo . ' Время озвучки ' . $timeVoice);
 
         if (count($nameVideos) == 1) {
             if ($timeVoice > $timeVideo) {
@@ -113,7 +113,6 @@ class GeneratorFiles
             $timeVideoForLong = 0;
             $resultArrayVideo = [];
 
-            $this->log->info('Пользователь выбрал несколько фоновых видео' . json_encode($nameVideos));
             foreach ($nameVideos as $nameVideo) {
 
                 $nameVideoNoExtension = explode('.', $nameVideo)[0];
@@ -131,6 +130,9 @@ class GeneratorFiles
             $counter = 0;
 
             while ($timeVideoForLong < ceil($timeVoice)) {
+
+                $this->log->info('Сумма времени видео' . $timeVideoForLong . 'Время видео ' . $ffmpegForVideoArray[$counter]['time']. ' Название файла '  .$ffmpegForVideoArray[$counter]['filePath'].  ' Время озвучки ' . ceil($timeVoice));
+
                 $timeVideoForLong += $ffmpegForVideoArray[$counter]['time'];
                 $resultArrayVideo[] = $ffmpegForVideoArray[$counter]['filePath'];
                 $counter += 1;
@@ -140,6 +142,7 @@ class GeneratorFiles
                 }
             }
 
+            $this->log->info('Склейка фоновых видео');
             $ffmpegForVideo = 'ffmpeg -i "concat:' . implode('|', $resultArrayVideo) . '" -vcodec  h264_nvenc -acodec copy -y ' . DIRECTORY_ADDITIONAL_VIDEO . $resultNameLongVideo . '.mp4';
             $this->log->info($ffmpegForVideo);
             shell_exec($ffmpegForVideo . ' -hide_banner -loglevel error 2>&1');
@@ -147,7 +150,7 @@ class GeneratorFiles
             $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $resultNameLongVideo . '.mp4 -i ' . DIRECTORY_MUSIC . $sound_name . ' -t ' . ceil($timeVoice) . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
         }
 
-
+        $this->log->info('Наложение звука на видео');
         $this->log->info($ffmpeg);
         $errors .= shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
