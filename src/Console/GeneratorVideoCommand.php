@@ -28,7 +28,7 @@ class GeneratorVideoCommand extends Command
     protected function configure(): void
     {
         $log = new Logger('info');
-        $log->pushHandler(new RotatingFileHandler('../var/log/generator-video.log', 2, Logger::INFO));
+        $log->pushHandler(new RotatingFileHandler('../var/log/generator-video-qq.log', 2, Logger::INFO));
         $log->pushHandler(new StreamHandler('php://stdout'));
 
         $this->log = $log;
@@ -127,7 +127,8 @@ class GeneratorVideoCommand extends Command
                     'voice_speed' => is_null($video['voice_speed']) ? '1.0' : $video['voice_speed'],
                 ];
 
-                $voiceData = (new Speechkit($this->log))->generatorWithSubtitles($video['text'], $fileNameVoice, $voiceSetting);
+                $textVideo = trim($video['initial_text']) . trim($video['text']) . trim($video['end_text']);
+                $voiceData = (new Speechkit($this->log))->generatorWithSubtitles($textVideo, $fileNameVoice, $voiceSetting);
 
                 if ($voiceData['status']) {
 
