@@ -247,14 +247,14 @@ class GeneratorFiles
     {
         $resultName = $this->contentId . '_logo';
         $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -i ' . DIRECTORY_LOGO_IMG . $nameFileLogo . ' -filter_complex "[1:v]scale=270:-1,format=yuva420p [overlay]; [0:v][overlay] overlay=30:30" -c:v h264_nvenc -c:a copy -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
-        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+        shell_exec($ffmpeg);
 
-        $this->log->info($ffmpeg);
-        if (!is_null($errors)) {
-            return ['status' => false];
-        }
+//        $this->log->info($ffmpeg);
+//        if (!is_null($errors)) {
+//            return ['status' => false];
+//        }
 
-        unlink(DIRECTORY_VIDEO . $videoName . '.mp4');
+//        unlink(DIRECTORY_VIDEO . $videoName . '.mp4');
         return ['fileName' => $resultName, 'status' => true];
     }
 
