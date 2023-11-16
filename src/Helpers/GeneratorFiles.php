@@ -143,11 +143,11 @@ class GeneratorFiles
             }
 
             $this->log->info('Склейка фоновых видео');
-            $ffmpegForVideo = 'ffmpeg -i "concat:' . implode('|', $resultArrayVideo) . '" -vcodec  h264_nvenc -acodec copy -y ' . DIRECTORY_ADDITIONAL_VIDEO . $resultNameLongVideo . '.mp4';
+            $ffmpegForVideo = 'ffmpeg -i "concat:' . implode('|', $resultArrayVideo) . '" -vcodec  h264_nvenc -acodec copy  -y ' . DIRECTORY_ADDITIONAL_VIDEO . $resultNameLongVideo . '.mp4';
             $this->log->info($ffmpegForVideo);
             shell_exec($ffmpegForVideo . ' -hide_banner -loglevel error 2>&1');
 
-            $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $resultNameLongVideo . '.mp4 -i ' . DIRECTORY_MUSIC . $sound_name . ' -t ' . ceil($timeVoice) . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
+            $ffmpeg = 'ffmpeg -i ' . DIRECTORY_ADDITIONAL_VIDEO . $resultNameLongVideo . '.mp4 -i ' . DIRECTORY_MUSIC . $sound_name . ' -t ' . ceil($timeVoice) . ' -c:v h264_nvenc -c:a aac -map 0:v:0 -map 1:a:0 -b:v 8000k -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
         }
 
         $this->log->info('Наложение звука на видео');
