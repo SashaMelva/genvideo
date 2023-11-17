@@ -99,7 +99,7 @@ return static function(App $app):void
 
             $group->post('/send', SendVideo::class);
             //$group->get('/generate/{id:[0-9]+}', GeneratorVideo::class);
-            $group->get('/test', TestController::class);
+//            $group->get('/test', TestController::class);
 
             $group->get('/correction-errors/{id:[0-9]+}', CorrectionErrorsVideoGeneration::class);
         });
