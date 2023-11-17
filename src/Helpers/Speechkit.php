@@ -258,7 +258,7 @@ class Speechkit
         return $result;
     }
 
-    private function SplitMp3New($Mp3Files, $number, array $voiceSetting, int $delayBetween): array
+    private function SplitMp3New($Mp3Files, $number, array $voiceSetting, int $delayBetween, int $delayEnd): array
     {
         try {
 
@@ -377,7 +377,7 @@ class Speechkit
             $tmp_array[] = DIRECTORY_SPEECHKIT . $cutFrontVideo . '.mp3';
 
 //            $this->log->info('Добавлям в конец файла две секунды');
-            $ffmpegShortAudioResult = 'ffmpeg -i ' . DIRECTORY_SPEECHKIT . $cutFrontVideo . '.mp3 -af "apad=pad_dur=2" -y ' . DIRECTORY_SPEECHKIT . $number . '.mp3';
+            $ffmpegShortAudioResult = 'ffmpeg -i ' . DIRECTORY_SPEECHKIT . $cutFrontVideo . '.mp3 -af "apad=pad_dur=' . $delayEnd . '" -y ' . DIRECTORY_SPEECHKIT . $number . '.mp3';
 //            $this->log->info($ffmpegShortAudioResult);
             shell_exec($ffmpegShortAudioResult . ' -hide_banner -loglevel error 2>&1');
 
@@ -451,8 +451,15 @@ class Speechkit
             }
 
 
-            $ffmpeg = 'ffmpeg -i "concat:' . $voices . '"  -acodec copy -c:a libmp3lame ' . DIRECTORY_SPEECHKIT . $number . '.mp3';
+            $ffmpeg = 'ffmpeg -i "concat:' . $voices . '"  -acodec copy -c:a libmp3lame ' . DIRECTORY_SPEECHKIT . $number . '_short.mp3';
             $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+//            $tmp_array[] = DIRECTORY_SPEECHKIT . $number . '_short.mp3';
+
+            //$this->log->info('Добавлям в конец файла две секунды');
+            $ffmpegShortAudioResult = 'ffmpeg -i ' . DIRECTORY_SPEECHKIT . $number . '_short.mp3 -af "apad=pad_dur=' . $voiceSetting['delay_end_video'] . '" -y ' . DIRECTORY_SPEECHKIT . $number . '.mp3';
+//            $this->log->info($ffmpegShortAudioResult);
+            shell_exec($ffmpegShortAudioResult . ' -hide_banner -loglevel error 2>&1');
+
             /**для субтитров*/
             $length = file_put_contents(DIRECTORY_TEXT . $number . '.srt', $this->getFilesSrt($subtitles, $delayBetweenParagraphMs));
 

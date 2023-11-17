@@ -135,6 +135,7 @@ class ContentVideo extends Model
         string  $textId,
         string  $ampulaVoice,
         ?int  $statusGeneratorImage = 0,
+        ?string $delayEndVideo = '3',
     ): ContentVideo
     {
         $newContent = new ContentVideo();
@@ -153,7 +154,7 @@ class ContentVideo extends Model
         $newContent->setAttribute('text_id', $textId);
         $newContent->setAttribute('ampula_voice', $ampulaVoice);
         $newContent->setAttribute('genertor_image_status', $statusGeneratorImage);
-
+        $newContent->setAttribute('delay_end_video', $delayEndVideo);
         $newContent->save();
         return $newContent;
     }

@@ -125,6 +125,7 @@ class GeneratorVideoCommand extends Command
                     'delay_between_offers_ms' => is_null($video['delay_between_offers']) ? 0 : $video['delay_between_offers'],
                     'delay_between_paragraphs_ms' => is_null($video['delay_between_paragraphs']) ? 0 : $video['delay_between_paragraphs'],
                     'voice_speed' => is_null($video['voice_speed']) ? '1.0' : $video['voice_speed'],
+                    'delay_end_video' => is_null($video['delay_end_video']) ? 3 : $video['delay_end_video']
                 ];
 
                 $textVideo = trim($video['initial_text']) . trim($video['text']) . trim($video['end_text']);
