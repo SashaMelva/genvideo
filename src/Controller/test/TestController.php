@@ -49,33 +49,78 @@ class TestController extends UserController
         $this->log = $log;
         $this->status_log = true;
 
-        $videoId = 174;
-        $resultName = '174_text';
-        $video = ContentVideo::findAllDataByID($videoId);
-        $video['video'] = ListVideo::findAllByContentId($videoId);
+        $text = 'Влияние медитации \n на нахождение равновесия \n в повседневной жизни';
+        $textArray = explode('\n', $text);
 
-        foreach ($video['video'] as $additionalVideo) {
-            if ($additionalVideo['type'] == 'content') {
-                $videoBackground[] = $additionalVideo['file_name'];
-            }
+        $this->log->info(json_encode($textArray));
+        $resultImage = 'preview_result.jpg';
+        $videoName = '422_text.mp4';
 
-            if ($additionalVideo['type'] == 'start') {
-                $videoStart[] = $additionalVideo['file_name'];
-            }
+        if (count($textArray) == 1) {
 
-            if ($additionalVideo['type'] == 'end') {
-                $videoEnd[] = $additionalVideo['file_name'];
-            }
-        }
+            $this->log->info('Одна строчка текста, добавили субтитр на первый кадр 5 секунды видео');
+            $ffmpeg = 'ffmpeg -ss 00:00:05 -i ' . DIRECTORY_VIDEO . $videoName. ' -frames:v 1 -vf "drawtext=fontfile=' . DIRECTORY_FONTS . 'arial_bold.ttf: text=' . $textArray[0] . ': fontcolor=black:line_spacing=0:  fontsize=84: box=0: boxcolor=yellow: boxborderw=10: x=20:y=60" -y  ' . DIRECTORY_PREVIEW . $resultImage;
+            $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+            $this->log->info($ffmpeg);
 
-        $generatorFiles = new GeneratorFiles($videoId, $this->log);
-        if ($video['type_background'] == 'video') {
-            $backgroundVideo = $generatorFiles->mergeVideo($resultName, $video['content_format'], $videoStart[0] ?? null, $videoEnd[0] ?? null);
         } else {
-            $backgroundVideo = $generatorFiles->mergeVideoWithSize($resultName, $video['content_format'], $videoStart[0] ?? null, $videoEnd[0] ?? null);
+            $this->log->info('Берём первую строчку текстта и выризаем из видео кадр');
+            $ffmpeg = 'ffmpeg -ss 00:00:05 -i ' . DIRECTORY_VIDEO . $videoName. ' -frames:v 1 -vf "drawtext=fontfile=' . DIRECTORY_FONTS . 'arial_bold.ttf: text=' . $textArray[0] . ': fontcolor=black:line_spacing=0:  fontsize=84: box=0: boxcolor=yellow: boxborderw=10: x=20:y=60" -y  ' . DIRECTORY_PREVIEW . 'preview_0.jpg';
+            $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+            $this->log->info($ffmpeg);
+
+            $marginTop = 120;
+            unset($textArray[0]);
+            foreach ($textArray as $key => $textValue) {
+                $marginTop += 80;
+                if ($key + 2 == count($textArray)) {
+                    $this->log->info('Последняя строчка текста');
+                    $ffmpeg = 'ffmpeg -ss 00:00:05 -i ' . DIRECTORY_PREVIEW . 'preview_' . $key - 1 . '.jpg -frames:v 1 -vf "drawtext=fontfile=' . DIRECTORY_FONTS . 'arial_bold.ttf: text=' . $textArray[0] . ': fontcolor=black:line_spacing=0:  fontsize=84: box=0: boxcolor=yellow: boxborderw=10: x=20:y='. $marginTop .'" -y  ' . DIRECTORY_PREVIEW . $resultImage;
+                    $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+                    $this->log->info($ffmpeg);
+                    break;
+                }
+
+                if ($key == 1) {
+                    $this->log->info('Вторая строчка текста');
+                    $marginTop += 10;
+                }
+
+                $this->log->info('Строчка текста ' . $key);
+                $ffmpeg = 'ffmpeg -ss 00:00:05 -i ' . DIRECTORY_PREVIEW . 'preview_' . $key - 1 . '.jpg -frames:v 1 -vf "drawtext=fontfile=' . DIRECTORY_FONTS . 'arial_bold.ttf: text=' . $textArray[0] . ': fontcolor=black:line_spacing=0:  fontsize=84: box=0: boxcolor=yellow: boxborderw=10: x=20:y='. $marginTop .'" -y  ' . DIRECTORY_PREVIEW . 'preview_' . $key . '.jpg';
+                $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+                $this->log->info($ffmpeg);
+            }
         }
 
-        var_dump($backgroundVideo);
+
+//        $videoId = 174;
+//        $resultName = '174_text';
+//        $video = ContentVideo::findAllDataByID($videoId);
+//        $video['video'] = ListVideo::findAllByContentId($videoId);
+//
+//        foreach ($video['video'] as $additionalVideo) {
+//            if ($additionalVideo['type'] == 'content') {
+//                $videoBackground[] = $additionalVideo['file_name'];
+//            }
+//
+//            if ($additionalVideo['type'] == 'start') {
+//                $videoStart[] = $additionalVideo['file_name'];
+//            }
+//
+//            if ($additionalVideo['type'] == 'end') {
+//                $videoEnd[] = $additionalVideo['file_name'];
+//            }
+//        }
+//
+//        $generatorFiles = new GeneratorFiles($videoId, $this->log);
+//        if ($video['type_background'] == 'video') {
+//            $backgroundVideo = $generatorFiles->mergeVideo($resultName, $video['content_format'], $videoStart[0] ?? null, $videoEnd[0] ?? null);
+//        } else {
+//            $backgroundVideo = $generatorFiles->mergeVideoWithSize($resultName, $video['content_format'], $videoStart[0] ?? null, $videoEnd[0] ?? null);
+//        }
+//
+//        var_dump($backgroundVideo);
 
 //        $path = DIRECTORY_EXCEL_IMPORT . '123.xlsx';
 //        $excelRows = SimpleExcelReader::create($path)->formatHeadersUsing(fn($header) => mb_strtolower(trim($header)));

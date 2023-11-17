@@ -209,7 +209,7 @@ class Speechkit
             print_r([iconv_strlen($value), $value]);
         }
 
-        $countChar = 250;
+        $countChar = 50;
         $result = [];
 
         for ($l = 0; $l < count($textArray); $l++) {

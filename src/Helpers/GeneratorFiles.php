@@ -245,6 +245,58 @@ class GeneratorFiles
         return ['fileName' => $resultName, 'status' => true];
     }
 
+    function getPreviewCode($images, $number, $str) {
+        $i = rand(1,2);
+
+        if ($i == 1) {
+            $rgba = 'rgba(255, 0, 0, 0.9)';
+            $white = "white";
+        } else if ($i == 2) {
+            $rgba = 'rgba(254, 224, 70, 0.9)';
+            $white = "black";
+        } else {
+            $rgba = 'rgba(20, 51, 204, 0.9)';
+            $white = "white";
+        }
+
+        $images = explode(',', $images);
+        $str = mb_strtoupper($str);
+        $str = str_replace(['«','»','"',',','.','?','!',' '], ' ', $str);
+        $str = explode(' ', $str);
+        $str = getArrayStr($str, 30);
+        $str = explode(" ", $str[0]);
+        $str = getArrayStr($str, 5);
+        $str = implode(' \n', $str);
+
+        $str = "convert -background none -undercolor '".$rgba."' -kerning -5 -interline-spacing -4 -pointsize 105 -fill ".$white." -annotate +50+150 '".
+            $str.' '."' images/foto_".$images[0]." images/thumbnail_".$number.".jpg";
+        return $str;
+    }
+
+    /** Генерируем превью */
+
+    public function generatorPreview(string $videoName, string $typeVideo, string $textPreview): array {
+        $resultName = $this->contentId . '_preview';
+        $ffmpeg = 'ffmpeg -i ';
+
+        if ($typeVideo == 'slide_show') {
+
+        }
+
+        if ($typeVideo == 'video') {
+
+        }
+        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+
+        var_dump($ffmpeg);
+        if (!is_null($errors)) {
+            return ['status' => false];
+        }
+
+        unlink(DIRECTORY_VIDEO . $videoName . '.mp4');
+        return ['fileName' => $resultName, 'status' => true];
+    }
+
     /**Генерируем логотип*/
     public function generatorLogo(string $nameFileLogo, string $videoName): array
     {

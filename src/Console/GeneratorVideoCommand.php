@@ -138,7 +138,8 @@ class GeneratorVideoCommand extends Command
                     $this->log->info('Успех генерации субтитров, id текста ' . $video['text_id']);
                     $this->log->info('Успех генерации аудио озвучки, id текста ' . $video['text_id']);
 
-                } else {
+                }
+                else {
 
                     if (isset($voiceData['command'])) {
                         $this->log->error($voiceData['command'] . $video['text_id']);
@@ -271,6 +272,20 @@ class GeneratorVideoCommand extends Command
                 }
             }
 
+//            if (!is_null($resultName)) {
+//                $this->log->info('Создаём превью для видео');
+//                $preview = $generatorFiles->generatorPreview($resultName,$video['type_background']);
+//
+//                if (!$preview['status']) {
+//                    ContentVideo::changeStatus($videoId, 13);
+//                    $this->log->error('Ошибка генерации превью');
+//                    exec($cmd);
+//                    return 0;
+//                }
+//
+//                $resultName = $preview['fileName'];
+//                $this->log->info('Превью сгенерировано ' . $resultName);
+//            }
             if (!is_null($video['color_background_id']) && !is_null($resultName)) {
 
                 $colorBackground = ColorBackground::findById((int)$video['color_background_id']);
@@ -301,7 +316,7 @@ class GeneratorVideoCommand extends Command
                 $this->log->info('Логотип прикреплён, имя файла ' . $resultName);
             }
 
-            if (!empty($textData)) {
+            if (!empty($textData) && !is_null($resultName)) {
 
                 $voice = $generatorFiles->generatorMusic($textData['file_name_voice'], $resultName);
 
@@ -318,7 +333,6 @@ class GeneratorVideoCommand extends Command
                 $this->log->info('Озвучка наложена, имя файла ' . $resultName);
             }
 
-            $this->log->info('Начало наложения субтитров для файла ' . $resultName . $textData['subtitles']);
             if (is_null($textData['subtitles']) || $textData['subtitles']) {
 
                 $this->log->info('Название файла субтитров  ' . $textData['file_name_voice']);
