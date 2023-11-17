@@ -332,7 +332,7 @@ class ImportDataExcelCommand extends Command
             $textId,
             'good', #TODO интонацию аудио
             $generatorImageStatus,
-            $row['задержка между абзацами в миллисекундах']
+            floor($row['задержка между абзацами в миллисекундах'] / 1000)
         );
         return $content->id;
     }
