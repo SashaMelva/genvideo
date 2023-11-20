@@ -113,7 +113,7 @@ return static function(App $app):void
             $group->post('/add-music', UploadMusic::class);
             $group->post('/add-video', UploadAdditionalVideo::class);
 
-            $group->post('/load-archive', GetVideoArchive::class);
+            $group->get('/load-archive/{id}/{type}/{token}', GetVideoArchive::class);
             $group->get('/load-video/{id:[0-9]+}/{token}', LoadVideo::class);
             $group->get('/load-music/{id:[0-9]+}', LoadMusic::class);
 
