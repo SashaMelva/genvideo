@@ -59,7 +59,6 @@ class TestController extends UserController
         $secondVideo = rand(1, (int)$res);
         $formatSeconds = $this->formatMilliseconds($secondVideo * 1000);
         $this->log->info('Выбранная и отформатированная секунда ' .$formatSeconds);
-        exit();
 
         $this->log->info(json_encode($textArray));
         $resultImage = 'preview_result.jpg';
