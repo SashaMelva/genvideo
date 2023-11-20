@@ -72,11 +72,11 @@ class TestController extends UserController
         $whidthAndHeight = shell_exec($identify);
         $whidthPreview = explode('x', $whidthAndHeight)[0];
         $heightPreview = explode('x', $whidthAndHeight)[1];
-        $this->log->info('Ширина и высота изображения' . $whidthAndHeight);
+        $this->log->info('Ширина и высота изображения ' . $whidthAndHeight);
 
 
         $magicCommand = 'convert /var/www/genvi-api/var/resources/preview/' . $firstPreviewName;
-        $this->log->info('Перебираем текст');
+        $this->log->info('Перебираем текст '. $whidthPreview . ' ' . $heightPreview);
 
         if ($whidthPreview > 600 && $whidthPreview < 700) {
             $marginTop = 80;
