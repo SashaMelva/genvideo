@@ -32,9 +32,10 @@ class LoadPreviewVideo extends UserController
                 if (!is_null($content['preview_name'])) {
                     $preview = [
                         'id_content' => $content['content_id'],
-                        'content_image' => base64_encode(file_get_contents(DIRECTORY_PREVIEW . $content['preview_name'])),
+                        'content_image' => base64_encode(file_get_contents(DIRECTORY_PREVIEW . $content['preview_file_name'])),
+                        'name' => $content['preview_file_name'],
                         'file_name' => $content['preview_name'],
-                        'text_image' => $content['preview_text'],
+                        'text' => $content['preview_text'],
                     ];
 
                     return $this->respondWithData($preview);
