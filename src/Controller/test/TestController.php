@@ -53,7 +53,7 @@ class TestController extends UserController
         $textArray = explode('\n', $text);
         $firstPreviewName = '12_photo.jpg'; //$this->contentId . '_photo';
 
-        $ffmpegTimeVideo = 'ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 /var/www/genvi-api/public/video/417_music.mp4';
+        $ffmpegTimeVideo = 'ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 /var/www/genvi-api/public/video/333_result.mp4';
         $res = shell_exec($ffmpegTimeVideo);
         $this->log->info('Длина видео в секундах ' . $res);
         $secondVideo = rand(1, (int)$res);
