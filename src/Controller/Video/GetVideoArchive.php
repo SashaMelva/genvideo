@@ -19,12 +19,12 @@ class GetVideoArchive extends UserController
      */
     public function action(): ResponseInterface
     {
-        $access_token = $this->request->getHeaderLine('token');
+//        $access_token = $this->request->getHeaderLine('token');
         $data = json_decode($this->request->getBody()->getContents(), true);
 
-        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
+//        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
 
-            try {
+//            try {
                 $contents = [];
                 $zipName = 'archive_' . date('Y_m_d_H_i_s') . '_' . floor(microtime(true) * 1000) . '.zip';
                 $zipCommand = 'zip ' . DIRECTORY_ARCHIVE . $zipName . ' ';
@@ -86,11 +86,11 @@ class GetVideoArchive extends UserController
                     ]);
                 }
 
-            } catch (Exception $e) {
-                return $this->respondWithError($e->getCode(), $e->getMessage());
-            }
-        } else {
-            return $this->respondWithError(215);
-        }
+//            } catch (Exception $e) {
+//                return $this->respondWithError($e->getCode(), $e->getMessage());
+//            }
+//        } else {
+//            return $this->respondWithError(215);
+//        }
     }
 }
