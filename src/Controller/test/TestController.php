@@ -79,15 +79,15 @@ class TestController extends UserController
         $this->log->info('Перебираем текст '. $whidthPreview . ' ' . $heightPreview);
 
         if ($whidthPreview > 600 && $whidthPreview < 700) {
-            $marginTop = 80;
-            $placeTop = 110;
-            $marginLeft = 40;
-            $fontSize = 84;
-        } else {
             $marginTop = 40;
             $placeTop = 80;
             $marginLeft = 20;
             $fontSize = 52;
+        } else {
+            $marginTop = 80;
+            $placeTop = 110;
+            $marginLeft = 40;
+            $fontSize = 84;
         }
 
         foreach ($textArray as $textValue) {
