@@ -43,6 +43,7 @@ use App\Controller\Video\GetAllContent;
 use App\Controller\Video\GetCollectionDataSettingVideo;
 use App\Controller\Video\GetContent;
 use App\Controller\Video\GetVideoArchive;
+use App\Controller\Video\LoadPreviewVideo;
 use App\Controller\Video\SendVideo;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -97,6 +98,8 @@ return static function(App $app):void
             $group->get('/get/{id:[0-9]+}', GetContent::class);
 
             $group->get('/load/{id:[0-9]+}/{token}', DownloadVideo::class);
+
+            $group->get('/load/preview/{id:[0-9]+}', LoadPreviewVideo::class);
 
             $group->post('/send', SendVideo::class);
             //$group->get('/generate/{id:[0-9]+}', GeneratorVideo::class);

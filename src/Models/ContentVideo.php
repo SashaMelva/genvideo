@@ -67,6 +67,8 @@ class ContentVideo extends Model
                 'content.file_name',
                 'content.project_id',
                 'content.format',
+                'content.preview_name',
+                'content.preview_text',
                 'content.status_id',
                 'status_content.name AS status_name',
                 'users.id AS creator_id',
