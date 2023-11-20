@@ -71,6 +71,7 @@ class ImportDataExcelCommand extends Command
                 'формат видео',
                 'текст для запроса',
                 'текст для озвучки',
+                'название файла превью',
                 'текст для превью',
                 'id фоновой музыки',
                 'задержка в милисикундах в конце видео',
@@ -334,7 +335,8 @@ class ImportDataExcelCommand extends Command
             'good', #TODO интонацию аудио
             $generatorImageStatus,
             floor($row['задержка между абзацами в миллисекундах'] / 1000),
-            $row['текст для превью']
+            $row['текст для превью'],
+            $row['название файла превью']
         );
         return $content->id;
     }
