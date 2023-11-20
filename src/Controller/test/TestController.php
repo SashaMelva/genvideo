@@ -51,47 +51,70 @@ class TestController extends UserController
 
         $text = 'Влияние медитации \n на нахождение равновесия \n в повседневной жизни';
         $textArray = explode('\n', $text);
+        $firstPreviewName = '12_photo.jpg'; //$this->contentId . '_photo';
+
+        $ffmpegTimeVideo = 'ffprobe -i /var/www/genvi-api/public/video/417_music.mp4';
+        $res = shell_exec($ffmpegTimeVideo);
+        $this->log->info($res);
+        exit();
 
         $this->log->info(json_encode($textArray));
         $resultImage = 'preview_result.jpg';
         $videoName = '422_text.mp4';
+        $this->log->info('Достаём кадр из видео');
+        $ffmpeg = 'ffmpeg -ss 00:00:05 -i ' . DIRECTORY_VIDEO . $videoName . ' -frames:v 1 -y  ' . DIRECTORY_PREVIEW . $firstPreviewName;
+        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
-        if (count($textArray) == 1) {
+        $magicCommand = 'convert /var/www/genvi-api/var/resources/preview/' . $firstPreviewName;
+        $this->log->info('Перебираем текст');
+        $marginTop = 80;
 
-            $this->log->info('Одна строчка текста, добавили субтитр на первый кадр 5 секунды видео');
-            $ffmpeg = 'ffmpeg -ss 00:00:05 -i ' . DIRECTORY_VIDEO . $videoName. ' -frames:v 1 -vf "drawtext=fontfile=' . DIRECTORY_FONTS . 'arial_bold.ttf: text=' . $textArray[0] . ': fontcolor=black:line_spacing=0:  fontsize=84: box=0: boxcolor=yellow: boxborderw=10: x=20:y=60" -y  ' . DIRECTORY_PREVIEW . $resultImage;
-            $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
-            $this->log->info($ffmpeg);
-
-        } else {
-            $this->log->info('Берём первую строчку текстта и выризаем из видео кадр');
-            $ffmpeg = 'ffmpeg -ss 00:00:05 -i ' . DIRECTORY_VIDEO . $videoName. ' -frames:v 1 -vf "drawtext=fontfile=' . DIRECTORY_FONTS . 'arial_bold.ttf: text=' . $textArray[0] . ': fontcolor=black:line_spacing=0:  fontsize=84: box=0: boxcolor=yellow: boxborderw=10: x=20:y=60" -y  ' . DIRECTORY_PREVIEW . 'preview_0.jpg';
-            $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
-            $this->log->info($ffmpeg);
-
-            $marginTop = 120;
-            unset($textArray[0]);
-            foreach ($textArray as $key => $textValue) {
-                $marginTop += 80;
-                if ($key + 2 == count($textArray)) {
-                    $this->log->info('Последняя строчка текста');
-                    $ffmpeg = 'ffmpeg -ss 00:00:05 -i ' . DIRECTORY_PREVIEW . 'preview_' . $key - 1 . '.jpg -frames:v 1 -vf "drawtext=fontfile=' . DIRECTORY_FONTS . 'arial_bold.ttf: text=' . $textArray[0] . ': fontcolor=black:line_spacing=0:  fontsize=84: box=0: boxcolor=yellow: boxborderw=10: x=20:y='. $marginTop .'" -y  ' . DIRECTORY_PREVIEW . $resultImage;
-                    $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
-                    $this->log->info($ffmpeg);
-                    break;
-                }
-
-                if ($key == 1) {
-                    $this->log->info('Вторая строчка текста');
-                    $marginTop += 10;
-                }
-
-                $this->log->info('Строчка текста ' . $key);
-                $ffmpeg = 'ffmpeg -ss 00:00:05 -i ' . DIRECTORY_PREVIEW . 'preview_' . $key - 1 . '.jpg -frames:v 1 -vf "drawtext=fontfile=' . DIRECTORY_FONTS . 'arial_bold.ttf: text=' . $textArray[0] . ': fontcolor=black:line_spacing=0:  fontsize=84: box=0: boxcolor=yellow: boxborderw=10: x=20:y='. $marginTop .'" -y  ' . DIRECTORY_PREVIEW . 'preview_' . $key . '.jpg';
-                $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
-                $this->log->info($ffmpeg);
-            }
+        foreach ($textArray as $key => $textValue) {
+            $magicCommand .= ' -undercolor yellow -fill black -gravity northwest -font ' . DIRECTORY_FONTS . 'arial_bold.ttf  -pointsize 84 -size 1024x -annotate +40+' . $marginTop . ' "' . $textValue . '"';
+            $marginTop += 110;
         }
+
+        $magicCommand .= '  ' . DIRECTORY_PREVIEW . $resultImage;
+        $this->log->info($magicCommand);
+        shell_exec($magicCommand);
+        unlink(DIRECTORY_PREVIEW . $firstPreviewName);
+
+//        if (count($textArray) == 1) {
+//
+//            $this->log->info('Одна строчка текста, добавили субтитр на первый кадр 5 секунды видео');
+//            $ffmpeg = 'ffmpeg -ss 00:00:05 -i ' . DIRECTORY_VIDEO . $videoName . ' -frames:v 1 -vf "drawtext=fontfile=' . DIRECTORY_FONTS . 'arial_bold.ttf: text=' . $textArray[0] . ': fontcolor=black:line_spacing=0:  fontsize=84: box=0: boxcolor=yellow: boxborderw=10: x=20:y=60" -y  ' . DIRECTORY_PREVIEW . $resultImage;
+//            $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+//            $this->log->info($ffmpeg);
+//
+//        } else {
+//            $this->log->info('Берём первую строчку текста и выризаем из видео кадр');
+//            $ffmpeg = 'ffmpeg -ss 00:00:05 -i ' . DIRECTORY_VIDEO . $videoName . ' -frames:v 1 -vf "drawtext=fontfile=' . DIRECTORY_FONTS . 'arial_bold.ttf: text=' . $textArray[0] . ': fontcolor=black:line_spacing=0:  fontsize=84: box=0: boxcolor=yellow: boxborderw=10: x=20:y=60" -y  ' . DIRECTORY_PREVIEW . 'preview_0.jpg';
+//            $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+//            $this->log->info($ffmpeg);
+//
+//            $marginTop = 110;
+//            unset($textArray[0]);
+//            foreach ($textArray as $key => $textValue) {
+//                $marginTop += 80;
+//                if ($key + 2 == count($textArray)) {
+//                    $this->log->info('Последняя строчка текста');
+//                    $ffmpeg = 'ffmpeg -ss 00:00:05 -i ' . DIRECTORY_PREVIEW . 'preview_' . $key - 1 . '.jpg -frames:v 1 -vf "drawtext=fontfile=' . DIRECTORY_FONTS . 'arial_bold.ttf: text=' . $textArray[0] . ': fontcolor=black:line_spacing=0:  fontsize=84: box=0: boxcolor=yellow: boxborderw=10: x=20:y=' . $marginTop . '" -y  ' . DIRECTORY_PREVIEW . $resultImage;
+//                    $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+//                    $this->log->info($ffmpeg);
+//                    break;
+//                }
+//
+//                if ($key == 1) {
+//                    $this->log->info('Вторая строчка текста');
+//                    $marginTop += 10;
+//                }
+//
+//                $this->log->info('Строчка текста ' . $key);
+//                $ffmpeg = 'ffmpeg -ss 00:00:05 -i ' . DIRECTORY_PREVIEW . 'preview_' . $key - 1 . '.jpg -frames:v 1 -vf "drawtext=fontfile=' . DIRECTORY_FONTS . 'arial_bold.ttf: text=' . $textArray[0] . ': fontcolor=black:line_spacing=0:  fontsize=84: box=0: boxcolor=yellow: boxborderw=10: x=20:y=' . $marginTop . '" -y  ' . DIRECTORY_PREVIEW . 'preview_' . $key . '.jpg';
+//                $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+//                $this->log->info($ffmpeg);
+//            }
+//        }
 
 
 //        $videoId = 174;
