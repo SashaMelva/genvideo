@@ -136,6 +136,7 @@ class ContentVideo extends Model
         string  $ampulaVoice,
         ?int  $statusGeneratorImage = 0,
         ?string $delayEndVideo = '3',
+        ?string $preview = '',
     ): ContentVideo
     {
         $newContent = new ContentVideo();
@@ -155,6 +156,7 @@ class ContentVideo extends Model
         $newContent->setAttribute('ampula_voice', $ampulaVoice);
         $newContent->setAttribute('genertor_image_status', $statusGeneratorImage);
         $newContent->setAttribute('delay_end_video', $delayEndVideo);
+        $newContent->setAttribute('preview_text', $preview);
         $newContent->save();
         return $newContent;
     }
