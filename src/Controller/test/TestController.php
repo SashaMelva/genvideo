@@ -55,7 +55,10 @@ class TestController extends UserController
 
         $ffmpegTimeVideo = 'ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 /var/www/genvi-api/public/video/417_music.mp4';
         $res = shell_exec($ffmpegTimeVideo);
-        $this->log->info($res);
+        $this->log->info('Длина видео в секундах ' . $res);
+        $secondVideo = rand(1,$res);
+        $formatSeconds = $this->formatMilliseconds($secondVideo);
+        $this->log->info('Выбранная и отформатированная секунда ' .$res);
         exit();
 
         $this->log->info(json_encode($textArray));
