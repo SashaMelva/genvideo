@@ -57,7 +57,7 @@ class TestController extends UserController
         $res = shell_exec($ffmpegTimeVideo);
         $this->log->info('Длина видео в секундах ' . $res);
         $secondVideo = rand(1, (int)$res);
-        $formatSeconds = $this->formatMilliseconds($secondVideo);
+        $formatSeconds = $this->formatMilliseconds($secondVideo * 1000);
         $this->log->info('Выбранная и отформатированная секунда ' .$formatSeconds);
         exit();
 
