@@ -45,7 +45,7 @@ class GetVideoArchive extends UserController
                     }
 
                     foreach ($contents as $content) {
-                        $zipCommand .= ' ' . DIRECTORY_VIDEO . $content['file_path'];
+                        $zipCommand .= ' ' . DIRECTORY_ADDITIONAL_VIDEO . $content['file_path'];
                     }
                 }
 
