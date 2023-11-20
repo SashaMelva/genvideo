@@ -209,6 +209,20 @@ class GeneratorManyVideoCommand  extends Command
                 $this->log->info('Фоновое изображение наложено, имя файла ' . $resultName);
             }
 
+            if (!is_null($video['preview_text']) && !is_null($resultName)) {
+                $preview = $generatorFiles->generatorPreview($video['preview_text'], $resultName);
+
+                if (!$preview['status']) {
+                    ContentVideo::changeStatus($videoId, 5);
+                    $this->log->error('Ошибка превью');
+                    exec($cmd);
+                    return 0;
+                }
+                ContentVideo::changePreview($videoId, $preview['previewName']);
+
+                $this->log->info('Превью сгенерировано ' . $resultName);
+            }
+
             if (!empty($logo) && !is_null($resultName)) {
                 $logoForVideo = $generatorFiles->generatorLogo($logo[0], $resultName);
 
@@ -242,7 +256,7 @@ class GeneratorManyVideoCommand  extends Command
             if (is_null($textData['subtitles']) || $textData['subtitles']) {
 
                 $this->log->info('Название файла субтитров  ' . $textData['file_name_voice']);
-                $titers = $generatorFiles->generatorText($resultName, $textData['file_name_voice'], $video['content_format']);
+                $titers = $generatorFiles->generatorText($resultName, $textData['file_name_voice'], $video['content_format'], $textData);
 
                 if (!$titers['status']) {
                     ContentVideo::changeStatus($videoId, 5);

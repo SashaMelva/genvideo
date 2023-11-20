@@ -675,8 +675,7 @@ class TestController extends UserController
         return $result;
     }
 
-    private
-    function formatMilliseconds($milliseconds): string
+    private function formatMilliseconds($milliseconds): string
     {
         $seconds = floor($milliseconds / 1000);
         $minutes = floor($seconds / 60);

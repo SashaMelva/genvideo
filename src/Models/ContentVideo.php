@@ -179,4 +179,11 @@ class ContentVideo extends Model
             ->where([['id', '=', $contentId]])
             ->delete();
     }
+
+    public static function changePreview(int $videoId, mixed $previewName): void
+    {
+        self::query()
+            ->where([['id', '=', $videoId]])
+            ->update(['preview_name' => $previewName]);
+    }
 }

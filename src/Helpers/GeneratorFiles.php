@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Models\ContentVideo;
 use getID3;
 use Monolog\Logger;
 
@@ -275,26 +276,66 @@ class GeneratorFiles
 
     /** Генерируем превью */
 
-    public function generatorPreview(string $videoName, string $typeVideo, string $textPreview): array {
-        $resultName = $this->contentId . '_preview';
-        $ffmpeg = 'ffmpeg -i ';
+    public function generatorPreview(string $textPreview, string $videoName): array {
 
-        if ($typeVideo == 'slide_show') {
+        $textArray = explode('\n', $textPreview);
+        $firstPreviewName = $this->contentId . '_photo';
 
-        }
+        $ffmpegTimeVideo = 'ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 /var/www/genvi-api/public/video/333_result.mp4';
+        $res = shell_exec($ffmpegTimeVideo);
+        $this->log->info('Длина видео в секундах ' . $res);
+        $secondVideo = rand(1, (int)$res);
+        $formatSeconds = $this->formatMilliseconds($secondVideo * 1000);
+        $this->log->info('Выбранная и отформатированная секунда ' . $formatSeconds);
 
-        if ($typeVideo == 'video') {
-
-        }
+        $this->log->info(json_encode($textArray));
+        $resultImage = 'preview_result.jpg';
+        $videoName = '422_text.mp4';
+        $this->log->info('Достаём кадр из видео');
+        $ffmpeg = 'ffmpeg -ss ' . $formatSeconds . ' -i ' . DIRECTORY_VIDEO . $videoName . ' -frames:v 1 -y  ' . DIRECTORY_PREVIEW . $firstPreviewName;
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
-        var_dump($ffmpeg);
+        $this->log->info('Узнаём параметры изображения');
+        $identify = ' identify -format "%wx%h" ' . DIRECTORY_PREVIEW . $firstPreviewName;
+        $whidthAndHeight = shell_exec($identify);
+        $whidthPreview = explode('x', $whidthAndHeight)[0];
+        $heightPreview = explode('x', $whidthAndHeight)[1];
+        $this->log->info('Ширина и высота изображения ' . $whidthAndHeight);
+
+
+        $magicCommand = 'convert /var/www/genvi-api/var/resources/preview/' . $firstPreviewName;
+        $this->log->info('Перебираем текст '. $whidthPreview . ' ' . $heightPreview);
+
+        if ($whidthPreview > 600 && $whidthPreview < 700) {
+            $marginTop = 40;
+            $placeTop = 40;
+            $marginLeft = 20;
+            $fontSize = 32;
+        } else {
+            $marginTop = 80;
+            $placeTop = 110;
+            $marginLeft = 40;
+            $fontSize = 84;
+        }
+
+        foreach ($textArray as $textValue) {
+            $magicCommand .= ' -undercolor yellow -fill black -gravity northwest -font ' . DIRECTORY_FONTS . 'arial_bold.ttf  -pointsize ' . $fontSize . ' -size 1024x -annotate +' . $marginLeft . '+' . $marginTop . ' "' . $textValue . '"';
+            $marginTop += $placeTop;
+        }
+
+        $magicCommand .= '  ' . DIRECTORY_PREVIEW . $resultImage;
+        $this->log->info($magicCommand);
+        shell_exec($magicCommand);
+
+        if (file_exists(DIRECTORY_PREVIEW . $resultImage)) {
+            return ['status' => true, 'previewName' => $resultImage];
+        }
+
         if (!is_null($errors)) {
             return ['status' => false];
         }
 
-        unlink(DIRECTORY_VIDEO . $videoName . '.mp4');
-        return ['fileName' => $resultName, 'status' => true];
+        return ['status' => true, 'previewName' => $resultImage];
     }
 
     /**Генерируем логотип*/
@@ -641,5 +682,19 @@ class GeneratorFiles
         }
 
         return 'ffmpeg' . $images . $sound . '-filter_complex "' . $scale . $v;
+    }
+
+    private function formatMilliseconds($milliseconds): string
+    {
+        $seconds = floor($milliseconds / 1000);
+        $minutes = floor($seconds / 60);
+        $hours = floor($minutes / 60);
+        $milliseconds = $milliseconds % 1000;
+        $seconds = $seconds % 60;
+        $minutes = $minutes % 60;
+
+        $format = '%u:%02u:%02u.%03u';
+
+        return sprintf($format, $hours, $minutes, $seconds, $milliseconds);
     }
 }
