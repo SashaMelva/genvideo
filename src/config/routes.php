@@ -42,6 +42,7 @@ use App\Controller\Video\DownloadVideo;
 use App\Controller\Video\GetAllContent;
 use App\Controller\Video\GetCollectionDataSettingVideo;
 use App\Controller\Video\GetContent;
+use App\Controller\Video\GetVideoArchive;
 use App\Controller\Video\SendVideo;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -109,7 +110,7 @@ return static function(App $app):void
             $group->post('/add-music', UploadMusic::class);
             $group->post('/add-video', UploadAdditionalVideo::class);
 
-
+            $group->post('/load-archive', GetVideoArchive::class);
             $group->get('/load-video/{id:[0-9]+}/{token}', LoadVideo::class);
             $group->get('/load-music/{id:[0-9]+}', LoadMusic::class);
 
