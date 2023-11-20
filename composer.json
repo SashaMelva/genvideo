@@ -19,23 +19,26 @@
     "require": {
         "php": "^8.0",
         "ext-curl": "*",
+        "ext-iconv": "*",
         "akrabat/ip-address-middleware": "^2.1",
         "firebase/php-jwt": "*",
+        "google/apiclient": "^2.0",
         "guzzlehttp/guzzle": "^7.5",
         "illuminate/database": "*",
+        "james-heinrich/getid3": "^1.9",
+        "monolog/monolog": "^2.9",
         "php-di/php-di": "^6.4",
+        "react/child-process": "0.7.x-dev",
+        "react/promise": "3",
         "slim/psr7": "^1.6",
         "slim/slim": "^4.11",
+        "spatie/simple-excel": "^3.2",
         "symfony/console": "^5.4",
         "symfony/mailer": "^5.4",
+        "symfony/process": "v5.1.7",
         "symfony/validator": "^5.4",
         "tuupola/slim-jwt-auth": "^3.7",
-        "monolog/monolog": "^2.9",
-        "james-heinrich/getid3": "^1.9",
-        "google/apiclient": "^2.0",
-        "vlucas/phpdotenv": "^5.5",
-        "spatie/simple-excel": "^3.2",
-        "ext-iconv": "*"
+        "vlucas/phpdotenv": "^5.5"
     },
     "scripts": {
         "pre-autoload-dump": "Google\\Task\\Composer::cleanup"
