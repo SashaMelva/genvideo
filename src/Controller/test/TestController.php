@@ -67,19 +67,37 @@ class TestController extends UserController
         $ffmpeg = 'ffmpeg -ss ' . $formatSeconds . ' -i ' . DIRECTORY_VIDEO . $videoName . ' -frames:v 1 -y  ' . DIRECTORY_PREVIEW . $firstPreviewName;
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
+        $this->log->info('Узнаём параметры изображения');
+        $identify = ' identify -format "%wx%h" ' . DIRECTORY_PREVIEW . $firstPreviewName;
+        $whidthAndHeight = shell_exec($identify);
+        $whidthPreview = explode('x', $whidthAndHeight)[0];
+        $heightPreview = explode('x', $whidthAndHeight)[1];
+        $this->log->info('Ширина и высота изображения' . $whidthAndHeight);
+
+
         $magicCommand = 'convert /var/www/genvi-api/var/resources/preview/' . $firstPreviewName;
         $this->log->info('Перебираем текст');
+
+//        if () {
+//
+//        }
+//        if () {
+//
+//        }
         $marginTop = 80;
+        $placeTop = 110;
+        $marginLeft = 40;
+        $fontSize = 84;
 
         foreach ($textArray as $key => $textValue) {
-            $magicCommand .= ' -undercolor yellow -fill black -gravity northwest -font ' . DIRECTORY_FONTS . 'arial_bold.ttf  -pointsize 84 -size 1024x -annotate +40+' . $marginTop . ' "' . $textValue . '"';
-            $marginTop += 110;
+            $magicCommand .= ' -undercolor yellow -fill black -gravity northwest -font ' . DIRECTORY_FONTS . 'arial_bold.ttf  -pointsize ' . $fontSize . ' -size 1024x -annotate +' . $marginLeft . '+' . $marginTop . ' "' . $textValue . '"';
+            $marginTop += $placeTop;
         }
 
         $magicCommand .= '  ' . DIRECTORY_PREVIEW . $resultImage;
         $this->log->info($magicCommand);
         shell_exec($magicCommand);
-        unlink(DIRECTORY_PREVIEW . $firstPreviewName);
+//        unlink(DIRECTORY_PREVIEW . $firstPreviewName);
 
 //        if (count($textArray) == 1) {
 //
