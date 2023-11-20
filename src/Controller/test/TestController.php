@@ -58,13 +58,13 @@ class TestController extends UserController
         $this->log->info('Длина видео в секундах ' . $res);
         $secondVideo = rand(1, (int)$res);
         $formatSeconds = $this->formatMilliseconds($secondVideo * 1000);
-        $this->log->info('Выбранная и отформатированная секунда ' .$formatSeconds);
+        $this->log->info('Выбранная и отформатированная секунда ' . $formatSeconds);
 
         $this->log->info(json_encode($textArray));
         $resultImage = 'preview_result.jpg';
         $videoName = '422_text.mp4';
         $this->log->info('Достаём кадр из видео');
-        $ffmpeg = 'ffmpeg -ss 00:00:05 -i ' . DIRECTORY_VIDEO . $videoName . ' -frames:v 1 -y  ' . DIRECTORY_PREVIEW . $firstPreviewName;
+        $ffmpeg = 'ffmpeg -ss ' . $formatSeconds . ' -i ' . DIRECTORY_VIDEO . $videoName . ' -frames:v 1 -y  ' . DIRECTORY_PREVIEW . $firstPreviewName;
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         $magicCommand = 'convert /var/www/genvi-api/var/resources/preview/' . $firstPreviewName;
