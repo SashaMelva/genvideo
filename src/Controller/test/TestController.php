@@ -78,18 +78,19 @@ class TestController extends UserController
         $magicCommand = 'convert /var/www/genvi-api/var/resources/preview/' . $firstPreviewName;
         $this->log->info('Перебираем текст');
 
-//        if () {
-//
-//        }
-//        if () {
-//
-//        }
-        $marginTop = 80;
-        $placeTop = 110;
-        $marginLeft = 40;
-        $fontSize = 84;
+        if ($whidthPreview > 600 && $whidthPreview < 700) {
+            $marginTop = 80;
+            $placeTop = 110;
+            $marginLeft = 40;
+            $fontSize = 84;
+        } else {
+            $marginTop = 40;
+            $placeTop = 80;
+            $marginLeft = 20;
+            $fontSize = 52;
+        }
 
-        foreach ($textArray as $key => $textValue) {
+        foreach ($textArray as $textValue) {
             $magicCommand .= ' -undercolor yellow -fill black -gravity northwest -font ' . DIRECTORY_FONTS . 'arial_bold.ttf  -pointsize ' . $fontSize . ' -size 1024x -annotate +' . $marginLeft . '+' . $marginTop . ' "' . $textValue . '"';
             $marginTop += $placeTop;
         }
