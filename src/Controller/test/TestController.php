@@ -80,9 +80,9 @@ class TestController extends UserController
 
         if ($whidthPreview > 600 && $whidthPreview < 700) {
             $marginTop = 40;
-            $placeTop = 80;
+            $placeTop = 20;
             $marginLeft = 20;
-            $fontSize = 52;
+            $fontSize = 32;
         } else {
             $marginTop = 80;
             $placeTop = 110;
