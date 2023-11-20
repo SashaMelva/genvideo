@@ -4,6 +4,7 @@ namespace App\Controller\Video;
 
 use App\Controller\UserController;
 use App\Helpers\CheckTokenExpiration;
+use App\Models\AdditionalVideo;
 use App\Models\ContentVideo;
 use Exception;
 use Psr\Container\ContainerExceptionInterface;
@@ -25,16 +26,27 @@ class GetVideoArchive extends UserController
 
             try {
                 $contents = [];
-
-                foreach ($data['id'] as $id) {
-                    $contents[] = ContentVideo::findByID($id);
-                }
-
                 $zipName = 'archive_' . date('Y_m_d_H_i_s') . '_' . floor(microtime(true) * 1000) . '.zip';
                 $zipCommand = 'zip ' . DIRECTORY_ARCHIVE . $zipName . ' ';
 
-                foreach ($contents as $content) {
-                    $zipCommand .= ' ' . DIRECTORY_VIDEO . $content['content_name'];
+
+                if ($data['type'] == 'content') {
+                    foreach ($data['id'] as $id) {
+                        $contents[] = ContentVideo::findByID($id);
+                    }
+
+                    foreach ($contents as $content) {
+                        $zipCommand .= ' ' . DIRECTORY_VIDEO . $content['file_name'];
+                    }
+                }
+                if ($data['type'] == 'video') {
+                    foreach ($data['id'] as $id) {
+                        $contents[] = AdditionalVideo::findByID($id);
+                    }
+
+                    foreach ($contents as $content) {
+                        $zipCommand .= ' ' . DIRECTORY_VIDEO . $content['file_path'];
+                    }
                 }
 
                 shell_exec($zipCommand);
