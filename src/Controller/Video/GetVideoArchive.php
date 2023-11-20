@@ -49,6 +49,7 @@ class GetVideoArchive extends UserController
                     }
                 }
 
+                var_dump($zipCommand);
                 shell_exec($zipCommand);
 
                 $file = DIRECTORY_ARCHIVE . $zipName;
