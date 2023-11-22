@@ -267,9 +267,10 @@ class Speechkit
             $this->log->info('Отправка запросов на синтез');
             foreach ($Mp3Files as $key => $item) {
 
+                $this->log->info($item);
                 $response = $this->response($item['text'], $voiceSetting);
                 $length = file_put_contents(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3', $response);
-
+                $this->log->info($response);
                 $getID3 = new getID3;
                 $file = $getID3->analyze(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3');
                 $seconds = $file['playtime_seconds'];
@@ -282,7 +283,7 @@ class Speechkit
                 if (!$length) {
                     return ['status' => false, 'files' => []];
                 }
-
+                $this->log->info( DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3');
                 $tmp_array[] = DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3';
                 $nameAudio[] = ['nameAudio' => $number . '_' . $key, 'merge' => $item['merge']];
             }
