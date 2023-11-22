@@ -209,7 +209,7 @@ class Speechkit
 
         $this->log->info(json_encode($textArray));
         foreach ($textArray as $key => $value) {
-            if (empty($value['text'])) {
+            if (empty($value)) {
                 unset($textArray[$key]);
             }
         }
