@@ -25,6 +25,7 @@ class Speechkit
      */
     public function generatorWithSubtitles(string $text, string $fileName, array $voiceSetting): array
     {
+        $this->log->info('Задержка между предложниями ' . $voiceSetting['delay_between_offers_ms'] . ' Задержка между абзацами ' . $voiceSetting['delay_between_paragraphs_ms']);
         try {
             if ($voiceSetting['delay_between_offers_ms'] > 0) {
 
@@ -198,7 +199,7 @@ class Speechkit
 
     private function spillSubtitlesParagraph(string $text): array
     {
-        $this->log->info('Форматирование текста по предложениям');
+        $this->log->info('Форматирование текста по абзацам');
         $desc = trim($text);
 
         if (str_contains($desc, '\n') == true) {
