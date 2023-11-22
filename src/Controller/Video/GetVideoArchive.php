@@ -22,10 +22,10 @@ class GetVideoArchive extends UserController
         $type = $this->request->getAttribute('type');
         $videoIds = $this->request->getAttribute('id');
         $videoIdArray = explode(',',$videoIds);
-        $access_token = $this->request->getAttribute('token');
+//        $access_token = $this->request->getAttribute('token');
 
         var_dump($videoIdArray);
-        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
+//        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
 
             try {
                 $contents = [];
@@ -40,8 +40,13 @@ class GetVideoArchive extends UserController
 
                     foreach ($contents as $content) {
                         $zipCommand .= ' ' . DIRECTORY_VIDEO . $content['file_name'];
+
+                        if (!is_null($content['preview_file_name'])) {
+                            $zipCommand .= ' ' . DIRECTORY_PREVIEW . $content['preview_file_name'];
+                        }
                     }
                 }
+
                 if ($type == 'video') {
                     foreach ($videoIdArray as $id) {
                         $contents[] = AdditionalVideo::findByID($id);
@@ -93,8 +98,8 @@ class GetVideoArchive extends UserController
             } catch (Exception $e) {
                 return $this->respondWithError($e->getCode(), $e->getMessage());
             }
-        } else {
-            return $this->respondWithError(215);
-        }
+//        } else {
+//            return $this->respondWithError(215);
+//        }
     }
 }
