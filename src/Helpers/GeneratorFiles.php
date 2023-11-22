@@ -36,7 +36,7 @@ class GeneratorFiles
 
         if ($formatVideo == '9/16') {
             $fontSize = 12;
-            $margin ='';
+            $margin = '';
         }
 
         if (is_null($textData['shadow']) || $textData['shadow'] == '0') {
@@ -132,7 +132,7 @@ class GeneratorFiles
 
             while ($timeVideoForLong < ceil($timeVoice)) {
 
-                $this->log->info('Сумма времени видео' . $timeVideoForLong . 'Время видео ' . $ffmpegForVideoArray[$counter]['time']. ' Название файла '  .$ffmpegForVideoArray[$counter]['filePath'].  ' Время озвучки ' . ceil($timeVoice));
+                $this->log->info('Сумма времени видео' . $timeVideoForLong . 'Время видео ' . $ffmpegForVideoArray[$counter]['time'] . ' Название файла ' . $ffmpegForVideoArray[$counter]['filePath'] . ' Время озвучки ' . ceil($timeVoice));
 
                 $timeVideoForLong += $ffmpegForVideoArray[$counter]['time'];
                 $resultArrayVideo[] = $ffmpegForVideoArray[$counter]['filePath'];
@@ -246,8 +246,9 @@ class GeneratorFiles
         return ['fileName' => $resultName, 'status' => true];
     }
 
-    function getPreviewCode($images, $number, $str) {
-        $i = rand(1,2);
+    function getPreviewCode($images, $number, $str)
+    {
+        $i = rand(1, 2);
 
         if ($i == 1) {
             $rgba = 'rgba(255, 0, 0, 0.9)';
@@ -262,27 +263,28 @@ class GeneratorFiles
 
         $images = explode(',', $images);
         $str = mb_strtoupper($str);
-        $str = str_replace(['«','»','"',',','.','?','!',' '], ' ', $str);
+        $str = str_replace(['«', '»', '"', ',', '.', '?', '!', ' '], ' ', $str);
         $str = explode(' ', $str);
         $str = getArrayStr($str, 30);
         $str = explode(" ", $str[0]);
         $str = getArrayStr($str, 5);
         $str = implode(' \n', $str);
 
-        $str = "convert -background none -undercolor '".$rgba."' -kerning -5 -interline-spacing -4 -pointsize 105 -fill ".$white." -annotate +50+150 '".
-            $str.' '."' images/foto_".$images[0]." images/thumbnail_".$number.".jpg";
+        $str = "convert -background none -undercolor '" . $rgba . "' -kerning -5 -interline-spacing -4 -pointsize 105 -fill " . $white . " -annotate +50+150 '" .
+            $str . ' ' . "' images/foto_" . $images[0] . " images/thumbnail_" . $number . ".jpg";
         return $str;
     }
 
     /** Генерируем превью */
 
-    public function generatorPreview(string $videoName ,string $textPreview): array {
-
+    public function generatorPreview(string $videoName, string $textPreview): array
+    {
+        $videoName = $videoName . '.mp4';
         $textArray = explode('\n', $textPreview);
         $firstPreviewName = $this->contentId . '_photo.jpg';
         $resultImage = $this->contentId . '_result.jpg';
 
-        $ffmpegTimeVideo = 'ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 '. DIRECTORY_VIDEO . $videoName;
+        $ffmpegTimeVideo = 'ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 ' . DIRECTORY_VIDEO . $videoName;
         $res = shell_exec($ffmpegTimeVideo);
         $this->log->info('Длина видео в секундах ' . $res);
         $secondVideo = rand(1, (int)$res);
@@ -304,7 +306,7 @@ class GeneratorFiles
 
 
         $magicCommand = 'convert /var/www/genvi-api/var/resources/preview/' . $firstPreviewName;
-        $this->log->info('Перебираем текст '. $whidthPreview . ' ' . $heightPreview);
+        $this->log->info('Перебираем текст ' . $whidthPreview . ' ' . $heightPreview);
 
         if ($whidthPreview > 600 && $whidthPreview < 700) {
             $marginTop = 40;
