@@ -61,7 +61,8 @@ class TestController extends UserController
             'voice_speed' => is_null($video['voice_speed']) ? '1.0' : $video['voice_speed'],
             'delay_end_video' => is_null($video['delay_end_video']) ? 3 : $video['delay_end_video']
         ];
-
+        $subtitles = [["text"=>"Метод upsert вставляет записи,","time" =>2544],["text"=>"которые не существуют, и обновляет записи. \nКоторые уже существуют, новыми значениями","time"=>6168]];
+        file_put_contents(DIRECTORY_TEXT . 333 . '.srt', $this->getFilesSrt($subtitles, 100));
 //        $textVideo = $video['initial_text'] . $video['text'] . $video['end_text'];
 //        var_dump($textVideo);
 //        var_dump(explode("\n", $textVideo));
@@ -208,7 +209,15 @@ class TestController extends UserController
 
         foreach ($text as $item) {
             $countSubtitles = floor($item['time'] / 3000);
+
+            if ($countSubtitles == 0) {
+                $countSubtitles = 1;
+            }
+
+            var_dump($countSubtitles);
             $textShorts = $this->shortText($item['text'], $countSubtitles);
+            var_dump($item);
+            var_dump($textShorts);
             $shortTimePiece = round($item['time'] / $countSubtitles, 2);
             $shortTime = 0;
             $counter = 0;
@@ -358,7 +367,7 @@ class TestController extends UserController
 
             $this->log->info('Генерируем файл субтитрв');
             /**для субтитров*/
-            $length = file_put_contents(DIRECTORY_TEXT . $number . '.srt', $this->getFilesSrt($this->mergesSubtitles($subtitles), $delayBetween));
+            $length =
 
             $this->log->info('Преабразуем файл субтитров в формат ass');
             $ffmpeg = 'ffmpeg -i ' . DIRECTORY_TEXT . $number . '.srt -y ' . DIRECTORY_TEXT . $number . '.ass';
@@ -626,9 +635,8 @@ class TestController extends UserController
     private function shortText(string $text, int $point): array
     {
         $textArray = explode(' ', $text);
-        $countChar = iconv_strlen($text);
-
         $result = [];
+        $countChar = iconv_strlen($text);
         $text = $textArray[0] . ' ';
         unset($textArray[0]);
         $count = count($textArray);

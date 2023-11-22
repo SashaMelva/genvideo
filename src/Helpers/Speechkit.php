@@ -482,10 +482,15 @@ class Speechkit
         $arr = [];
         $allTime = 0;
         $counterGlobal = 1;
-        $this->log->info('Массив субтитры ' . json_encode($text, JSON_UNESCAPED_UNICODE));
+        $this->log->info('Массив субтитры с задржкой ' . $delayBetweenOffersMs . ' ' . json_encode($text, JSON_UNESCAPED_UNICODE));
 
         foreach ($text as $item) {
             $countSubtitles = floor($item['time'] / 3000);
+
+            if ($countSubtitles == 0) {
+                $countSubtitles = 1;
+            }
+
             $textShorts = $this->shortText($item['text'], $countSubtitles);
             $shortTimePiece = round($item['time'] / $countSubtitles, 2);
             $shortTime = 0;
