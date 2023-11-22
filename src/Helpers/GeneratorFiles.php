@@ -276,13 +276,13 @@ class GeneratorFiles
 
     /** Генерируем превью */
 
-    public function generatorPreview(string $textPreview, string $videoName): array {
+    public function generatorPreview(string $videoName ,string $textPreview): array {
 
         $textArray = explode('\n', $textPreview);
         $firstPreviewName = $this->contentId . '_photo.jpg';
         $resultImage = $this->contentId . '_result.jpg';
 
-        $ffmpegTimeVideo = 'ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 /var/www/genvi-api/public/video/333_result.mp4';
+        $ffmpegTimeVideo = 'ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 '. DIRECTORY_VIDEO . $videoName;
         $res = shell_exec($ffmpegTimeVideo);
         $this->log->info('Длина видео в секундах ' . $res);
         $secondVideo = rand(1, (int)$res);

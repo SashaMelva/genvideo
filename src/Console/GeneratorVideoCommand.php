@@ -274,7 +274,7 @@ class GeneratorVideoCommand extends Command
 
             if (!is_null($resultName)) {
                 $this->log->info('Создаём превью для видео');
-                $preview = $generatorFiles->generatorPreview($resultName, $video['type_background']);
+                $preview = $generatorFiles->generatorPreview($resultName, $video['preview_text']);
 
                 if (!$preview['status']) {
                     ContentVideo::changeStatus($videoId, 13);

@@ -94,6 +94,7 @@ class ContentVideo extends Model
                 'content.ampula_voice',
                 'content.format AS content_format',
                 'content.color_background_id AS color_background_id',
+                'content.preview_text',
                 'text.id AS text_id',
                 'text.text',
                 'text.file_name_text',
