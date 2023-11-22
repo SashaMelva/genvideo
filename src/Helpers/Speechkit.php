@@ -207,7 +207,7 @@ class Speechkit
             $textArray = explode("\n", $desc);
         }
 
-        $this->log->info(json_encode($textArray));
+        $this->log->info(json_encode($textArray, JSON_UNESCAPED_UNICODE));
 //        foreach ($textArray as $key => $value) {
 //            if (empty($value)) {
 //                unset($textArray[$key]);
@@ -263,6 +263,8 @@ class Speechkit
         }
 
         $this->log->info("Получили отформатированный текст");
+        $this->log->info(json_encode($textArray, JSON_UNESCAPED_UNICODE));
+        exit();
         return $result;
     }
 
@@ -377,7 +379,7 @@ class Speechkit
 
             $this->log->info('Склеиваеи все аудио ');
             $resultNameAllFiles = $number . '_all';
-            $ffmpeg = 'ffmpeg -i "concat:' . $voices . '"  -acodec copy -c:a libmp3lame ' . DIRECTORY_SPEECHKIT . $resultNameAllFiles . '.mp3';
+            $ffmpeg = 'ffmpeg -i "concat:' . $voices . '"  -acodec copy -c:a libmp3lame -y ' . DIRECTORY_SPEECHKIT . $resultNameAllFiles . '.mp3';
             $this->log->info($ffmpeg);
             shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
             $tmp_array[] = DIRECTORY_SPEECHKIT . $resultNameAllFiles . '.mp3';
