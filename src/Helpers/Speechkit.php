@@ -484,24 +484,25 @@ class Speechkit
 //        $this->log->info('Массив субтитры ' . json_encode($text, true));
         foreach ($text as $key => $item) {
 
-            if ($item['time'] > 5600) {
-                $counter += 1;
-                $textShort = $this->shortText($item['text']);
-                $shortTime = round($item['time'] / 2, 2);
-
-                if ($key == 0) {
-                    $arr[] = ($counter) . "\r\n" . '00:00:00,000 --> '
-                        . str_replace('.', ',', $this->formatMilliseconds($shortTime + $allTime)) . "\r\n" . $textShort[0] . "\r\n";
-                } else {
-                    $arr[] = ($counter) . "\r\n" . str_replace('.', ',', $this->formatMilliseconds($allTime))
-                        . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($shortTime + $allTime)) . "\r\n" . $textShort[0] . "\r\n";
-                }
-                $allTimeWhithShort = $shortTime + $allTime;
-                $counter += 1;
-                $arr[] = ($counter) . "\r\n" . str_replace('.', ',', $this->formatMilliseconds($allTimeWhithShort))
-                    . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($item['time'] + $allTime)) . "\r\n" . $textShort[1] . "\r\n";
-
-            } elseif ($item['time'] > 5600) {
+//            if ($item['time'] > 5600) {
+//                $counter += 1;
+//                $textShort = $this->shortText($item['text']);
+//                $shortTime = round($item['time'] / 2, 2);
+//
+//                if ($key == 0) {
+//                    $arr[] = ($counter) . "\r\n" . '00:00:00,000 --> '
+//                        . str_replace('.', ',', $this->formatMilliseconds($shortTime + $allTime)) . "\r\n" . $textShort[0] . "\r\n";
+//                } else {
+//                    $arr[] = ($counter) . "\r\n" . str_replace('.', ',', $this->formatMilliseconds($allTime))
+//                        . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($shortTime + $allTime)) . "\r\n" . $textShort[0] . "\r\n";
+//                }
+//                $allTimeWhithShort = $shortTime + $allTime;
+//                $counter += 1;
+//                $arr[] = ($counter) . "\r\n" . str_replace('.', ',', $this->formatMilliseconds($allTimeWhithShort))
+//                    . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($item['time'] + $allTime)) . "\r\n" . $textShort[1] . "\r\n";
+//
+//            } else
+                if ($item['time'] > 3000) {
                 $counter += 1;
                 $textShort = $this->shortText($item['text']);
                 $shortTime = round($item['time'] / 2, 2);
