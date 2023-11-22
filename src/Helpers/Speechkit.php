@@ -271,11 +271,8 @@ class Speechkit
 //            $this->log->info(json_encode($Mp3Files));
 
             foreach ($Mp3Files as $key => $item) {
-
-                $this->log->info($item);
                 $response = $this->response($item['text'], $voiceSetting);
                 $length = file_put_contents(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3', $response);
-                $this->log->info($response);
                 $getID3 = new getID3;
                 $file = $getID3->analyze(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3');
                 $seconds = $file['playtime_seconds'];
