@@ -279,7 +279,8 @@ class GeneratorFiles
     public function generatorPreview(string $textPreview, string $videoName): array {
 
         $textArray = explode('\n', $textPreview);
-        $firstPreviewName = $this->contentId . '_photo';
+        $firstPreviewName = $this->contentId . '_photo.jpg';
+        $resultImage = $this->contentId . '_result.jpg';
 
         $ffmpegTimeVideo = 'ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 /var/www/genvi-api/public/video/333_result.mp4';
         $res = shell_exec($ffmpegTimeVideo);
@@ -289,10 +290,9 @@ class GeneratorFiles
         $this->log->info('Выбранная и отформатированная секунда ' . $formatSeconds);
 
         $this->log->info(json_encode($textArray));
-        $resultImage = 'preview_result.jpg';
-        $videoName = '422_text.mp4';
         $this->log->info('Достаём кадр из видео');
         $ffmpeg = 'ffmpeg -ss ' . $formatSeconds . ' -i ' . DIRECTORY_VIDEO . $videoName . ' -frames:v 1 -y  ' . DIRECTORY_PREVIEW . $firstPreviewName;
+        $this->log->info($ffmpeg);
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
         $this->log->info('Узнаём параметры изображения');

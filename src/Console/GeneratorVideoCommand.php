@@ -139,8 +139,7 @@ class GeneratorVideoCommand extends Command
                     $this->log->info('Успех генерации субтитров, id текста ' . $video['text_id']);
                     $this->log->info('Успех генерации аудио озвучки, id текста ' . $video['text_id']);
 
-                }
-                else {
+                } else {
 
                     if (isset($voiceData['command'])) {
                         $this->log->error($voiceData['command'] . $video['text_id']);
@@ -275,7 +274,7 @@ class GeneratorVideoCommand extends Command
 
             if (!is_null($resultName)) {
                 $this->log->info('Создаём превью для видео');
-                $preview = $generatorFiles->generatorPreview($resultName,$video['type_background']);
+                $preview = $generatorFiles->generatorPreview($resultName, $video['type_background']);
 
                 if (!$preview['status']) {
                     ContentVideo::changeStatus($videoId, 13);
@@ -284,9 +283,9 @@ class GeneratorVideoCommand extends Command
                     return 0;
                 }
 
-                $resultName = $preview['fileName'];
                 $this->log->info('Превью сгенерировано ' . $resultName);
             }
+
             if (!is_null($video['color_background_id']) && !is_null($resultName)) {
 
                 $colorBackground = ColorBackground::findById((int)$video['color_background_id']);

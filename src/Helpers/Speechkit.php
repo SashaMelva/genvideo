@@ -269,7 +269,7 @@ class Speechkit
             if (key($Mp3Files) == 'text') {
                 $Mp3Files = [0 => $Mp3Files];
             }
-            $this->log->info(json_encode($Mp3Files));
+//            $this->log->info(json_encode($Mp3Files));
 
             foreach ($Mp3Files as $key => $item) {
 
@@ -289,52 +289,52 @@ class Speechkit
                 if (!$length) {
                     return ['status' => false, 'files' => []];
                 }
-                $this->log->info( DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3');
+//                $this->log->info( DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3');
                 $tmp_array[] = DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3';
                 $nameAudio[] = ['nameAudio' => $number . '_' . $key, 'merge' => $item['merge']];
             }
-            $this->log->info('Названия полученныйх видео ' . json_encode($tmp_array, true));
-            $this->log->info('Название файлов на удаление ' . json_encode($nameAudio, true));
-            $this->log->info('Получили массив субтитров ' . json_encode($subtitles, true));
+//            $this->log->info('Названия полученныйх видео ' . json_encode($tmp_array, true));
+//            $this->log->info('Название файлов на удаление ' . json_encode($nameAudio, true));
+//            $this->log->info('Получили массив субтитров ' . json_encode($subtitles, true));
             $voices = implode('|', $tmp_array);
 
-            $this->log->info('Начало склейки аудио с задержкой');
+//            $this->log->info('Начало склейки аудио с задержкой');
             if ($delayBetween > 0) {
                 $arrayLongAudio = [];
                 $mergesAudio = [];
 
                 foreach ($nameAudio as $key => $audio) {
                     $audioName = DIRECTORY_SPEECHKIT . $audio['nameAudio'] . '.mp3';
-                    $this->log->info('Название файла ' . $audioName);
+//                    $this->log->info('Название файла ' . $audioName);
 
                     if ($audio['merge']) {
 
-                        $this->log->info('Файл является частью для склейки ' . $audioName);
+//                        $this->log->info('Файл является частью для склейки ' . $audioName);
                         $mergesAudio[] = DIRECTORY_SPEECHKIT . $audio['nameAudio'] . '.mp3';
                         $this->log->info('Масиив с файлами для склейки' . json_encode($mergesAudio, true));
 
                         if (isset($nameAudio[$key + 1])) {
-                            $this->log->info('Это последний фал для склеки? ' . !$nameAudio[$key + 1]['merge']);
+//                            $this->log->info('Это последний фал для склеки? ' . !$nameAudio[$key + 1]['merge']);
                             if (!$nameAudio[$key + 1]['merge']) {
-                                $this->log->info('Последний файл для склеки');
+//                                $this->log->info('Последний файл для склеки');
                                 $audioName = DIRECTORY_SPEECHKIT . $audio['nameAudio'] . '_merges.mp3';
 
                                 $ffmpeg = 'ffmpeg -i "concat:' . implode('|', $mergesAudio) . '"  -acodec copy -c:a libmp3lame ' . $audioName;
-                                $this->log->info($ffmpeg);
+//                                $this->log->info($ffmpeg);
                                 shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
                                 $outputAudio = DIRECTORY_SPEECHKIT . $audio['nameAudio'] . '_merges_long.mp3';
-                                $this->log->info('Добавление файлу паузу в начале');
+//                                $this->log->info('Добавление файлу паузу в начале');
                                 $ffmpegPause = 'ffmpeg -i ' . $audioName . ' -af adelay=' . $delayBetween . ' ' . $outputAudio;
-                                $this->log->info($ffmpegPause);
+//                                $this->log->info($ffmpegPause);
                                 shell_exec($ffmpegPause . ' -hide_banner -loglevel error 2>&1');
 
                                 $mergesAudio = [];
                                 $arrayLongAudio[] = $outputAudio;
                             }
-                            $this->log->info('Это не последний файлм для склеки');
+//                            $this->log->info('Это не последний файлм для склеки');
                         } else {
-                            $this->log->info('Последние файлы для склеки' . json_encode($mergesAudio, true));
+//                            $this->log->info('Последние файлы для склеки' . json_encode($mergesAudio, true));
 
                             $audioName = DIRECTORY_SPEECHKIT . $audio['nameAudio'] . '_merges.mp3';
                             $ffmpeg = 'ffmpeg -i "concat:' . implode('|', $mergesAudio) . '"  -acodec copy -c:a libmp3lame ' . $audioName;
