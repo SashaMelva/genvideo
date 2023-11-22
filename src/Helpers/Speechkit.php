@@ -208,18 +208,21 @@ class Speechkit
         }
 
         $this->log->info(json_encode($textArray));
-        foreach ($textArray as $key => $value) {
-            if (empty($value)) {
-                unset($textArray[$key]);
-            }
-        }
-        $this->log->info(json_encode($textArray));
-        exit();
+//        foreach ($textArray as $key => $value) {
+//            if (empty($value)) {
+//                unset($textArray[$key]);
+//            }
+//        }
+//        $this->log->info(json_encode($textArray));
+//        exit();
         $countChar = 250;
         $result = [];
 
         for ($l = 0; $l < count($textArray); $l++) {
 
+            if (empty($textArray[$l])) {
+                continue;
+            }
             if (iconv_strlen(trim($textArray[$l])) > $countChar) {
                 $textLongArrayParagraph = explode('.', trim($textArray[$l]));
                 if (iconv_strlen($textLongArrayParagraph[count($textLongArrayParagraph) - 1]) >= 0 && iconv_strlen($textLongArrayParagraph[count($textLongArrayParagraph) - 1]) < 2) {
