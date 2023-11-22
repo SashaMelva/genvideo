@@ -128,7 +128,7 @@ class GeneratorVideoCommand extends Command
                     'delay_end_video' => is_null($video['delay_end_video']) ? 3 : $video['delay_end_video']
                 ];
 
-                $textVideo = trim($video['initial_text']) . trim($video['text']) . trim($video['end_text']);
+                $textVideo = $video['initial_text'] . trim($video['text']) . $video['end_text'];
                 $voiceData = (new Speechkit($this->log))->generatorWithSubtitles($textVideo, $fileNameVoice, $voiceSetting);
 
                 if ($voiceData['status']) {

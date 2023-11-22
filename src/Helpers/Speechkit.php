@@ -40,7 +40,7 @@ class Speechkit
 
             } else {
                 $this->log->info('Задержка не требуется');
-                $resultText = $this->spillSubtitles($text);
+                $resultText = $this->spillSubtitlesParagraph($text);
                 $this->log->info(json_encode($resultText));
                 $data = $this->SplitMp3New($resultText, $fileName, $voiceSetting, 0, $voiceSetting['delay_end_video']);
             }
@@ -200,11 +200,16 @@ class Speechkit
     {
         $this->log->info('Форматирование текста по предложениям');
         $desc = trim($text);
-        $textArray = explode('\n', $desc);
 
-        foreach ($textArray as $value) {
-            print_r([iconv_strlen($value), $value]);
+        if (str_contains($desc, '\n') == true) {
+            $textArray = explode('\n', $desc);
+        } else {
+            $textArray = explode("\n", $desc);
         }
+
+//        foreach ($textArray as $value) {
+//
+//        }
 
         $countChar = 250;
         $result = [];
