@@ -264,8 +264,7 @@ class Speechkit
             $nameAudio = [];
 
             $this->log->info('Отправка запросов на синтез');
-            $this->log->info(key($Mp3Files));
-            $this->log->info(json_encode($Mp3Files));
+
             if (key($Mp3Files) == 'text') {
                 $Mp3Files = [0 => $Mp3Files];
             }
@@ -481,12 +480,13 @@ class Speechkit
         $arr = [];
         $allTime = 0;
         $counter = 0;
-//        $this->log->info('Массив субтитры ' . json_encode($text, true));
+        $this->log->info('Массив субтитры ' . json_encode($text, JSON_UNESCAPED_UNICODE));
         foreach ($text as $key => $item) {
 
             if ($item['time'] > 5600) {
                 $counter += 1;
                 $textShort = $this->shortText($item['text'], 4);
+                $this->log->info(json_encode($textShort, JSON_UNESCAPED_UNICODE));
                 $shortTime = round($item['time'] / 4, 2);
 
                 if ($key == 0) {
@@ -501,6 +501,16 @@ class Speechkit
                 $counter += 1;
                 $arr[] = ($counter) . "\r\n" . str_replace('.', ',', $this->formatMilliseconds($allTimeWhithShort))
                     . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($item['time'] + $allTime)) . "\r\n" . $textShort[1] . "\r\n";
+                $allTimeWhithShort = $shortTime + $allTime;
+
+                $counter += 1;
+                $arr[] = ($counter) . "\r\n" . str_replace('.', ',', $this->formatMilliseconds($allTimeWhithShort))
+                    . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($item['time'] + $allTime)) . "\r\n" . $textShort[2] . "\r\n";
+                $allTimeWhithShort = $shortTime + $allTime;
+
+                $counter += 1;
+                $arr[] = ($counter) . "\r\n" . str_replace('.', ',', $this->formatMilliseconds($allTimeWhithShort))
+                    . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($item['time'] + $allTime)) . "\r\n" . $textShort[3] . "\r\n";
 
             } elseif ($item['time'] > 3000) {
                 $counter += 1;
@@ -594,7 +604,7 @@ class Speechkit
             $result[] = ['text' => $text['text'], 'time' => $text['time']];
         }
 
-        $this->log->info('Получили преобразованные субтитры ' . json_encode($result, true));
+//        $this->log->info('Получили преобразованные субтитры ' . json_encode($result, true));
         return $result;
     }
 
