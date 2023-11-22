@@ -208,11 +208,11 @@ class Speechkit
             $textArray = explode("\n", $desc);
         }
 
-        foreach ($textArray as $key => $value) {
-            if (empty($value['text'])) {
-                unset($textArray[$key]);
-            }
-        }
+//        foreach ($textArray as $key => $value) {
+//            if (empty($value['text'])) {
+//                unset($textArray[$key]);
+//            }
+//        }
 
         $countChar = 250;
         $result = [];
