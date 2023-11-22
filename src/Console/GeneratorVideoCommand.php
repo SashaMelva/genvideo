@@ -283,6 +283,7 @@ class GeneratorVideoCommand extends Command
                     return 0;
                 }
 
+                ContentVideo::changePreview($videoId, $preview['previewName']);
                 $this->log->info('Превью сгенерировано ' . $resultName);
             }
 

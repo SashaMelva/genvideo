@@ -185,6 +185,6 @@ class ContentVideo extends Model
     {
         self::query()
             ->where([['id', '=', $videoId]])
-            ->update(['preview_name' => $previewName]);
+            ->update(['preview_file_name' => $previewName]);
     }
 }
