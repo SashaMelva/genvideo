@@ -484,27 +484,27 @@ class Speechkit
 //        $this->log->info('Массив субтитры ' . json_encode($text, true));
         foreach ($text as $key => $item) {
 
-//            if ($item['time'] > 5600) {
-//                $counter += 1;
-//                $textShort = $this->shortText($item['text']);
-//                $shortTime = round($item['time'] / 2, 2);
-//
-//                if ($key == 0) {
-//                    $arr[] = ($counter) . "\r\n" . '00:00:00,000 --> '
-//                        . str_replace('.', ',', $this->formatMilliseconds($shortTime + $allTime)) . "\r\n" . $textShort[0] . "\r\n";
-//                } else {
-//                    $arr[] = ($counter) . "\r\n" . str_replace('.', ',', $this->formatMilliseconds($allTime))
-//                        . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($shortTime + $allTime)) . "\r\n" . $textShort[0] . "\r\n";
-//                }
-//                $allTimeWhithShort = $shortTime + $allTime;
-//                $counter += 1;
-//                $arr[] = ($counter) . "\r\n" . str_replace('.', ',', $this->formatMilliseconds($allTimeWhithShort))
-//                    . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($item['time'] + $allTime)) . "\r\n" . $textShort[1] . "\r\n";
-//
-//            } else
-                if ($item['time'] > 3000) {
+            if ($item['time'] > 5600) {
                 $counter += 1;
-                $textShort = $this->shortText($item['text']);
+                $textShort = $this->shortText($item['text'], 4);
+                $shortTime = round($item['time'] / 4, 2);
+
+                if ($key == 0) {
+                    $arr[] = ($counter) . "\r\n" . '00:00:00,000 --> '
+                        . str_replace('.', ',', $this->formatMilliseconds($shortTime + $allTime)) . "\r\n" . $textShort[0] . "\r\n";
+                } else {
+                    $arr[] = ($counter) . "\r\n" . str_replace('.', ',', $this->formatMilliseconds($allTime))
+                        . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($shortTime + $allTime)) . "\r\n" . $textShort[0] . "\r\n";
+                }
+
+                $allTimeWhithShort = $shortTime + $allTime;
+                $counter += 1;
+                $arr[] = ($counter) . "\r\n" . str_replace('.', ',', $this->formatMilliseconds($allTimeWhithShort))
+                    . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($item['time'] + $allTime)) . "\r\n" . $textShort[1] . "\r\n";
+
+            } elseif ($item['time'] > 3000) {
+                $counter += 1;
+                $textShort = $this->shortText($item['text'], 2);
                 $shortTime = round($item['time'] / 2, 2);
 
                 if ($key == 0) {
@@ -514,6 +514,7 @@ class Speechkit
                     $arr[] = ($counter) . "\r\n" . str_replace('.', ',', $this->formatMilliseconds($allTime))
                         . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($shortTime + $allTime)) . "\r\n" . $textShort[0] . "\r\n";
                 }
+
                 $allTimeWhithShort = $shortTime + $allTime;
                 $counter += 1;
                 $arr[] = ($counter) . "\r\n" . str_replace('.', ',', $this->formatMilliseconds($allTimeWhithShort))
@@ -535,7 +536,7 @@ class Speechkit
         return implode("\r\n", $arr);
     }
 
-    private function shortText(string $text): array
+    private function shortText(string $text, int $point): array
     {
         $textArray = explode(' ', $text);
         $countChar = iconv_strlen($text);
@@ -545,7 +546,7 @@ class Speechkit
         $count = count($textArray);
 
         for ($i = 1; $i < $count; $i++) {
-            if (iconv_strlen($text) + iconv_strlen($textArray[$i]) > $countChar / 2) {
+            if (iconv_strlen($text) + iconv_strlen($textArray[$i]) > $countChar / $point) {
                 $result[] = $text;
                 $result[] = implode(" ", $textArray);
                 break;
