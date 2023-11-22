@@ -36,13 +36,13 @@ class Speechkit
 
                 $this->log->info('Задержка между абзацами');
                 $resultText = $this->spillSubtitlesParagraph($text);
-                $data = $this->SplitMp3New($resultText, $fileName, $voiceSetting, $voiceSetting['delay_between_paragraphs_ms'], $voiceSetting['delay_between_offers_ms']);
+                $data = $this->SplitMp3New($resultText, $fileName, $voiceSetting, $voiceSetting['delay_between_paragraphs_ms'], $voiceSetting['delay_end_video']);
 
             } else {
                 $this->log->info('Задержка не требуется');
                 $resultText = $this->spillSubtitles($text);
                 $this->log->info(json_encode($resultText));
-                $data = $this->SplitMp3($resultText, $fileName, $voiceSetting);
+                $data = $this->SplitMp3New($resultText, $fileName, $voiceSetting, 0, $voiceSetting['delay_end_video']);
             }
 
             $this->log->info('Получили данные по генерации озвучки и субтитров' . json_encode($data));
@@ -97,11 +97,9 @@ class Speechkit
             return ['text' => trim($textArray[0]) . '. ', 'merge' => false];
         }
 
-
         $text = trim($textArray[0]) . '. ';
         unset($textArray[0]);
         $count = count($textArray);
-
 
         for ($i = 1; $i <= $count; $i++) {
 
@@ -288,9 +286,9 @@ class Speechkit
                 $tmp_array[] = DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3';
                 $nameAudio[] = ['nameAudio' => $number . '_' . $key, 'merge' => $item['merge']];
             }
-//            $this->log->info('Названия полученныйх видео ' . json_encode($tmp_array, true));
-//            $this->log->info('Название файлов на удаление ' . json_encode($nameAudio, true));
-//            $this->log->info('Получили массив субтитров ' . json_encode($subtitles, true));
+            $this->log->info('Названия полученныйх видео ' . json_encode($tmp_array, true));
+            $this->log->info('Название файлов на удаление ' . json_encode($nameAudio, true));
+            $this->log->info('Получили массив субтитров ' . json_encode($subtitles, true));
             $voices = implode('|', $tmp_array);
 
             $this->log->info('Начало склейки аудио с задержкой');
@@ -300,46 +298,46 @@ class Speechkit
 
                 foreach ($nameAudio as $key => $audio) {
                     $audioName = DIRECTORY_SPEECHKIT . $audio['nameAudio'] . '.mp3';
-//                    $this->log->info('Название файла ' . $audioName);
+                    $this->log->info('Название файла ' . $audioName);
 
                     if ($audio['merge']) {
 
-//                        $this->log->info('Файл является частью для склейки ' . $audioName);
+                        $this->log->info('Файл является частью для склейки ' . $audioName);
                         $mergesAudio[] = DIRECTORY_SPEECHKIT . $audio['nameAudio'] . '.mp3';
-//                        $this->log->info('Масиив с файлами для склейки' . json_encode($mergesAudio, true));
+                        $this->log->info('Масиив с файлами для склейки' . json_encode($mergesAudio, true));
 
                         if (isset($nameAudio[$key + 1])) {
-//                            $this->log->info('Это последний фал для склеки? ' . !$nameAudio[$key + 1]['merge']);
+                            $this->log->info('Это последний фал для склеки? ' . !$nameAudio[$key + 1]['merge']);
                             if (!$nameAudio[$key + 1]['merge']) {
-//                                $this->log->info('Последний файл для склеки');
+                                $this->log->info('Последний файл для склеки');
                                 $audioName = DIRECTORY_SPEECHKIT . $audio['nameAudio'] . '_merges.mp3';
 
                                 $ffmpeg = 'ffmpeg -i "concat:' . implode('|', $mergesAudio) . '"  -acodec copy -c:a libmp3lame ' . $audioName;
-//                                $this->log->info($ffmpeg);
+                                $this->log->info($ffmpeg);
                                 shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
                                 $outputAudio = DIRECTORY_SPEECHKIT . $audio['nameAudio'] . '_merges_long.mp3';
-//                                $this->log->info('Добавление файлу паузу в начале');
+                                $this->log->info('Добавление файлу паузу в начале');
                                 $ffmpegPause = 'ffmpeg -i ' . $audioName . ' -af adelay=' . $delayBetween . ' ' . $outputAudio;
-//                                $this->log->info($ffmpegPause);
+                                $this->log->info($ffmpegPause);
                                 shell_exec($ffmpegPause . ' -hide_banner -loglevel error 2>&1');
 
                                 $mergesAudio = [];
                                 $arrayLongAudio[] = $outputAudio;
                             }
-//                            $this->log->info('Это не последний файлм для склеки');
+                            $this->log->info('Это не последний файлм для склеки');
                         } else {
-//                            $this->log->info('Последние файлы для склеки' . json_encode($mergesAudio, true));
+                            $this->log->info('Последние файлы для склеки' . json_encode($mergesAudio, true));
 
                             $audioName = DIRECTORY_SPEECHKIT . $audio['nameAudio'] . '_merges.mp3';
                             $ffmpeg = 'ffmpeg -i "concat:' . implode('|', $mergesAudio) . '"  -acodec copy -c:a libmp3lame ' . $audioName;
-//                            $this->log->info($ffmpeg);
+                            $this->log->info($ffmpeg);
                             shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
                             $outputAudio = DIRECTORY_SPEECHKIT . $audio['nameAudio'] . '_merges_long.mp3';
-//                            $this->log->info('Добавление файлу паузу в начале');
+                            $this->log->info('Добавление файлу паузу в начале');
                             $ffmpegPause = 'ffmpeg -i ' . $audioName . ' -af adelay=' . $delayBetween . ' ' . $outputAudio;
-//                            $this->log->info($ffmpegPause);
+                            $this->log->info($ffmpegPause);
                             shell_exec($ffmpegPause . ' -hide_banner -loglevel error 2>&1');
 
                             $mergesAudio = [];
@@ -349,10 +347,10 @@ class Speechkit
                         continue;
                     }
 
-//                    $this->log->info('Формирование аудио с пустотой спереди');
+                    $this->log->info('Формирование аудио с пустотой спереди');
                     $outputAudio = $audio['nameAudio'] . '_long.mp3';
                     $ffmpeg = 'ffmpeg -i ' . $audioName . ' -af adelay=' . $delayBetween . ' ' . DIRECTORY_SPEECHKIT . $outputAudio;
-//                    $this->log->info($ffmpeg);
+                    $this->log->info($ffmpeg);
                     shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
                     $arrayLongAudio[] = DIRECTORY_SPEECHKIT . $outputAudio;
                 }
@@ -372,13 +370,13 @@ class Speechkit
             $this->log->info('Отрезаем спереди файла пустоту');
             $cutFrontVideo = $resultNameAllFiles . '_cut';
             $ffmpegShortAudio = 'ffmpeg -i ' . DIRECTORY_SPEECHKIT . $resultNameAllFiles . '.mp3 -ss ' . (int)($delayBetween / 1000) . ' -acodec copy -y ' . DIRECTORY_SPEECHKIT . $cutFrontVideo . '.mp3';
-//            $this->log->info($ffmpegShortAudio);
+            $this->log->info($ffmpegShortAudio);
             shell_exec($ffmpegShortAudio . ' -hide_banner -loglevel error 2>&1');
             $tmp_array[] = DIRECTORY_SPEECHKIT . $cutFrontVideo . '.mp3';
 
-//            $this->log->info('Добавлям в конец файла две секунды');
+            $this->log->info('Добавлям в конец файла две секунды');
             $ffmpegShortAudioResult = 'ffmpeg -i ' . DIRECTORY_SPEECHKIT . $cutFrontVideo . '.mp3 -af "apad=pad_dur=' . $delayEnd . '" -y ' . DIRECTORY_SPEECHKIT . $number . '.mp3';
-//            $this->log->info($ffmpegShortAudioResult);
+            $this->log->info($ffmpegShortAudioResult);
             shell_exec($ffmpegShortAudioResult . ' -hide_banner -loglevel error 2>&1');
 
 
