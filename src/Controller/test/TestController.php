@@ -49,56 +49,20 @@ class TestController extends UserController
         $this->log = $log;
         $this->status_log = true;
 
-        $text = 'Влияние медитации \n на нахождение равновесия \n в повседневной жизни';
-        $textArray = explode('\n', $text);
-        $firstPreviewName = '12_photo.jpg'; //$this->contentId . '_photo';
+        $subtitles = [
+            ["text" => "По психосоматике астма может быть связана с психологическими и эмоциональными факторами.", "time" => 6240],
+            ["text" => "Хотя астма в основном рассматривается как хроническое воспалительное заболевание дыхательных путей, психосоматический подход подчеркивает влияние психологических состояний на проявление и усиление симптомов астмы.", "time" => 13104],
+            ["text" => "Стресс, тревожность, депрессия и другие эмоциональные факторы могут усиливать симптомы астмы у некоторых людей.", "time" => 7656], ["text" => "Это может быть связано с изменениями в дыхательной функции, уровнями воспаления или сокращениями бронхиальных мышц под воздействием стресса и эмоционального напряжения.", "time" => 10800],
+            ["text" => "Кроме того, некоторые люди могут испытывать \"стресс-индуцированную астму\", когда стресс или эмоциональное напряжение являются прямыми триггерами для приступов удушья и других симптомов астмы.", "time" => 12792],
+            ["text" => "Важно отметить, что психосоматический подход не исключает физиологические аспекты астмы, такие как воспаление дыхательных путей и гиперреактивность бронхов.", "time" => 10224],
+            ["text" => "Однако он подчеркивает важность понимания влияния психологических факторов на заболевание и возможность использования психологических методов в комплексном лечении астмы.", "time" => 10296],
+            ["text" => "Люди с астмой могут иметь пользу от поддержки психолога или психотерапевта для управления стрессом, тревожностью и другими эмоциональными аспектами, которые могут влиять на их состояние здоровья.", "time" => 12960],
+            ["text" => "Также медитация, релаксация, практики осознанности и другие методы саморегуляции могут быть полезны в управлении психологическими аспектами астмы.", "time" => 10104]
+        ];
 
-        $ffmpegTimeVideo = 'ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 /var/www/genvi-api/public/video/333_result.mp4';
-        $res = shell_exec($ffmpegTimeVideo);
-        $this->log->info('Длина видео в секундах ' . $res);
-        $secondVideo = rand(1, (int)$res);
-        $formatSeconds = $this->formatMilliseconds($secondVideo * 1000);
-        $this->log->info('Выбранная и отформатированная секунда ' . $formatSeconds);
+        file_put_contents(DIRECTORY_TEXT . 222 . '.srt', $this->getFilesSrt($subtitles, 40000));
 
-        $this->log->info(json_encode($textArray));
-        $resultImage = 'preview_result.jpg';
-        $videoName = '422_text.mp4';
-        $this->log->info('Достаём кадр из видео');
-        $ffmpeg = 'ffmpeg -ss ' . $formatSeconds . ' -i ' . DIRECTORY_VIDEO . $videoName . ' -frames:v 1 -y  ' . DIRECTORY_PREVIEW . $firstPreviewName;
-        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
-
-        $this->log->info('Узнаём параметры изображения');
-        $identify = ' identify -format "%wx%h" ' . DIRECTORY_PREVIEW . $firstPreviewName;
-        $whidthAndHeight = shell_exec($identify);
-        $whidthPreview = explode('x', $whidthAndHeight)[0];
-        $heightPreview = explode('x', $whidthAndHeight)[1];
-        $this->log->info('Ширина и высота изображения ' . $whidthAndHeight);
-
-
-        $magicCommand = 'convert /var/www/genvi-api/var/resources/preview/' . $firstPreviewName;
-        $this->log->info('Перебираем текст '. $whidthPreview . ' ' . $heightPreview);
-
-        if ($whidthPreview > 600 && $whidthPreview < 700) {
-            $marginTop = 40;
-            $placeTop = 40;
-            $marginLeft = 20;
-            $fontSize = 32;
-        } else {
-            $marginTop = 80;
-            $placeTop = 110;
-            $marginLeft = 40;
-            $fontSize = 84;
-        }
-
-        foreach ($textArray as $textValue) {
-            $magicCommand .= ' -undercolor yellow -fill black -gravity northwest -font ' . DIRECTORY_FONTS . 'arial_bold.ttf  -pointsize ' . $fontSize . ' -size 1024x -annotate +' . $marginLeft . '+' . $marginTop . ' "' . $textValue . '"';
-            $marginTop += $placeTop;
-        }
-
-        $magicCommand .= '  ' . DIRECTORY_PREVIEW . $resultImage;
-        $this->log->info($magicCommand);
-        shell_exec($magicCommand);
-//        unlink(DIRECTORY_PREVIEW . $firstPreviewName);
+        //        unlink(DIRECTORY_PREVIEW . $firstPreviewName);
 
 //        if (count($textArray) == 1) {
 //
@@ -215,6 +179,36 @@ class TestController extends UserController
         $data = $this->SplitMp3($result, 'RESULT_endNew', $voiceSetting, $voiceSetting['delay_between_offers_ms']);
 
         return $this->respondWithData($data);
+    }
+
+    private function getFilesSrt(array $text, float $delayBetweenOffersMs): string
+    {
+        $arr = [];
+        $allTime = 0;
+        $counterGlobal = 1;
+        $this->log->info('Массив субтитры ' . json_encode($text, JSON_UNESCAPED_UNICODE));
+
+        foreach ($text as $item) {
+            $countSubtitles = floor($item['time'] / 3000);
+            $textShorts = $this->shortText($item['text'], $countSubtitles);
+            $shortTimePiece = round($item['time'] / $countSubtitles, 2);
+            $shortTime = 0;
+            $counter = 0;
+
+            while ($counter < $countSubtitles) {
+
+                $arr[] = ($counterGlobal) . "\r\n" . str_replace('.', ',', $this->formatMilliseconds($shortTime + $allTime))
+                    . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($shortTime + $allTime + $shortTimePiece)) . "\r\n" . $textShorts[$counter] . "\r\n";
+
+                $shortTime = $shortTime + $shortTimePiece;
+                $counterGlobal += 1;
+                $counter += 1;
+            }
+
+            $allTime = $item['time'] + $allTime + $delayBetweenOffersMs;
+        }
+
+        return implode("\r\n", $arr);
     }
 
     private function SplitMp3($Mp3Files, $number, array $voiceSetting, int $delayBetween): array
@@ -382,46 +376,6 @@ class TestController extends UserController
         return $result;
     }
 
-    private function getFilesSrt(array $text, float $delayBetweenOffersMs): string
-    {
-        $arr = [];
-        $allTime = 0;
-        $counter = 0;
-        $this->log->info('Массив субтитры ' . json_encode($text, true));
-        foreach ($text as $key => $item) {
-
-            if ($item['time'] > 5600) {
-                $counter += 1;
-                $textShort = $this->shortText($item['text']);
-                $shortTime = round($item['time'] / 2, 2);
-
-                if ($key == 0) {
-                    $arr[] = ($counter) . "\r\n" . '00:00:00,000 --> '
-                        . str_replace('.', ',', $this->formatMilliseconds($shortTime + $allTime)) . "\r\n" . $textShort[0] . "\r\n";
-                } else {
-                    $arr[] = ($counter) . "\r\n" . str_replace('.', ',', $this->formatMilliseconds($allTime))
-                        . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($shortTime + $allTime)) . "\r\n" . $textShort[0] . "\r\n";
-                }
-                $allTimeWhithShort = $shortTime + $allTime;
-                $counter += 1;
-                $arr[] = ($counter) . "\r\n" . str_replace('.', ',', $this->formatMilliseconds($allTimeWhithShort))
-                    . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($item['time'] + $allTime)) . "\r\n" . $textShort[1] . "\r\n";
-
-            } else {
-                $counter += 1;
-                if ($key == 0) {
-                    $arr[] = ($key + 1) . "\r\n" . '00:00:00,000 --> '
-                        . str_replace('.', ',', $this->formatMilliseconds($item['time'] + $allTime)) . "\r\n" . $item['text'] . "\r\n";
-                } else {
-                    $arr[] = ($counter) . "\r\n" . str_replace('.', ',', $this->formatMilliseconds($allTime))
-                        . ' --> ' . str_replace('.', ',', $this->formatMilliseconds($item['time'] + $allTime)) . "\r\n" . $item['text'] . "\r\n";
-                }
-            }
-
-            $allTime = $item['time'] + $allTime + $delayBetweenOffersMs;
-        }
-        return implode("\r\n", $arr);
-    }
 
     /** Распределение текста по предложениям длинною не более 250 симвволов, не теряя смысловой нагрузки */
     private function spillSubtitlesOffers(string $text): array
@@ -651,25 +605,35 @@ class TestController extends UserController
         }
     }
 
-    private
-    function shortText(string $text): array
+    private function shortText(string $text, int $point): array
     {
         $textArray = explode(' ', $text);
         $countChar = iconv_strlen($text);
+
         $result = [];
         $text = $textArray[0] . ' ';
         unset($textArray[0]);
         $count = count($textArray);
 
         for ($i = 1; $i < $count; $i++) {
-            if (iconv_strlen($text) + iconv_strlen($textArray[$i]) > $countChar / 2) {
-                $result[] = $text;
-                $result[] = implode(" ", $textArray);
-                break;
+
+            if (iconv_strlen(trim($text)) + iconv_strlen(trim($textArray[$i])) > ceil($countChar / $point)) {
+                $result[] = trim($text);
+                $text = '';
+
+                if ($i + 1 == $count) {
+                    break;
+                }
             }
 
             $text .= $textArray[$i] . ' ';
             unset($textArray[$i]);
+        }
+
+        if ($point >= 4) {
+            $result[$point - 1] = trim($result[$point - 1] . ' ' . $text . implode(' ', $textArray));
+        } else {
+            $result[] = $text . implode(' ', $textArray);
         }
 
         return $result;
