@@ -66,7 +66,7 @@ class Speechkit
                     }
                 }
 
-                return ['status' => true, 'time' => $file['playtime_seconds'], 'name' => $fileName, 'command' => $data['command']];
+                return ['status' => true, 'time' => $seconds, 'name' => $fileName, 'command' => $data['command']];
 
             } elseif (!is_null($filesName)) {
                 foreach ($filesName as $item) {
@@ -208,13 +208,6 @@ class Speechkit
         }
 
         $this->log->info(json_encode($textArray, JSON_UNESCAPED_UNICODE));
-//        foreach ($textArray as $key => $value) {
-//            if (empty($value)) {
-//                unset($textArray[$key]);
-//            }
-//        }
-//        $this->log->info(json_encode($textArray));
-//        exit();
         $countChar = 250;
         $result = [];
 
@@ -263,8 +256,7 @@ class Speechkit
         }
 
         $this->log->info("Получили отформатированный текст");
-        $this->log->info(json_encode($textArray, JSON_UNESCAPED_UNICODE));
-        exit();
+        $this->log->info(json_encode($result, JSON_UNESCAPED_UNICODE));
         return $result;
     }
 
@@ -391,7 +383,7 @@ class Speechkit
             shell_exec($ffmpegShortAudio . ' -hide_banner -loglevel error 2>&1');
             $tmp_array[] = DIRECTORY_SPEECHKIT . $cutFrontVideo . '.mp3';
 
-            $this->log->info('Добавлям в конец файла две секунды');
+            $this->log->info('Добавлям в конец файла ' . $delayEnd . ' секунды');
             $ffmpegShortAudioResult = 'ffmpeg -i ' . DIRECTORY_SPEECHKIT . $cutFrontVideo . '.mp3 -af "apad=pad_dur=' . $delayEnd . '" -y ' . DIRECTORY_SPEECHKIT . $number . '.mp3';
             $this->log->info($ffmpegShortAudioResult);
             shell_exec($ffmpegShortAudioResult . ' -hide_banner -loglevel error 2>&1');
@@ -399,6 +391,8 @@ class Speechkit
 
             $this->log->info('Генерируем файл субтитрв');
             /**для субтитров*/
+            var_dump($subtitles);
+            var_dump($this->mergesSubtitles($subtitles));
             file_put_contents(DIRECTORY_TEXT . $number . '.srt', $this->getFilesSrt($this->mergesSubtitles($subtitles), $delayBetween));
 
             $this->log->info('Преабразуем файл субтитров в формат ass');

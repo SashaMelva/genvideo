@@ -133,8 +133,7 @@ class GeneratorVideoCommand extends Command
 
                 if ($voiceData['status']) {
 
-                    TextVideo::updateFileTextAndStatus($video['text_id'], $fileNameVoice, RELATIVE_PATH_TEXT . $fileNameVoice, '1');
-                    TextVideo::updateFileVoice($video['text_id'], $fileNameVoice, RELATIVE_PATH_SPEECHKIT . $fileNameVoice . '.' . $voiceSetting['format'], '1', $voiceData['time']);
+                    TextVideo::updateFileTextAndStatus($video['text_id'], $fileNameVoice, RELATIVE_PATH_TEXT . $fileNameVoice, '1', $fileNameVoice, RELATIVE_PATH_SPEECHKIT . $fileNameVoice . '.' . $voiceSetting['format'], '1', $voiceData['time']);
                     ContentVideo::changeStatus($videoId, 3);
                     $this->log->info('Успех генерации субтитров, id текста ' . $video['text_id']);
                     $this->log->info('Успех генерации аудио озвучки, id текста ' . $video['text_id']);
