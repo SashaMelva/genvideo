@@ -18,12 +18,12 @@ class LoadPreviewVideo extends UserController
      */
     public function action(): ResponseInterface
     {
-//        $access_token = $this->request->getHeaderLine('Token');
+        $access_token = $this->request->getHeaderLine('Token');
         $contentId = $this->request->getAttribute('id');
 
         ini_set('memory_limit', '-1');
 
-//        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
+        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
 
             try {
 
@@ -46,8 +46,8 @@ class LoadPreviewVideo extends UserController
             } catch (Throwable $e) {
                 return $this->respondWithError($e->getCode(), $e->getMessage());
             }
-//        } else {
-//            return $this->respondWithError(215);
-//        }
+        } else {
+            return $this->respondWithError(215);
+        }
     }
 }
