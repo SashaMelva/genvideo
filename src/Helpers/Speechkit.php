@@ -42,7 +42,6 @@ class Speechkit
             } else {
                 $this->log->info('Задержка не требуется');
                 $resultText = $this->spillSubtitlesParagraph($text);
-                $this->log->info(json_encode($resultText));
                 $data = $this->SplitMp3New($resultText, $fileName, $voiceSetting, 0, $voiceSetting['delay_end_video']);
             }
 
@@ -208,12 +207,14 @@ class Speechkit
             $textArray = explode("\n", $desc);
         }
 
-//        foreach ($textArray as $key => $value) {
-//            if (empty($value['text'])) {
-//                unset($textArray[$key]);
-//            }
-//        }
-
+        $this->log->info(json_encode($textArray));
+        foreach ($textArray as $key => $value) {
+            if (empty($value['text'])) {
+                unset($textArray[$key]);
+            }
+        }
+        $this->log->info(json_encode($textArray));
+        exit();
         $countChar = 250;
         $result = [];
 
