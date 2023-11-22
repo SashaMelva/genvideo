@@ -67,7 +67,6 @@ class ContentVideo extends Model
                 'content.file_name',
                 'content.project_id',
                 'content.format',
-                'content.preview_name',
                 'content.preview_text',
                 'content.preview_file_name',
                 'content.status_id',
@@ -145,7 +144,6 @@ class ContentVideo extends Model
         ?int  $statusGeneratorImage = 0,
         ?string $delayEndVideo = '3',
         ?string $preview = '',
-        ?string $previewName = '',
     ): ContentVideo
     {
         $newContent = new ContentVideo();
@@ -166,7 +164,6 @@ class ContentVideo extends Model
         $newContent->setAttribute('genertor_image_status', $statusGeneratorImage);
         $newContent->setAttribute('delay_end_video', $delayEndVideo);
         $newContent->setAttribute('preview_text', $preview);
-        $newContent->setAttribute('preview_name', $previewName);
         $newContent->save();
         return $newContent;
     }
