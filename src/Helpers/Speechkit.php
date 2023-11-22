@@ -209,7 +209,7 @@ class Speechkit
         }
 
         foreach ($textArray as $key => $value) {
-            if (empty($value)) {
+            if (empty($value['text'])) {
                 unset($textArray[$key]);
             }
         }
@@ -272,6 +272,7 @@ class Speechkit
 
             $this->log->info('Отправка запросов на синтез');
 
+            $this->log->info(key($Mp3Files[0]));
             if (key($Mp3Files) == 'text') {
                 $Mp3Files = [0 => $Mp3Files];
             }
