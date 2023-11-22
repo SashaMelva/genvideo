@@ -273,20 +273,20 @@ class GeneratorVideoCommand extends Command
                 }
             }
 
-//            if (!is_null($resultName)) {
-//                $this->log->info('Создаём превью для видео');
-//                $preview = $generatorFiles->generatorPreview($resultName,$video['type_background']);
-//
-//                if (!$preview['status']) {
-//                    ContentVideo::changeStatus($videoId, 13);
-//                    $this->log->error('Ошибка генерации превью');
-//                    exec($cmd);
-//                    return 0;
-//                }
-//
-//                $resultName = $preview['fileName'];
-//                $this->log->info('Превью сгенерировано ' . $resultName);
-//            }
+            if (!is_null($resultName)) {
+                $this->log->info('Создаём превью для видео');
+                $preview = $generatorFiles->generatorPreview($resultName,$video['type_background']);
+
+                if (!$preview['status']) {
+                    ContentVideo::changeStatus($videoId, 13);
+                    $this->log->error('Ошибка генерации превью');
+                    exec($cmd);
+                    return 0;
+                }
+
+                $resultName = $preview['fileName'];
+                $this->log->info('Превью сгенерировано ' . $resultName);
+            }
             if (!is_null($video['color_background_id']) && !is_null($resultName)) {
 
                 $colorBackground = ColorBackground::findById((int)$video['color_background_id']);
