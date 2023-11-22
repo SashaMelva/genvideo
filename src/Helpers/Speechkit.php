@@ -202,7 +202,6 @@ class Speechkit
         $this->log->info('Форматирование текста по абзацам');
         $desc = trim($text);
 
-        $this->log->info(str_contains($desc, '\n') == true);
         if (str_contains($desc, '\n') == true) {
             $textArray = explode('\n', $desc);
         } else {
@@ -214,7 +213,7 @@ class Speechkit
                 unset($textArray[$key]);
             }
         }
-        $this->log->info(json_encode($textArray));
+
         $countChar = 250;
         $result = [];
 
@@ -254,13 +253,12 @@ class Speechkit
                     }
                 }
             } else {
-                $result[] = ['text' => trim($textArray[$l]), 'merge' => false, 'len' => iconv_strlen(trim($textArray[$l]))];
+                $result[] = ['text' => trim($textArray[$l]), 'merge' => false];
             }
 
         }
 
         $this->log->info("Получили отформатированный текст");
-//        $this->log->info(json_encode($result, true));
         return $result;
     }
 
