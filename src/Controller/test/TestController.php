@@ -49,6 +49,30 @@ class TestController extends UserController
         $this->log = $log;
         $this->status_log = true;
 
+        $textPreview = 'Медитация перед сном для своей гармонии';
+
+        $desc = trim($textPreview);
+        $textArray = explode(' ', $desc);
+        $text = '';
+        $countChar = 25;
+        $result = [];
+        $countArray = count($textArray);
+        /** Проверка остальных предложения на количество символов */
+        for ($i = 0; $i < $countArray; $i++) {
+            var_dump($i);
+            if (iconv_strlen(trim($textArray[$i])) + iconv_strlen($text) > $countChar) {
+                var_dump(iconv_strlen($text));
+                $result[] = trim($text);
+                $text = '';
+            }
+
+            $text .= trim($textArray[$i]) . ' ';
+            unset($textArray[$i]);
+
+        }
+        $result[] = trim(implode(" ", $textArray) . $text);
+        var_dump($result);
+        exit();
         $video = ContentVideo::findAllDataByID(435);
 
         $voiceSetting = [
@@ -61,7 +85,7 @@ class TestController extends UserController
             'voice_speed' => is_null($video['voice_speed']) ? '1.0' : $video['voice_speed'],
             'delay_end_video' => is_null($video['delay_end_video']) ? 3 : $video['delay_end_video']
         ];
-        $subtitles = [["text"=>"Метод upsert вставляет записи,","time" =>2544],["text"=>"которые не существуют, и обновляет записи. \nКоторые уже существуют, новыми значениями","time"=>6168]];
+        $subtitles = [["text" => "Метод upsert вставляет записи,", "time" => 2544], ["text" => "которые не существуют, и обновляет записи. \nКоторые уже существуют, новыми значениями", "time" => 6168]];
         file_put_contents(DIRECTORY_TEXT . 333 . '.srt', $this->getFilesSrt($subtitles, 100));
 //        $textVideo = $video['initial_text'] . $video['text'] . $video['end_text'];
 //        var_dump($textVideo);
@@ -369,7 +393,7 @@ class TestController extends UserController
             /**для субтитров*/
             $length =
 
-            $this->log->info('Преабразуем файл субтитров в формат ass');
+                $this->log->info('Преабразуем файл субтитров в формат ass');
             $ffmpeg = 'ffmpeg -i ' . DIRECTORY_TEXT . $number . '.srt -y ' . DIRECTORY_TEXT . $number . '.ass';
             $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
             return ['status' => true, 'files' => $tmp_array, 'command' => $ffmpeg];

@@ -280,9 +280,27 @@ class GeneratorFiles
     public function generatorPreview(string $videoName, string $textPreview): array
     {
         $videoName = $videoName . '.mp4';
-        $textArray = explode('\n', $textPreview);
         $firstPreviewName = $this->contentId . '_photo.jpg';
         $resultImage = $this->contentId . '_result.jpg';
+
+        $textArrayWords = explode(' ', trim($textPreview));
+        $text = '';
+        $countChar = 25;
+        $textArray = [];
+        $countArray = count($textArrayWords);
+        /** Проверка остальных предложения на количество символов */
+        for ($i = 0; $i < $countArray; $i++) {
+
+            if (iconv_strlen(trim($textArrayWords[$i])) + iconv_strlen($text) > $countChar) {
+                $textArray[] = trim($text);
+                $text = '';
+            }
+
+            $text .= trim($textArrayWords[$i]) . ' ';
+            unset($textArrayWords[$i]);
+        }
+
+        $textArray[] = trim(implode(" ", $textArrayWords) . $text);
 
         $ffmpegTimeVideo = 'ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 ' . DIRECTORY_VIDEO . $videoName;
         $res = shell_exec($ffmpegTimeVideo);
