@@ -18,7 +18,7 @@ class Article extends Model
         $newContent->setAttribute('rubric', $rubric);
         $newContent->setAttribute('created_at', new \DateTimeImmutable());
         $newContent->setAttribute('updated_at', new \DateTimeImmutable());
-        $newContent->setAttribute('rubric', $webSiteId);
+        $newContent->setAttribute('website_id', $webSiteId);
         $newContent->setAttribute('marking', $marking);
         $newContent->setAttribute('status_id', 1);
         $newContent->save();
@@ -42,8 +42,8 @@ class Article extends Model
                 'articles.marking',
                 'articles.text',
                 'articles.status_id',
-                'articles.id_project',
-                'articles.id_website',
+                'articles.project_id',
+                'articles.website_id',
                 'websites.domen',
                 'websites.user_name',
                 'websites.password_app',
