@@ -32,6 +32,13 @@ class Article extends Model
             ->update(['status_id' => $statusId]);
     }
 
+    public static function updatedContentData(int $textId, string $text): void
+    {
+        self::query()
+            ->where([['id', '=', $textId]])
+            ->update(['text' => $text]);
+    }
+
     public static function findAllById(int $articleId)
     {
         return self::query()

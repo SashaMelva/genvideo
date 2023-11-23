@@ -14,7 +14,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class FormatTextArticleFromChatGpt  extends Command
+class FormatTextArticleFromChatGpt extends Command
 {
     private Logger $log;
     private bool $status_log;
@@ -93,13 +93,14 @@ class FormatTextArticleFromChatGpt  extends Command
                 }
 
                 $this->log->info('Соранение результата');
-                TextVideo::updatedContentData($gptRequest['text_id'], $resultText);
+                Article::updatedContentData($articleId, $resultText);
                 Article::changeStatus($articleId, 6);
 
             } else {
 
                 if ($this->status_log) {
                     $this->log->info('Не найден запрос на генерацию контента: ' . $articleId);
+                    GPTChatRequests::changeStatus($gptRequest['id'], 5);
                     Article::changeStatus($articleId, 9);
                     exec($cmd);
                     return 0;
