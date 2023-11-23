@@ -68,27 +68,12 @@ class SendingArticleWordpress extends Command
             Article::changeStatus($articleId, 7);
             $article = Article::findAllById($articleId);
 
-            $url = '/wp-json/wp/v2/posts?title=' . $article['name'] . '&status=draft&content=' . $article['text'];
+            $text = str_replace('\n', "\n",  $article['text']);
+            var_dump($text);
+            $requestFlag = $this->senTextJson($article, $text);
 
-            if (!is_null($article['rubric'])) {
-                $url .= '&categories=' . $article['rubric'];
-            }
 
-            if (!is_null($article['marking'])) {
-                $url .= '&tags=' . $article['marking'];
-            }
-
-            $client = new Client([
-                'base_uri' => 'https://' . $article['domen'],
-                'headers' => [
-                    'Authorization' => 'Basic ' . base64_encode($article['user_name'] . ':' . $article['password_app'])
-                ]
-            ]);
-
-            $res = $client->post($url);
-
-            if ($res->getStatusCode() !== 200) {
-                $this->log->info('Ошибка отправки запроса: ' . $articleId);
+            if (!$requestFlag) {
                 Article::changeStatus($articleId, 9);
             }
 
@@ -103,5 +88,41 @@ class SendingArticleWordpress extends Command
 
         exec($cmd);
         return 0;
+    }
+
+    private function senTextJson(array $article, string $text): bool
+    {
+        $url = 'https://' . $article['domen'] . '/wp-json/wp/v2/posts';
+
+        $client = new Client();
+
+        $postData = [
+            'title' => $article['name'],
+            'status' => 'draft',
+            'content' => $text,
+        ];
+
+        if (!is_null($article['rubric'])) {
+            $postData[] = ['categories'=>$article['rubric']];
+        }
+
+        if (!is_null($article['marking'])) {
+            $postData[] = ['tags' => $article['marking']];
+        }
+
+        $res = $client->post($url, [
+            'headers' => [
+                'Authorization' => 'Basic ' . base64_encode($article['user_name'] . ':' . $article['password_app']),
+                'Content-Type' => 'application/json',
+            ],
+            'body' => json_encode($postData),
+        ]);
+
+        if ($res->getStatusCode() != 201 && $res->getStatusCode() != 200) {
+            $this->log->info('Ошибка отправки запроса');
+            return false;
+        }
+
+        return true;
     }
 }
