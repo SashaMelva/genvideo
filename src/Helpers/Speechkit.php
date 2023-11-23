@@ -153,10 +153,19 @@ class Speechkit
     {
         $this->log->info('Форматирование текста по предложениям');
         $desc = trim($text);
-        $desc = preg_replace("[\r\n]", " ", $desc);
-        $desc = preg_replace("[\n]", " ", $desc);
-        $desc = str_replace('\n', '', $desc);
-        $textArray = explode('.', $desc);
+
+        if (str_contains($desc, '\n') == true) {
+            $textArrayParagraph = explode('\n', $desc);
+        } else {
+            $textArrayParagraph = explode("\n", $desc);
+        }
+
+        $this->log->info(json_encode($textArrayParagraph, JSON_UNESCAPED_UNICODE));
+        $textArray = [];
+
+        foreach ($textArrayParagraph as $paragraph) {
+            $textArray = array_merge($textArray,explode('.', $paragraph));
+        }
 
         if (iconv_strlen($textArray[count($textArray) - 1]) >= 0 && iconv_strlen($textArray[count($textArray) - 1]) < 2) {
             unset($textArray[count($textArray) - 1]);
@@ -164,9 +173,12 @@ class Speechkit
 
         $countChar = 250;
         $result = [];
-
         /** Проверка остальных предложения на количество символов */
         for ($i = 0; $i < count($textArray); $i++) {
+
+            if (empty($textArray[$i])) {
+                continue;
+            }
 
             if (iconv_strlen(trim($textArray[$i])) > $countChar) {
                 $textLongArray = explode(',', trim($textArray[$i]));
@@ -191,6 +203,7 @@ class Speechkit
                 $result[] = ['text' => trim($textArray[$i]) . '.', 'merge' => false];
             }
         }
+
         $this->log->info("Получили отворматированный текст");
 //        $this->log->info(json_encode($result, true));
         return $result;
@@ -274,9 +287,11 @@ class Speechkit
             if (key($Mp3Files) == 'text') {
                 $Mp3Files = [0 => $Mp3Files];
             }
-            $this->log->info(json_encode($Mp3Files));
+            $this->log->info(json_encode($Mp3Files, JSON_UNESCAPED_UNICODE));
 
             foreach ($Mp3Files as $key => $item) {
+                $this->log->info($item['text']);
+                $this->log->info(json_encode($voiceSetting));
                 $response = $this->response($item['text'], $voiceSetting);
                 $length = file_put_contents(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3', $response);
                 $getID3 = new getID3;
@@ -295,9 +310,9 @@ class Speechkit
                 $tmp_array[] = DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3';
                 $nameAudio[] = ['nameAudio' => $number . '_' . $key, 'merge' => $item['merge']];
             }
-//            $this->log->info('Названия полученныйх видео ' . json_encode($tmp_array, true));
-//            $this->log->info('Название файлов на удаление ' . json_encode($nameAudio, true));
-//            $this->log->info('Получили массив субтитров ' . json_encode($subtitles, true));
+            $this->log->info('Названия полученныйх видео ' . json_encode($tmp_array, true));
+            $this->log->info('Название файлов на удаление ' . json_encode($nameAudio, true));
+            $this->log->info('Получили массив субтитров ' . json_encode($subtitles, true));
             $voices = implode('|', $tmp_array);
 
 //            $this->log->info('Начало склейки аудио с задержкой');
