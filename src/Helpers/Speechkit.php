@@ -293,6 +293,7 @@ class Speechkit
                 $this->log->info($item['text']);
                 $this->log->info(json_encode($voiceSetting));
                 $response = $this->response($item['text'], $voiceSetting);
+                $this->log->info(json_encode($response, JSON_UNESCAPED_UNICODE));
                 $length = file_put_contents(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3', $response);
                 $getID3 = new getID3;
                 $file = $getID3->analyze(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3');
