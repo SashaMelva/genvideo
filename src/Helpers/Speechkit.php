@@ -270,11 +270,11 @@ class Speechkit
 
             $this->log->info('Отправка запросов на синтез');
 
-            $this->log->info(key($Mp3Files[0]));
+            $this->log->info(key($Mp3Files));
             if (key($Mp3Files) == 'text') {
                 $Mp3Files = [0 => $Mp3Files];
             }
-//            $this->log->info(json_encode($Mp3Files));
+            $this->log->info(json_encode($Mp3Files));
 
             foreach ($Mp3Files as $key => $item) {
                 $response = $this->response($item['text'], $voiceSetting);
