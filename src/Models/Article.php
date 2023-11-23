@@ -10,9 +10,9 @@ class Article extends Model
     protected $primaryKey = 'id';
     protected $table = 'articles';
 
-    public static function addContent(int $projectId, string $articleName, int $webSiteId, string $rubric, string $marking): ContentVideo
+    public static function addContent(int $projectId, string $articleName, int $webSiteId, string $rubric, string $marking): Article
     {
-        $newContent = new ContentVideo();
+        $newContent = new Article();
         $newContent->setAttribute('project_id', $projectId);
         $newContent->setAttribute('name', $articleName);
         $newContent->setAttribute('rubric', $rubric);

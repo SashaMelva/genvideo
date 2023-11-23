@@ -46,7 +46,6 @@ class ImportExcelArticle extends Command
         }
 
         $filesImport = DB::table('import_excel')->select('id', 'file_name', 'creator_id')->where([['status', '=', 'загружен'], ['type', '=', 2]])->get()->toArray();
-        // $filesImport = DB::table('import_excel')->select('id', 'file_name', 'creator_id')->get()->toArray();
 
         if (empty($filesImport)) {
             $this->log->info('Нет файлов для импорта');

@@ -13,7 +13,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class ImportDataForExcel  extends UserController
+class ImportDataForExcel extends UserController
 {
     /**
      * @throws ContainerExceptionInterface
@@ -23,10 +23,10 @@ class ImportDataForExcel  extends UserController
     {
         header('Access-Control-Allow-Origin: *');
         $data = $this->getFormData();
-//        $access_token = $this->request->getHeaderLine('token');
-//        $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
-//
-//        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
+        $access_token = $this->request->getHeaderLine('token');
+        $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
+
+        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
 
             try {
 
@@ -48,7 +48,7 @@ class ImportDataForExcel  extends UserController
                         return $this->respondWithError(400, 'Ошибка загрузки файла');
                     }
 
-                    $file = ImportExcel::addFile($filename, 1, 30 /*$token->user_id*/, $data['type'] ?? 1);
+                    $file = ImportExcel::addFile($filename, 1, $token->user_id, $data['type'] ?? 1);
                     return $this->respondWithData(['file_name' => $file->file_name, 'id' => $file->id]);
 
                 } else {
@@ -58,8 +58,8 @@ class ImportDataForExcel  extends UserController
             } catch (Exception $e) {
                 return $this->respondWithError($e->getCode(), $e->getMessage());
             }
-//        } else {
-//            return $this->respondWithError(215);
-//        }
+        } else {
+            return $this->respondWithError(215);
+        }
     }
 }
