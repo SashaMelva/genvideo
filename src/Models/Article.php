@@ -31,4 +31,25 @@ class Article extends Model
             ->where([['id', '=', $article_id]])
             ->update(['status_id' => $statusId]);
     }
+
+    public static function findAllById(int $articleId)
+    {
+        return self::query()
+            ->select(
+                'articles.id AS articles_id',
+                'articles.name',
+                'articles.rubric',
+                'articles.marking',
+                'articles.text',
+                'articles.status_id',
+                'articles.id_project',
+                'articles.id_website',
+                'websites.domen',
+                'websites.user_name',
+                'websites.password_app',
+            )
+            ->leftJoin('websites', 'articles.', '=', 'websites.id')
+            ->where('articles.id', '=', $articleId)
+            ->get()->toArray()[0];
+    }
 }

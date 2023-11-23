@@ -7,6 +7,7 @@ use App\Helpers\CheckTokenExpiration;
 use App\Helpers\GeneratorFiles;
 use App\Helpers\Speechkit;
 use App\Helpers\UploadFile;
+use App\Models\Article;
 use App\Models\ColorBackground;
 use App\Models\ContentVideo;
 use App\Models\GPTChatRequests;
@@ -30,6 +31,7 @@ use Monolog\Logger;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
+use RuntimeException;
 use Spatie\SimpleExcel\SimpleExcelReader;
 
 class TestController extends UserController
@@ -49,6 +51,38 @@ class TestController extends UserController
         $this->log = $log;
         $this->status_log = true;
 
+     $article = Article::findAllById(1);
+
+
+        $categoris = '';
+        $tag = '';
+        $url = '/wp-json/wp/v2/posts?title=' . $article['name'] . '&status=draft&content=' . $article['text'];
+
+        if (!is_null($article['rubric'])) {
+            $url .= '&categories='. $article['rubric'];
+        }
+
+        if (!is_null($article['marking'])) {
+            $url .= '&tags='. $article['marking'];
+        }
+
+        $client =  new Client([
+            'base_uri' => 'https://' . $article['domen'],
+            'headers' => [
+                'Authorization' => 'Basic ' . base64_encode($article['user_name'] . ':' . $article['password_app'])
+            ]
+        ]);
+
+        $res  = $client->post($url);
+
+        if ($res->getStatusCode() !== 200) { // created
+            throw new RuntimeException(var_export($res, true));
+        }
+
+        //getting id from response
+        $resEnd =  json_decode($res->getBody()->getContents())->id;
+        var_dump($resEnd);
+        exit;
         $textPreview = 'Добро пожаловать в нашу медитацию перед сном, посвященную ощущению гармонии внутри и вокруг себя. Приготовьтесь улечься и расслабиться, закройте глаза и начните глубоко дышать.\n\nДавайте сначала посветим несколько минут на то, чтобы успокоить свой разум и тело. Позвольте себе отпустить все беспокойства и напряжение, чтобы полностью погрузиться в этот момент.\n\nВаше тело становится тяжелым и расслабленным, каждый вдох наполняет вас спокойствием, а каждый выдох уносит с собой все негативные эмоции и мысли. Чувствуйте, как ваше тело становится все более легким и свободным.\n\nТеперь давайте перенесем свое внимание на наше внутреннее состояние. Почувствуйте свое сердце, его ритмичные пульсации. Ваше сердце наполняется любовью и благодарностью. ЧЧувствуйте, как эти чувства распространяются по всему вашему телу, принося гармонию и спокойствие в каждую клеточку, чувствуйте, как эти чувства распространяются по всему вашему телу, принося гармонию и спокойствие в каждую клеточку, чувствуйте, как эти чувства распространяются по всему вашему телу, принося гармонию и спокойствие в каждую клеточку.\n\nПредставьте себе, что вы находитесь в прекрасном месте природы. Возможно, это лес, пляж или горы. Визуализируйте это место с яркими красками и прекрасным ароматом. Чувствуйте, как вы окружены спокойствием и гармонией природы.\n\nПостепенно расширьте свое восприятие на весь мир вокруг вас. Почувствуйте, как вы связаны с ним энергетическими нитями, как ваше сознание расширяется на все живое. Почувствуйте гармонию и взаимосвязь между всеми существами и элементами природы.\n\nТеперь, когда вы чувствуете эту гармонию внутри себя и вокруг себя, позвольте себе ощутить благодарность за все, что вам дарит мир. Благодарите за каждый день, каждый момент, каждое существо, которое когда-либо пересекло ваш путь. Благодарите за возможность быть здесь и сейчас, в этом моменте гармонии.\n\nЧувствуйте, как эта благодарность наполняет вас счастьем и миром. Позвольте себе остаться в этом состоянии гармонии и благодарности, пока вы не заснете.\n\nСпокойной ночи.';
         $client = new Client();
         $response = $client->post('https://tts.api.cloud.yandex.net/speech/v1/tts:synthesize',

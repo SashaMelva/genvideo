@@ -15,6 +15,7 @@ use App\Console\GetYandexAimToken;
 use App\Console\ImportDataExcelCommand;
 use App\Console\ImportExcelArticle;
 use App\Console\NewTestGPTRequest;
+use App\Console\SendingArticleWordpress;
 use App\Console\TestGPTRequest;
 use App\Console\TestScript;
 use Psr\Container\ContainerInterface;
@@ -67,10 +68,11 @@ try {
     $cli->add(new GeneratorImage()); // Получение картинок по описанию, полученного с чата
     $cli->add(new GeneratorVoiceAndSubtitlesCommand()); //генерация озвучки и субтитров ОТКЛЮЧЁН
     $cli->add(new GeneratorManyVideoCommand()); //новый скрипт для перегенерации видео генерации видео
+    $cli->add(new SendingArticleWordpress());
+
+
     $cli->add(new NewTestGPTRequest());
-
     $cli->add(new GeneratorChatGPTTextPromise());
-
     $cli->add(new TestGPTRequest());
     $cli->add(new TestScript());
 
