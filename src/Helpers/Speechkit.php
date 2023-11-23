@@ -614,6 +614,7 @@ class Speechkit
             $tokenData = DB::table('token_yandex')->where([['id', '=', 1]])->get()->toArray()[0];
             $token = trim($tokenData->token);
 
+            $this->log->info($token);
             $response = $this->client->post('https://tts.api.cloud.yandex.net/speech/v1/tts:synthesize',
                 [
                     'headers' => [
@@ -631,7 +632,7 @@ class Speechkit
                         'folderId' => 'b1glckrv5eg7s4kkhtpn'
                     ]
                 ]);
-
+            $this->log->info($response);
             if ($response->getStatusCode() !== 200) {
                 return false;
             }
