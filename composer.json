@@ -38,7 +38,8 @@
         "symfony/process": "v5.1.7",
         "symfony/validator": "^5.4",
         "tuupola/slim-jwt-auth": "^3.7",
-        "vlucas/phpdotenv": "^5.5"
+        "vlucas/phpdotenv": "^5.5",
+      "ext-zip": "*"
     },
     "scripts": {
         "pre-autoload-dump": "Google\\Task\\Composer::cleanup"

@@ -58,7 +58,7 @@ try {
     $cli->add(new GeneratorVideoCommand()); //первый скрипт генерации видео на кроне
     $cli->add(new GetYandexAimToken()); // получение токена для синтеза текста на кроне
     $cli->add(new ImportDataExcelCommand()); //импорт данных с файлов excel на кроне
-    $cli->add(new ImportExcelArticle());
+    $cli->add(new ImportExcelArticle()); // импорт данных для статей
 
     $cli->add(new DistributionChatGPTRequest()); //отправка запроса на получеие текста т чата gpt на кроне
     $cli->add(new GeneratorChatGPTText()); //отправка запроса на получеие текста т чата gpt на кроне
