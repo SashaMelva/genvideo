@@ -69,10 +69,11 @@ class TestController extends UserController
         }
 
         foreach ($contents as $content) {
-            $zip->addFile(DIRECTORY_VIDEO . $content['file_name'], 'видео' . DIRECTORY_SEPARATOR . $content['content_name'] . '.mp3');
+            $nameFile = str_replace('.', '', $content['content_name']);
+            $zip->addFile(DIRECTORY_VIDEO . $content['file_name'], 'видео' . DIRECTORY_SEPARATOR . $nameFile . '.mp4');
 
             if (!is_null($content['preview_file_name'])) {
-                $zip->addFile(DIRECTORY_PREVIEW . $content['preview_file_name'], 'превью' . DIRECTORY_SEPARATOR . $content['content_name'] . '.jpg');
+                $zip->addFile(DIRECTORY_PREVIEW . $content['preview_file_name'], 'превью' . DIRECTORY_SEPARATOR . $nameFile . '.jpg');
             }
         }
 

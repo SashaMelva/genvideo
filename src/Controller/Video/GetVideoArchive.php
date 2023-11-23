@@ -10,6 +10,7 @@ use Exception;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
+use ZipArchive;
 
 class GetVideoArchive extends UserController
 {
@@ -21,17 +22,17 @@ class GetVideoArchive extends UserController
     {
         $type = $this->request->getAttribute('type');
         $videoIds = $this->request->getAttribute('id');
-        $videoIdArray = explode(',',$videoIds);
-//        $access_token = $this->request->getAttribute('token');
+        $videoIdArray = explode(',', $videoIds);
+        $access_token = $this->request->getAttribute('token');
 
-        var_dump($videoIdArray);
-//        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
+        if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
 
             try {
                 $contents = [];
-                $zipName = 'archive_' . date('Y_m_d_H_i_s') . '_' . floor(microtime(true) * 1000) . '.zip';
-                $zipCommand = 'zip ' . DIRECTORY_ARCHIVE . $zipName . ' ';
 
+                $zip = new ZipArchive();
+                $zipFile = DIRECTORY_ARCHIVE . 'archive_' . date('Y_m_d_H_i_s') . '_' . floor(microtime(true) * 1000) . '.zip';
+                $zip->open($zipFile, ZipArchive::CREATE | ZipArchive::OVERWRITE);
 
                 if ($type == 'content') {
                     foreach ($videoIdArray as $id) {
@@ -39,10 +40,11 @@ class GetVideoArchive extends UserController
                     }
 
                     foreach ($contents as $content) {
-                        $zipCommand .= ' ' . DIRECTORY_VIDEO . $content['file_name'];
+                        $nameFile = str_replace('.', '', $content['content_name']);
+                        $zip->addFile(DIRECTORY_VIDEO . $content['file_name'], 'видео' . DIRECTORY_SEPARATOR . $nameFile . '.mp4');
 
                         if (!is_null($content['preview_file_name'])) {
-                            $zipCommand .= ' ' . DIRECTORY_PREVIEW . $content['preview_file_name'];
+                            $zip->addFile(DIRECTORY_PREVIEW . $content['preview_file_name'], 'превью' . DIRECTORY_SEPARATOR . $nameFile . '.jpg');
                         }
                     }
                 }
@@ -53,15 +55,12 @@ class GetVideoArchive extends UserController
                     }
 
                     foreach ($contents as $content) {
-                        $zipCommand .= ' ' . DIRECTORY_ADDITIONAL_VIDEO . $content['file_path'];
+                        $zip->addFile(DIRECTORY_ADDITIONAL_VIDEO . $content['file_name'], 'видео' . DIRECTORY_SEPARATOR . $content['name'] . '.mp4');
                     }
                 }
+                $zip->close();
 
-                var_dump($zipCommand);
-                shell_exec($zipCommand);
-
-                $file = DIRECTORY_ARCHIVE . $zipName;
-                if (file_exists($file)) {
+                if (file_exists($zipFile)) {
 
                     if (ob_get_level()) {
                         ob_end_clean();
@@ -70,14 +69,14 @@ class GetVideoArchive extends UserController
                     header('Access-Control-Allow-Origin: *');
                     header('Content-Description: File Transfer');
                     header('Content-Type: application/octet-stream');
-                    header('Content-Disposition: attachment; filename=' . basename($file));
+                    header('Content-Disposition: attachment; filename=' . basename($zipFile));
                     header('Content-Transfer-Encoding: binary');
                     header('Expires: 0');
                     header('Cache-Control: must-revalidate');
                     header('Pragma: public');
-                    header('Content-Length: ' . filesize($file));
+                    header('Content-Length: ' . filesize($zipFile));
 
-                    if ($fd = fopen($file, 'rb')) {
+                    if ($fd = fopen($zipFile, 'rb')) {
                         while (!feof($fd)) {
                             print fread($fd, 1024);
                         }
@@ -98,8 +97,8 @@ class GetVideoArchive extends UserController
             } catch (Exception $e) {
                 return $this->respondWithError($e->getCode(), $e->getMessage());
             }
-//        } else {
-//            return $this->respondWithError(215);
-//        }
+        } else {
+            return $this->respondWithError(215);
+        }
     }
 }
