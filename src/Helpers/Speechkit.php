@@ -81,73 +81,6 @@ class Speechkit
         }
     }
 
-    /**
-     * Разбиваем текст по абзацам
-     */
-    private function spillSubtitles(string $text): array
-    {
-        $desc = $text . ' ';
-        $desc = preg_replace("[\r\n]", ' ', $desc);
-        $desc = str_replace('\n', '', $desc);
-        $textArray = explode('.', $desc);
-        $countChar = 250;
-        $result = [];
-
-        if (count($textArray) == 1 || (count($textArray) == 2 && empty(trim($textArray[1])))) {
-            return ['text' => trim($textArray[0]) . '. ', 'merge' => false];
-        }
-
-        $text = trim($textArray[0]) . '. ';
-        unset($textArray[0]);
-        $count = count($textArray);
-
-        for ($i = 1; $i <= $count; $i++) {
-
-            if (iconv_strlen(trim($text)) + iconv_strlen(trim($textArray[$i])) > $countChar) {
-                if (iconv_strlen(trim($textArray[$i])) > $countChar) {
-
-                    $textLongArray = explode(',', trim($textArray[$i]));
-                    $textLong = trim($textLongArray[0]) . ', ';
-                    unset($textLongArray[0]);
-                    $countLong = count($textLongArray);
-
-                    for ($j = 1; $j <= $countLong; $j++) {
-                        if (iconv_strlen($textLong) + iconv_strlen($textLongArray[$j]) > $countChar) {
-                            $result[] = ['text' => trim($textLong) . ', ', 'merge' => true];
-                            $textLong = '';
-                        }
-
-                        $textLong .= trim($textLongArray[$j]) . ', ';
-
-                        if ($j == $countLong) {
-                            $result[] = ['text' => trim($textLong) . ', ', 'merge' => true];
-                        }
-                    }
-                    $text = '';
-                    continue;
-                }
-
-                $rep = str_replace('..', '.', trim($text) . '. ');
-                $rep = str_replace('!.', '.', $rep);
-                $result[] = ['text' => str_replace('? .', '. ', $rep), 'merge' => false];
-                $text = '';
-            }
-
-            $text .= trim($textArray[$i]) . '. ';
-
-            if ($i == $count) {
-                $rep = str_replace('. .', '.', trim($text) . '. ');
-                $rep = str_replace('! .', '!', $rep);
-                $rep = str_replace('? .', '?', $rep);
-                $rep = str_replace('..', '.', $rep);
-                $rep = str_replace('!.', '!', $rep);
-                $result[] = ['text' => str_replace('?.', '?', $rep), 'merge' => false];
-            }
-        }
-
-        return $result;
-    }
-
     /** Распределение текста по предложениям длинною не более 250 симвволов, не теряя смысловой нагрузки */
     private function spillSubtitlesOffers(string $text): array
     {
@@ -290,10 +223,8 @@ class Speechkit
             $this->log->info(json_encode($Mp3Files, JSON_UNESCAPED_UNICODE));
 
             foreach ($Mp3Files as $key => $item) {
-                $this->log->info($item['text']);
-                $this->log->info(json_encode($voiceSetting));
+
                 $response = $this->response($item['text'], $voiceSetting);
-                $this->log->info(json_encode($response, JSON_UNESCAPED_UNICODE));
                 $length = file_put_contents(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3', $response);
                 $getID3 = new getID3;
                 $file = $getID3->analyze(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3');
@@ -418,85 +349,10 @@ class Speechkit
             return ['status' => true, 'files' => $tmp_array, 'command' => $ffmpeg];
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
-        } catch (GuzzleException $e) {
-            $this->log->info($e);
         }
     }
 
-    /**
-     * @throws Exception|GuzzleException
-     */
-    private function SplitMp3($Mp3Files, $number, $voiceSetting): array
-    {
-        try {
-            $delayBetweenParagraphMs = $voiceSetting['delay_between_paragraphs'] ?? 0;
 
-            $tmp_array = [];
-            $subtitles = [];
-            $nameAudio = [];
-            $this->log->error($delayBetweenParagraphMs);
-            foreach ($Mp3Files as $key => $item) {
-
-                $response = $this->response($item['text'], $voiceSetting);
-                $length = file_put_contents(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3', $response);
-                $getID3 = new getID3;
-                $file = $getID3->analyze(DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3');
-                $seconds = $file['playtime_seconds'];
-
-                $subtitles[] = [
-                    'text' => $item['text'],
-                    'time' => $seconds * 1000,
-                ];
-
-                if (!$length) {
-                    return ['status' => false, 'files' => []];
-                }
-
-                $tmp_array[] = DIRECTORY_SPEECHKIT . $number . '_' . $key . '.mp3';
-                $nameAudio[] = $number . '_' . $key;
-            }
-
-
-            $voices = implode('|', $tmp_array);
-
-            if ($delayBetweenParagraphMs > 0) {
-                $arrayLongAudio = [];
-
-                foreach ($nameAudio as $key => $audio) {
-                    if ($key == 0) {
-                        $arrayLongAudio[] = DIRECTORY_SPEECHKIT . $audio . '.mp3';
-                        continue;
-                    }
-                    $outputAudio = $audio . '_long.mp3';
-                    $ffmpeg = 'ffmpeg -i ' . DIRECTORY_SPEECHKIT . $audio . '.mp3 -af adelay=' . $delayBetweenParagraphMs . ' ' . DIRECTORY_SPEECHKIT . $outputAudio;
-                    $arrayLongAudio[] = DIRECTORY_SPEECHKIT . $outputAudio;
-                    $e = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
-                }
-
-                $tmp_array = array_merge($tmp_array, $arrayLongAudio);
-                $voices = implode('|', $arrayLongAudio);
-            }
-
-
-            $ffmpeg = 'ffmpeg -i "concat:' . $voices . '"  -acodec copy -c:a libmp3lame ' . DIRECTORY_SPEECHKIT . $number . '_short.mp3';
-            $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
-//            $tmp_array[] = DIRECTORY_SPEECHKIT . $number . '_short.mp3';
-
-            //$this->log->info('Добавлям в конец файла две секунды');
-            $ffmpegShortAudioResult = 'ffmpeg -i ' . DIRECTORY_SPEECHKIT . $number . '_short.mp3 -af "apad=pad_dur=' . $voiceSetting['delay_end_video'] . '" -y ' . DIRECTORY_SPEECHKIT . $number . '.mp3';
-//            $this->log->info($ffmpegShortAudioResult);
-            shell_exec($ffmpegShortAudioResult . ' -hide_banner -loglevel error 2>&1');
-
-            /**для субтитров*/
-            $length = file_put_contents(DIRECTORY_TEXT . $number . '.srt', $this->getFilesSrt($subtitles, $delayBetweenParagraphMs));
-
-            $ffmpeg = 'ffmpeg -i ' . DIRECTORY_TEXT . $number . '.srt -y ' . DIRECTORY_TEXT . $number . '.ass';
-            $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
-            return ['status' => true, 'files' => $tmp_array, 'command' => $ffmpeg];
-        } catch (Exception $e) {
-            throw new Exception($e->getMessage());
-        }
-    }
 
     private function getFilesSrt(array $text, float $delayBetweenOffersMs): string
     {
@@ -613,10 +469,10 @@ class Speechkit
     private function response(string $text, array $voiceSetting): bool|string
     {
         try {
+
             $tokenData = DB::table('token_yandex')->where([['id', '=', 1]])->get()->toArray()[0];
             $token = trim($tokenData->token);
 
-            $this->log->info($token);
             $response = $this->client->post('https://tts.api.cloud.yandex.net/speech/v1/tts:synthesize',
                 [
                     'headers' => [
@@ -634,7 +490,7 @@ class Speechkit
                         'folderId' => 'b1glckrv5eg7s4kkhtpn'
                     ]
                 ]);
-            $this->log->info($response);
+
             if ($response->getStatusCode() !== 200) {
                 return false;
             }
