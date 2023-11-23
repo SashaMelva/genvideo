@@ -48,7 +48,7 @@ class ImportDataForExcel  extends UserController
                         return $this->respondWithError(400, 'Ошибка загрузки файла');
                     }
 
-                    $file = ImportExcel::addFile($filename, 1, $token->user_id);
+                    $file = ImportExcel::addFile($filename, 1, $token->user_id, $data['type'] ?? 1);
                     return $this->respondWithData(['file_name' => $file->file_name, 'id' => $file->id]);
 
                 } else {

@@ -42,6 +42,7 @@ use App\Controller\Video\DownloadVideo;
 use App\Controller\Video\GetAllContent;
 use App\Controller\Video\GetCollectionDataSettingVideo;
 use App\Controller\Video\GetContent;
+use App\Controller\Video\GetSettingVideo;
 use App\Controller\Video\GetVideoArchive;
 use App\Controller\Video\LoadPreviewVideo;
 use App\Controller\Video\SendVideo;
@@ -106,6 +107,7 @@ return static function(App $app):void
 //            $group->get('/test', TestController::class);
 
             $group->get('/correction-errors/{id:[0-9]+}', CorrectionErrorsVideoGeneration::class);
+            $group->get('/get-setting/{id:[0-9]+}', GetSettingVideo::class);
         });
 
         $group->group('/file', function (RouteCollectorProxyInterface $group) {
