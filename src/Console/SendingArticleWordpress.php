@@ -4,6 +4,7 @@ namespace App\Console;
 
 use App\Models\Article;
 use Exception;
+use GuzzleHttp\Client;
 use Illuminate\Database\Capsule\Manager as DB;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\StreamHandler;
@@ -20,7 +21,7 @@ class SendingArticleWordpress extends Command
     protected function configure(): void
     {
         $log = new Logger('info');
-        $log->pushHandler(new RotatingFileHandler('../var/log/generator-image.log', 2, Logger::INFO));
+        $log->pushHandler(new RotatingFileHandler('../var/log/send-article.log', 2, Logger::INFO));
         $log->pushHandler(new StreamHandler('php://stdout'));
 
         $this->log = $log;
@@ -29,8 +30,8 @@ class SendingArticleWordpress extends Command
         parent::configure();
 
         $this
-            ->setName('generator-image')
-            ->setDescription('generator-image');
+            ->setName('send-article')
+            ->setDescription('send-article');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -38,7 +39,7 @@ class SendingArticleWordpress extends Command
         date_default_timezone_set('Europe/Moscow');
         mb_internal_encoding("UTF-8");
 
-        $cmd = '/usr/bin/supervisorctl stop generator-image';
+        $cmd = '/usr/bin/supervisorctl stop send-article';
 
         if ($this->status_log) {
             $this->log->info('Начало ' . date('Y-m-s H:i:s'));
@@ -65,8 +66,31 @@ class SendingArticleWordpress extends Command
             }
 
             Article::changeStatus($articleId, 7);
+            $article = Article::findAllById($articleId);
 
-            $articleData = Article::findAllById($articleId);
+            $url = '/wp-json/wp/v2/posts?title=' . $article['name'] . '&status=draft&content=' . $article['text'];
+
+            if (!is_null($article['rubric'])) {
+                $url .= '&categories=' . $article['rubric'];
+            }
+
+            if (!is_null($article['marking'])) {
+                $url .= '&tags=' . $article['marking'];
+            }
+
+            $client = new Client([
+                'base_uri' => 'https://' . $article['domen'],
+                'headers' => [
+                    'Authorization' => 'Basic ' . base64_encode($article['user_name'] . ':' . $article['password_app'])
+                ]
+            ]);
+
+            $res = $client->post($url);
+
+            if ($res->getStatusCode() !== 200) {
+                $this->log->info('Ошибка отправки запроса: ' . $articleId);
+                Article::changeStatus($articleId, 9);
+            }
 
         } catch (Exception $e) {
             $this->log->error($e->getMessage());
