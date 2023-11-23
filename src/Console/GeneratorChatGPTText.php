@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Models\Article;
 use App\Models\ContentVideo;
 use App\Models\GPTChatCabinet;
 use App\Models\GPTChatRequests;
@@ -70,7 +71,12 @@ class GeneratorChatGPTText extends Command
             ListRequestGPTCabinet::changeStatus($requestList->id, 2);
 
             $request = GPTChatRequests::findOne($requestList->id_request);
-            ContentVideo::changeStatus($request['content_id'], 7);
+
+            if (!is_null($request->content_id)) {
+                ContentVideo::changeStatus($request->content_id, 7);
+            } else {
+                Article::changeStatus($request->article_id, 3);
+            }
 
             $cabinet = GPTChatCabinet::findOne($requestList->id_cabinet);
             $proxy = ListCabinetGPTForProxy::findProxyByCabinetId($cabinet->id);
@@ -82,7 +88,12 @@ class GeneratorChatGPTText extends Command
                 GPTChatCabinet::changeStatusCabinet($cabinet->id, true);
                 ListRequestGPTCabinet::changeStatus($requestList->id, 4);
                 GPTChatRequests::changeStatusAndContent($requestList->id_request, 4, $response['response']);
-                ContentVideo::changeStatus($request->content_id, 8);
+
+                if (!is_null($request->content_id)) {
+                    ContentVideo::changeStatus($request->content_id, 8);
+                } else {
+                    Article::changeStatus($request->article_id, 4);
+                }
 
             } elseif ($response['status'] == 'errorConnection') {
 

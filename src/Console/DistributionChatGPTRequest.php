@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Models\Article;
 use App\Models\ContentVideo;
 use App\Models\GPTChatCabinet;
 use App\Models\GPTChatRequests;
@@ -98,7 +99,13 @@ class DistributionChatGPTRequest extends Command
                     $this->log->info('Не найден запрос на генерацию контента: ' . json_encode($requests));
                 }
                 GPTChatRequests::changeStatus($request->id, 3);
-                ContentVideo::changeStatus($request, 8);
+
+                if (!is_null($request->content_id)) {
+                    ContentVideo::changeStatus($request->content_id, 8);
+                } else {
+                    Article::changeStatus($request->article_id, 7);
+                }
+
                 exec($cmd);
                 return 0;
             }
@@ -106,7 +113,12 @@ class DistributionChatGPTRequest extends Command
         } catch (Exception $e) {
             $this->log->error($e->getMessage());
             $this->log->info('Контент опять поставлен в очередь на получении текста: ' . $request);
-            ContentVideo::changeStatus($request, 6);
+
+            if (!is_null($request->content_id)) {
+                ContentVideo::changeStatus($request->content_id, 6);
+            } else {
+                Article::changeStatus($request->article_id, 2);
+            }
         }
 
         if ($this->status_log) {

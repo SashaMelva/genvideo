@@ -2,7 +2,7 @@
 
 namespace App\Console;
 
-use App\Models\ContentVideo;
+use App\Models\Article;
 use App\Models\GPTChatRequests;
 use App\Models\TextVideo;
 use Exception;
@@ -14,7 +14,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class FormatTextFromChatGptCommand extends Command
+class FormatTextArticleFromChatGpt  extends Command
 {
     private Logger $log;
     private bool $status_log;
@@ -22,7 +22,7 @@ class FormatTextFromChatGptCommand extends Command
     protected function configure(): void
     {
         $log = new Logger('info');
-        $log->pushHandler(new RotatingFileHandler('../var/log/format-text-gpt.log', 2, Logger::INFO));
+        $log->pushHandler(new RotatingFileHandler('../var/log/format-text-article-gpt.log', 2, Logger::INFO));
         $log->pushHandler(new StreamHandler('php://stdout'));
 
         $this->log = $log;
@@ -31,8 +31,8 @@ class FormatTextFromChatGptCommand extends Command
         parent::configure();
 
         $this
-            ->setName('format-text-gpt')
-            ->setDescription('format-text-gpt');
+            ->setName('format-text-article-gpt')
+            ->setDescription('format-text-article-gpt');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -40,35 +40,35 @@ class FormatTextFromChatGptCommand extends Command
         date_default_timezone_set('Europe/Moscow');
         mb_internal_encoding("UTF-8");
 
-        $cmd = '/usr/bin/supervisorctl stop format-text-gpt';
+        $cmd = '/usr/bin/supervisorctl stop format-text-article-gpt';
 
         if ($this->status_log) {
             $this->log->info('Начало ' . date('Y-m-s H:i:s'));
         }
 
-        $contentIds = DB::table('content')->select('id')->where([['status_id', '=', 8]])->get()->toArray();
+        $articles = DB::table('articles')->select('id')->where([['status_id', '=', 4]])->get()->toArray();
 
         if ($this->status_log) {
-            $this->log->info('Контенты на форматирования текста: ' . json_encode($contentIds));
+            $this->log->info('Статья на форматирования текста: ' . json_encode($articles));
         }
 
-        if (empty($contentIds)) {
+        if (empty($articles)) {
             $this->log->info('Нет задач на генерацию текста');
             exec($cmd);
             return 0;
         }
 
-        $contentId = $contentIds[0]->id;
+        $articleId = $articles[0]->id;
 
         try {
 
             if ($this->status_log) {
-                $this->log->info('Контент взят на генерацию текста: ' . $contentId);
+                $this->log->info('Статья взят на генерацию текста: ' . $articleId);
             }
 
-            ContentVideo::changeStatus($contentId, 9);
+            Article::changeStatus($articleId, 5);
 
-            $gptRequest = GPTChatRequests::findByContentId($contentId);
+            $gptRequest = GPTChatRequests::findByContentId($articleId);
 
             if (!empty($gptRequest)) {
 
@@ -86,33 +86,30 @@ class FormatTextFromChatGptCommand extends Command
                 $resultText = $resultTextArray['choices'][0]['message']['content'];
 
                 if (empty($resultText)) {
-                    $this->log->error('Ответ запроса путой, контент поставлен в очередь на получение резкльтата запроса: ' . $contentId);
-                    ContentVideo::changeStatus($contentId, 12);
+                    $this->log->error('Ответ запроса путой, контент поставлен в очередь на получение резкльтата запроса: ' . $articleId);
+                    Article::changeStatus($articleId, 1);
                     exec($cmd);
                     return 0;
                 }
 
                 $this->log->info('Соранение результата');
                 TextVideo::updatedContentData($gptRequest['text_id'], $resultText);
-                ContentVideo::changeStatus($contentId, 1);
-                //ContentVideo::changeStatus($contentId, 10);
+                Article::changeStatus($articleId, 6);
 
             } else {
 
                 if ($this->status_log) {
-                    $this->log->info('Не найден запрос на генерацию контента: ' . $contentId);
-                    ContentVideo::changeStatus($contentId, 12);
+                    $this->log->info('Не найден запрос на генерацию контента: ' . $articleId);
+                    Article::changeStatus($articleId, 9);
                     exec($cmd);
                     return 0;
                 }
-
-                ContentVideo::changeStatus($contentId, 8);
             }
 
         } catch (Exception $e) {
             $this->log->error($e->getMessage());
-            $this->log->info('Ошибка форматирования текста: ' . $contentId);
-            ContentVideo::changeStatus($contentId, 12);
+            $this->log->info('Ошибка форматирования текста: ' . $articleId);
+            Article::changeStatus($articleId, 9);
         }
 
         if ($this->status_log) {

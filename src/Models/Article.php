@@ -24,4 +24,11 @@ class Article extends Model
         $newContent->save();
         return $newContent;
     }
+
+    public static function changeStatus(int $article_id, int $statusId): void
+    {
+        self::query()
+            ->where([['id', '=', $article_id]])
+            ->update(['status_id' => $statusId]);
+    }
 }

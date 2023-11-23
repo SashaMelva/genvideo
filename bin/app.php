@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\Console\DistributionChatGPTRequest;
+use App\Console\FormatTextArticleFromChatGpt;
 use App\Console\FormatTextFromChatGptCommand;
 use App\Console\GeneratorChatGPTText;
 use App\Console\GeneratorChatGPTTextPromise;
@@ -12,6 +13,7 @@ use App\Console\GeneratorVideoCommand;
 use App\Console\GeneratorVoiceAndSubtitlesCommand;
 use App\Console\GetYandexAimToken;
 use App\Console\ImportDataExcelCommand;
+use App\Console\ImportExcelArticle;
 use App\Console\NewTestGPTRequest;
 use App\Console\TestGPTRequest;
 use App\Console\TestScript;
@@ -55,11 +57,12 @@ try {
     $cli->add(new GeneratorVideoCommand()); //первый скрипт генерации видео на кроне
     $cli->add(new GetYandexAimToken()); // получение токена для синтеза текста на кроне
     $cli->add(new ImportDataExcelCommand()); //импорт данных с файлов excel на кроне
+    $cli->add(new ImportExcelArticle());
 
     $cli->add(new DistributionChatGPTRequest()); //отправка запроса на получеие текста т чата gpt на кроне
     $cli->add(new GeneratorChatGPTText()); //отправка запроса на получеие текста т чата gpt на кроне
 
-
+    $cli->add(new FormatTextArticleFromChatGpt());
     $cli->add(new FormatTextFromChatGptCommand()); //форматирование ответа, полученного от чата на кроне
     $cli->add(new GeneratorImage()); // Получение картинок по описанию, полученного с чата
     $cli->add(new GeneratorVoiceAndSubtitlesCommand()); //генерация озвучки и субтитров ОТКЛЮЧЁН
