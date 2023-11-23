@@ -55,7 +55,7 @@ class Article extends Model
                 'websites.user_name',
                 'websites.password_app',
             )
-            ->leftJoin('websites', 'articles.', '=', 'websites.id')
+            ->leftJoin('websites', 'articles.website_id', '=', 'websites.id')
             ->where('articles.id', '=', $articleId)
             ->get()->toArray()[0];
     }

@@ -48,11 +48,11 @@ class SendingArticleWordpress extends Command
         $articlesIds = DB::table('articles')->select('id')->where([['status_id', '=', 6]])->get()->toArray();
 
         if ($this->status_log) {
-            $this->log->info('Контенты на форматирования текста: ' . json_encode($articlesIds));
+            $this->log->info('Статьи на отправку: ' . json_encode($articlesIds));
         }
 
         if (empty($articlesIds)) {
-            $this->log->info('Нет задач на генерацию текста');
+            $this->log->info('Нет задач на отправку');
             exec($cmd);
             return 0;
         }
@@ -62,7 +62,7 @@ class SendingArticleWordpress extends Command
         try {
 
             if ($this->status_log) {
-                $this->log->info('Контент взят на генерацию текста: ' . $articleId);
+                $this->log->info('Статья взята на отправку в вордпресс: ' . $articleId);
             }
 
             Article::changeStatus($articleId, 7);
@@ -94,7 +94,7 @@ class SendingArticleWordpress extends Command
 
         } catch (Exception $e) {
             $this->log->error($e->getMessage());
-            $this->log->info('Ошибка форматирования текста: ' . $articleId);
+            $this->log->info('Ошибка отправки статьи: ' . $articleId);
             Article::changeStatus($articleId, 9);
         }
 
