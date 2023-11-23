@@ -19,6 +19,13 @@ class GPTChatRequests extends Model
             ->get()->toArray();
     }
 
+    public static function findByArticleId(int $articleId): array
+    {
+        return self::query()
+            ->where([['article_id', '=', $articleId]])
+            ->get()->toArray();
+    }
+
     public static function findOne(int $id): Model|Collection|Builder|array|null
     {
         return self::query()->find($id)->getModel();

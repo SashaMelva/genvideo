@@ -67,8 +67,7 @@ class FormatTextArticleFromChatGpt extends Command
             }
 
             Article::changeStatus($articleId, 5);
-
-            $gptRequest = GPTChatRequests::findByContentId($articleId);
+            $gptRequest = GPTChatRequests::findByArticleId($articleId);
 
             if (!empty($gptRequest)) {
 
@@ -100,7 +99,7 @@ class FormatTextArticleFromChatGpt extends Command
 
                 if ($this->status_log) {
                     $this->log->info('Не найден запрос на генерацию контента: ' . $articleId);
-                    GPTChatRequests::changeStatus($gptRequest['id'], 5);
+//                    GPTChatRequests::changeStatus($gptRequest['id'], 5);
                     Article::changeStatus($articleId, 9);
                     exec($cmd);
                     return 0;
