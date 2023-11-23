@@ -418,6 +418,8 @@ class Speechkit
             return ['status' => true, 'files' => $tmp_array, 'command' => $ffmpeg];
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
+        } catch (GuzzleException $e) {
+            $this->log->info($e);
         }
     }
 
