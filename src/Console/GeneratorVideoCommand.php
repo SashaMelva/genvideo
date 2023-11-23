@@ -271,7 +271,7 @@ class GeneratorVideoCommand extends Command
                 }
             }
 
-            if (!is_null($resultName)) {
+            if (!is_null($resultName) && !is_null($video['preview_text'])) {
                 $this->log->info('Создаём превью для видео');
                 $preview = $generatorFiles->generatorPreview($resultName, $video['preview_text']);
 
