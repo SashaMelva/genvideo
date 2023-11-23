@@ -88,8 +88,9 @@ class GeneratorChatGPTText extends Command
                 GPTChatCabinet::changeStatusCabinet($cabinet->id, true);
                 ListRequestGPTCabinet::changeStatus($requestList->id, 4);
                 GPTChatRequests::changeStatusAndContent($requestList->id_request, 4, $response['response']);
-
-                if (!is_null($request->content_id)) {
+                $this->log->info($response['response']);
+                $this->log->info(!empty($request->content_id));
+                if (!empty($request->content_id)) {
                     ContentVideo::changeStatus($request->content_id, 8);
                 } else {
                     Article::changeStatus($request->article_id, 4);
