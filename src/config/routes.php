@@ -5,6 +5,7 @@ use App\Controller\Article\AddNewWebsite;
 use App\Controller\Article\DeletedWebsite;
 use App\Controller\Article\GetAllArticle;
 use App\Controller\Article\GetAllWebsite;
+use App\Controller\Article\GetByIdArticle;
 use App\Controller\Article\GetOneWebsite;
 use App\Controller\Article\UpdateWebsite;
 use App\Controller\Authorization\GetUserToken;
@@ -144,6 +145,7 @@ return static function (App $app): void {
 
         $group->group('/article', function (RouteCollectorProxyInterface $group) {
             $group->get('/get-all/{id:[0-9]+}', GetAllArticle::class);
+            $group->get('/get/{id:[0-9]+}', GetByIdArticle::class);
         });
 
 //        $group->group('/integration', function (RouteCollectorProxyInterface $group) {
