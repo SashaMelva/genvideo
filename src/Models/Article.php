@@ -10,7 +10,7 @@ class Article extends Model
     protected $primaryKey = 'id';
     protected $table = 'articles';
 
-    public static function addContent(int $projectId, string $articleName, int $webSiteId, string $rubric, string $marking): Article
+    public static function addContent(int $projectId, string $articleName, int $webSiteId, string $rubric, string $marking, ?int $date): Article
     {
         $newContent = new Article();
         $newContent->setAttribute('project_id', $projectId);
@@ -21,6 +21,7 @@ class Article extends Model
         $newContent->setAttribute('website_id', $webSiteId);
         $newContent->setAttribute('marking', $marking);
         $newContent->setAttribute('status_id', 1);
+        $newContent->setAttribute('date_publish', $date);
         $newContent->save();
         return $newContent;
     }
@@ -51,6 +52,7 @@ class Article extends Model
                 'articles.status_id',
                 'articles.project_id',
                 'articles.website_id',
+                'articles.date_publish',
                 'websites.domen',
                 'websites.user_name',
                 'websites.password_app',

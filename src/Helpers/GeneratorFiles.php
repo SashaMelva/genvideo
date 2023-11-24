@@ -362,7 +362,24 @@ class GeneratorFiles
     public function generatorLogo(string $nameFileLogo, string $videoName): array
     {
         $resultName = $this->contentId . '_logo';
-        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -i ' . DIRECTORY_LOGO_IMG . $nameFileLogo . ' -filter_complex "[1:v]scale=120:-1,format=yuva420p [overlay]; [0:v][overlay] overlay=20:20" -c:v h264_nvenc -c:a copy -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
+        $width = 120;
+        $firstPreviewName= $this->contentId . '.png';
+
+        $this->log->info('Достаём кадр из видео');
+        $ffmpeg = 'ffmpeg -ss 00:00:05 -i ' . DIRECTORY_VIDEO . $videoName . ' -frames:v 1 -y  ' . DIRECTORY_PREVIEW . $firstPreviewName;
+        $this->log->info($ffmpeg);
+        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+
+        unlink(DIRECTORY_PREVIEW . $firstPreviewName);
+        $identify = 'identify -format "%wx%h" ' . DIRECTORY_PREVIEW . $firstPreviewName;
+        $widthAndHeight = shell_exec($identify);
+        $widthPreview = explode('x', $widthAndHeight)[0];
+
+        if ($widthPreview == 1280) {
+            $width = 200;
+        }
+
+        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -i ' . DIRECTORY_LOGO_IMG . $nameFileLogo . ' -filter_complex "[1:v]scale=' . $width . ':-1,format=yuva420p [overlay]; [0:v][overlay] overlay=20:20" -c:v h264_nvenc -c:a copy -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
         shell_exec($ffmpeg);
 
         $this->log->info($ffmpeg);

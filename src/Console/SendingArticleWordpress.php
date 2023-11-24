@@ -45,7 +45,7 @@ class SendingArticleWordpress extends Command
             $this->log->info('Начало ' . date('Y-m-s H:i:s'));
         }
 
-        $articlesIds = DB::table('articles')->select('id')->where([['status_id', '=', 6]])->get()->toArray();
+        $articlesIds = DB::table('articles')->select('id')->where([['status_id', '=', 8]])->get()->toArray();
 
         if ($this->status_log) {
             $this->log->info('Статьи на отправку: ' . json_encode($articlesIds));
@@ -98,7 +98,6 @@ class SendingArticleWordpress extends Command
 
         $postData = [
             'title' => $article['name'],
-            'status' => 'draft',
             'content' => $text,
         ];
 
@@ -110,6 +109,18 @@ class SendingArticleWordpress extends Command
             $postData[] = ['tags' => $article['marking']];
         }
 
+        if (!is_null($article['date_publish'])) {
+            $postData[] = [
+                'date' => date('Y-m-dH:i:s', $article['date_publish']),
+                'status' => 'publish',
+            ];
+        } else {
+            $postData[] = [
+                'status' => 'draft',
+            ];
+        }
+
+        var_dump( json_encode($postData));
         $res = $client->post($url, [
             'headers' => [
                 'Authorization' => 'Basic ' . base64_encode($article['user_name'] . ':' . $article['password_app']),

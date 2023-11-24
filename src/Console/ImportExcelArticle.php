@@ -69,6 +69,7 @@ class ImportExcelArticle extends Command
                 'текст для запроса',
                 'метки',
                 'рубрики',
+                'дата публикации видео'
             ];
 
             if (!file_exists($path)) {
@@ -202,6 +203,7 @@ class ImportExcelArticle extends Command
             $row['id сайта'],
             $row['рубрики'],
             $row['метки'],
+            $row['дата публикации видео'] ?? null,
         );
         return $article->id;
     }
