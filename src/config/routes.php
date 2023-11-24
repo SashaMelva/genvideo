@@ -2,6 +2,7 @@
 
 
 use App\Controller\Article\AddNewWebsite;
+use App\Controller\Article\DeletedWebsite;
 use App\Controller\Article\GetAllWebsite;
 use App\Controller\Article\GetOneWebsite;
 use App\Controller\Article\UpdateWebsite;
@@ -138,7 +139,10 @@ return static function (App $app): void {
 
             $group->post('/add', AddNewWebsite::class);
             $group->post('/update', UpdateWebsite::class);
-            $group->post('/delete', DeletedWebsite::class);
+            $group->post('/delete/{id:[0-9]+}', DeletedWebsite::class);
+        });
+        $group->group('/article', function (RouteCollectorProxyInterface $group) {
+            $group->get('/get-all', GetAllArticle::class);
         });
 //        $group->group('/integration', function (RouteCollectorProxyInterface $group) {
         $group->get('/token/{id:[0-9]+}', GetToken::class);

@@ -31,13 +31,13 @@ class Website extends Model
             ->get()->toArray();
     }
 
-    public static function accessCheckCreator(int $projectId, int $userid): bool
+    public static function accessCheckCreator(int $websiteId, int $userid): bool
     {
         $access = self::query()
-            ->where([['id', '=', $projectId]])
+            ->where([['id', '=', $websiteId]])
             ->get()->toArray()[0];
 
-        return $access['creator_id'] == $userid;
+        return $access['user_id'] == $userid;
     }
 
     public static function fullInfo(int $id): array
@@ -89,5 +89,12 @@ class Website extends Model
                 'name' => $date['name'],
                 'description' => $date['description'],
                 ]);
+    }
+
+    public static function deleteWebsite(int $id): void
+    {
+        self::query()
+            ->where([['id', '=', $id]])
+            ->delete();;
     }
 }
