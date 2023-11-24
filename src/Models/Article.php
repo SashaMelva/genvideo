@@ -61,4 +61,26 @@ class Article extends Model
             ->where('articles.id', '=', $articleId)
             ->get()->toArray()[0];
     }
+
+    public static function findAll(int $projectId): array
+    {
+        return self::query()
+            ->select(
+                'articles.id AS articles_id',
+                'articles.name AS articles_name',
+                'articles.rubric',
+                'articles.marking',
+                'articles.status_id',
+                'articles.project_id',
+                'articles.website_id',
+                'articles.date_publish',
+                'websites.name AS websites_name',
+                'websites.domen',
+                'websites.user_name',
+                'websites.password_app',
+            )
+            ->leftJoin('websites', 'articles.website_id', '=', 'websites.id')
+            ->where('articles.project_id', '=', $projectId)
+            ->get()->toArray();
+    }
 }
