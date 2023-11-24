@@ -103,12 +103,10 @@ return static function (App $app): void {
             $group->post('/collection-data', CollectionDataVideo::class);
             $group->post('/get-all', GetAllContent::class);
             $group->get('/get/{id:[0-9]+}', GetContent::class);
-
             $group->get('/load/{id:[0-9]+}/{token}', DownloadVideo::class);
-
             $group->get('/load/preview/{id:[0-9]+}', LoadPreviewVideo::class);
 
-            $group->post('/send', SendVideo::class);
+//            $group->post('/send', SendVideo::class);
             //$group->get('/generate/{id:[0-9]+}', GeneratorVideo::class);
 //            $group->get('/test', TestController::class);
 
