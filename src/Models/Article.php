@@ -60,11 +60,14 @@ class Article extends Model
                 'articles.project_id',
                 'articles.website_id',
                 'articles.date_publish',
+                'article_status.name',
+                'article_status.description',
                 'websites.domen',
                 'websites.user_name',
                 'websites.password_app',
             )
             ->leftJoin('websites', 'articles.website_id', '=', 'websites.id')
+            ->leftJoin('article_status', 'articles.status_id', '=', 'article_status.id')
             ->where('articles.id', '=', $articleId)
             ->get()->toArray()[0];
     }
@@ -81,12 +84,15 @@ class Article extends Model
                 'articles.project_id',
                 'articles.website_id',
                 'articles.date_publish',
+                'article_status.name',
+                'article_status.description',
                 'websites.name AS websites_name',
                 'websites.domen',
                 'websites.user_name',
                 'websites.password_app',
             )
             ->leftJoin('websites', 'articles.website_id', '=', 'websites.id')
+            ->leftJoin('article_status', 'articles.status_id', '=', 'article_status.id')
             ->where('articles.project_id', '=', $projectId)
             ->get()->toArray();
     }
