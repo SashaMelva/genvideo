@@ -19,7 +19,7 @@ class ListMusic  extends Model
     public static function findAllByContentId(int $contentId): array
     {
         return self::query()
-            ->select('content_id', 'music.id', 'music.file_name', 'music.file_path', 'music.type', 'music.project_id')
+            ->select('content_id', 'music.id', 'music.file_name', 'music.file_path', 'music.type', 'music.project_id', 'music.name')
             ->leftJoin('music', 'list_music.music_id', 'music.id')
             ->where([['content_id', '=', $contentId]])
             ->get()->toArray();

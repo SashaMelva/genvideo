@@ -8,7 +8,6 @@ use App\Console\FormatTextFromChatGptCommand;
 use App\Console\GeneratorChatGPTText;
 use App\Console\GeneratorChatGPTTextPromise;
 use App\Console\GeneratorImage;
-use App\Console\GeneratorManyVideoCommand;
 use App\Console\GeneratorVideoCommand;
 use App\Console\GeneratorVoiceAndSubtitlesCommand;
 use App\Console\GetYandexAimToken;
@@ -58,17 +57,16 @@ try {
     $cli->add(new GeneratorVideoCommand()); //первый скрипт генерации видео на кроне
     $cli->add(new GetYandexAimToken()); // получение токена для синтеза текста на кроне
     $cli->add(new ImportDataExcelCommand()); //импорт данных с файлов excel на кроне
-    $cli->add(new ImportExcelArticle()); // импорт данных для статей
+    $cli->add(new ImportExcelArticle()); // импорт данных для статей excel на кроне
 
     $cli->add(new DistributionChatGPTRequest()); //отправка запроса на получеие текста т чата gpt на кроне
     $cli->add(new GeneratorChatGPTText()); //отправка запроса на получеие текста т чата gpt на кроне
 
-    $cli->add(new FormatTextArticleFromChatGpt());
+    $cli->add(new FormatTextArticleFromChatGpt()); //форматирование ответа, полученного от чата для статей на кроне
     $cli->add(new FormatTextFromChatGptCommand()); //форматирование ответа, полученного от чата на кроне
     $cli->add(new GeneratorImage()); // Получение картинок по описанию, полученного с чата
     $cli->add(new GeneratorVoiceAndSubtitlesCommand()); //генерация озвучки и субтитров ОТКЛЮЧЁН
-    $cli->add(new GeneratorManyVideoCommand()); //новый скрипт для перегенерации видео генерации видео
-    $cli->add(new SendingArticleWordpress());
+    $cli->add(new SendingArticleWordpress()); // Публикация статей по апи вордпреса
 
 
     $cli->add(new NewTestGPTRequest());
