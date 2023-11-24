@@ -4,8 +4,7 @@ namespace App\Controller\Article;
 
 use App\Controller\UserController;
 use App\Helpers\CheckTokenExpiration;
-use App\Models\ContentVideo;
-use App\Models\ListProject;
+use App\Models\Website;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Psr\Container\ContainerExceptionInterface;
@@ -26,15 +25,11 @@ class GetAllWebsite extends UserController
         if (CheckTokenExpiration::action($this->container->get('jwt-secret'), $access_token)) {
 
             try {
+
                 $token = JWT::decode($access_token, new Key($this->container->get('jwt-secret'), 'HS256'));
+                $website = Website::findAllData($token->user_id);
 
-                $projects = ListProject::findAllProjectInfoByUserId($token->user_id);
-
-                foreach ($projects as $key =>  $project) {
-                    $projects[$key]['count_content'] = ContentVideo::countContent($project['project_id']);
-                }
-
-                return $this->respondWithData($projects);
+                return $this->respondWithData($website);
 
             } catch (Throwable $e) {
                 return $this->respondWithError($e->getCode(), $e->getMessage());

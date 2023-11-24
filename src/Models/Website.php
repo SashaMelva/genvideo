@@ -25,9 +25,10 @@ class Website extends Model
             ->first();
     }
 
-    public static function findAll(): array
+    public static function findAllData(int $userId): array
     {
         return self::query()
+            ->where('user_id', '=', $userId)
             ->get()->toArray();
     }
 

@@ -136,14 +136,15 @@ return static function (App $app): void {
         $group->group('/website', function (RouteCollectorProxyInterface $group) {
             $group->get('/get-one/{id:[0-9]+}', GetOneWebsite::class);
             $group->get('/get-all', GetAllWebsite::class);
-
             $group->post('/add', AddNewWebsite::class);
             $group->post('/update', UpdateWebsite::class);
             $group->post('/delete/{id:[0-9]+}', DeletedWebsite::class);
         });
+
         $group->group('/article', function (RouteCollectorProxyInterface $group) {
             $group->get('/get-all', GetAllArticle::class);
         });
+
 //        $group->group('/integration', function (RouteCollectorProxyInterface $group) {
         $group->get('/token/{id:[0-9]+}', GetToken::class);
         $group->get('/token-callback', TokenCallBack::class);
