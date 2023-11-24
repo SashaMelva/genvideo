@@ -1,6 +1,10 @@
 <?php
 
 
+use App\Controller\Article\AddNewWebsite;
+use App\Controller\Article\GetAllWebsite;
+use App\Controller\Article\GetOneWebsite;
+use App\Controller\Article\UpdateWebsite;
 use App\Controller\Authorization\GetUserToken;
 use App\Controller\Authorization\LoginUser;
 use App\Controller\Authorization\LogoutUser;
@@ -51,8 +55,7 @@ use Psr\Http\Message\ResponseInterface;
 use Slim\App;
 use Slim\Interfaces\RouteCollectorProxyInterface;
 
-return static function(App $app):void
-{
+return static function (App $app): void {
 
     $app->options('/api/{routes:.+}', function (RequestInterface $request, ResponseInterface $response): ResponseInterface {
         return $response;
@@ -129,11 +132,18 @@ return static function(App $app):void
 //            $group->get('/delete-video/{id:[0-9]+}', DeleteAdditionalVideo::class);
         });
 
+        $group->group('/website', function (RouteCollectorProxyInterface $group) {
+            $group->get('/get-one/{id:[0-9]+}', GetOneWebsite::class);
+            $group->get('/get-all', GetAllWebsite::class);
 
+            $group->post('/add', AddNewWebsite::class);
+            $group->post('/update', UpdateWebsite::class);
+            $group->post('/delete', DeletedWebsite::class);
+        });
 //        $group->group('/integration', function (RouteCollectorProxyInterface $group) {
-            $group->get('/token/{id:[0-9]+}', GetToken::class);
-            $group->get('/token-callback', TokenCallBack::class);
-            $group->get('/add-token/{id:[0-9]+}', SaveTokenCallBack::class);
+        $group->get('/token/{id:[0-9]+}', GetToken::class);
+        $group->get('/token-callback', TokenCallBack::class);
+        $group->get('/add-token/{id:[0-9]+}', SaveTokenCallBack::class);
 //        });
 
     });
