@@ -326,16 +326,26 @@ class GeneratorFiles
         $magicCommand = 'convert /var/www/genvi-api/var/resources/preview/' . $firstPreviewName;
         $this->log->info('Перебираем текст ' . $whidthPreview . ' ' . $heightPreview);
 
-        if ($whidthPreview > 600 && $whidthPreview < 700) {
+        if ($whidthPreview >= 600 && $whidthPreview <= 700) {
             $marginTop = 40;
             $placeTop = 40;
             $marginLeft = 20;
             $fontSize = 32;
-        } else {
+        } elseif ($whidthPreview >= 1200 && $whidthPreview <= 1500) {
             $marginTop = 80;
             $placeTop = 110;
             $marginLeft = 40;
             $fontSize = 84;
+        } elseif ($whidthPreview >= 1501 && $whidthPreview <= 2500) {
+            $marginTop = 80;
+            $placeTop = 110;
+            $marginLeft = 40;
+            $fontSize = 126;
+        } else {
+            $marginTop = 80;
+            $placeTop = 110;
+            $marginLeft = 40;
+            $fontSize = 268;
         }
 
         foreach ($textArray as $textValue) {
@@ -375,8 +385,12 @@ class GeneratorFiles
         $widthAndHeight = shell_exec($identify);
         $widthPreview = explode('x', $widthAndHeight)[0];
 
-        if ($widthPreview == 1280) {
+        if ($widthPreview >= 1200 && $widthPreview <= 1500) {
             $width = 200;
+        } elseif ($widthPreview >= 1501 && $widthPreview <= 2500) {
+            $width = 300;
+        } elseif ($widthPreview >= 2501 && $widthPreview <= 4200) {
+            $width = 720;
         }
 
         $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -i ' . DIRECTORY_LOGO_IMG . $nameFileLogo . ' -filter_complex "[1:v]scale=' . $width . ':-1,format=yuva420p [overlay]; [0:v][overlay] overlay=20:20" -c:v h264_nvenc -c:a copy -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';

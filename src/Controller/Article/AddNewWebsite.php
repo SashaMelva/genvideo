@@ -38,6 +38,7 @@ class AddNewWebsite extends UserController
                 $project->setAttribute('name', $data['name']);
                 $project->setAttribute('description', $data['description']);
                 $project->setAttribute('user_id', $token->user_id);
+
                 $project->save();
 
                 return $this->respondWithData('Success');
