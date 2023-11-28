@@ -138,7 +138,7 @@ return static function (App $app): void {
             $group->get('/get-all', GetAllWebsite::class);
             $group->post('/add', AddNewWebsite::class);
             $group->post('/update', UpdateWebsite::class);
-            $group->post('/delete/{id:[0-9]+}', DeletedWebsite::class);
+            $group->get('/delete/{id:[0-9]+}', DeletedWebsite::class);
         });
 
         $group->group('/article', function (RouteCollectorProxyInterface $group) {
