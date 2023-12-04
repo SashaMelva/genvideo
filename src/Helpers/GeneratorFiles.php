@@ -371,6 +371,7 @@ class GeneratorFiles
     /**Генерируем логотип*/
     public function generatorLogo(string $nameFileLogo, string $videoName): array
     {
+        $videoName = $videoName . '.mp4';
         $resultName = $this->contentId . '_logo';
         $width = 120;
         $firstPreviewName= $this->contentId . '.png';
@@ -393,7 +394,7 @@ class GeneratorFiles
             $width = 720;
         }
 
-        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . '.mp4 -i ' . DIRECTORY_LOGO_IMG . $nameFileLogo . ' -filter_complex "[1:v]scale=' . $width . ':-1,format=yuva420p [overlay]; [0:v][overlay] overlay=20:20" -c:v h264_nvenc -c:a copy -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
+        $ffmpeg = 'ffmpeg -i ' . DIRECTORY_VIDEO . $videoName . ' -i ' . DIRECTORY_LOGO_IMG . $nameFileLogo . ' -filter_complex "[1:v]scale=' . $width . ':-1,format=yuva420p [overlay]; [0:v][overlay] overlay=20:20" -c:v h264_nvenc -c:a copy -y ' . DIRECTORY_VIDEO . $resultName . '.mp4';
         shell_exec($ffmpeg);
 
         $this->log->info($ffmpeg);
