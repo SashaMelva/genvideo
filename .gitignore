@@ -2,3 +2,4 @@
 /vendor/
 .env
 /var/log/
+/var/resources/
