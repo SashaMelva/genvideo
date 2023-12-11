@@ -1,6 +1,7 @@
 .idea
 /vendor/
 .env
+/var/
 /var/log/
 /var/resources/
 /var/video/
