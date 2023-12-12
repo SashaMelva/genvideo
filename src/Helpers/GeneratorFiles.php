@@ -381,11 +381,11 @@ class GeneratorFiles
         $this->log->info($ffmpeg);
         $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
 
-        unlink(DIRECTORY_PREVIEW . $firstPreviewName);
         $identify = 'identify -format "%wx%h" ' . DIRECTORY_PREVIEW . $firstPreviewName;
         $widthAndHeight = shell_exec($identify);
         $widthPreview = explode('x', $widthAndHeight)[0];
         $this->log->info("Разрешение", ['data' => $widthPreview]);
+        unlink(DIRECTORY_PREVIEW . $firstPreviewName);
 
         if ($widthPreview >= 1200 && $widthPreview <= 1500) {
             $width = 200;
