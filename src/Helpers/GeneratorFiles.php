@@ -538,6 +538,7 @@ class GeneratorFiles
         $this->log->info('Преобразование основного видео в формат ts');
         if ($this->mergeFiles($nameVideoContent, DIRECTORY_VIDEO)) {
             $ffmpeg .= DIRECTORY_VIDEO . $nameVideoContent . '.ts';
+            $ffmpeg_start .= DIRECTORY_VIDEO . $nameVideoContent . '.ts';
         } else {
             return ['status' => false, 'command' => $ffmpeg];
         }
@@ -569,7 +570,7 @@ class GeneratorFiles
 
         $this->log->info('Количество видео для склейки ' . $countVideo);
         if (!is_null($nameVideoStart)) {
-            $ffmpeg .= ' -filter_complex "[0:v][1:v]concat=n=2:v=1:a=0[vout]; [0:a][1:a]concat=n=2:v=0:a=1[aout]" -map "[vout]" -map "[aout]" -c:v h264_nvenc -c:a aac -y ' . DIRECTORY_VIDEO . $fileName . '.mp4';
+            $ffmpeg_start .= ' -filter_complex "[0:v][1:v]concat=n=2:v=1:a=0[vout]; [0:a][1:a]concat=n=2:v=0:a=1[aout]" -map "[vout]" -map "[aout]" -c:v h264_nvenc -c:a aac -y ' . DIRECTORY_VIDEO . $fileName . '.mp4';
         } else {
             $ffmpeg .= '" -vcodec  h264_nvenc -acodec copy -y ' . DIRECTORY_VIDEO . $fileName . '.mp4';
         }
@@ -582,10 +583,18 @@ class GeneratorFiles
 //            $ffmpeg .= ' -filter_complex "[0:v] [0:a] [1:v] [1:a] [2:v] [2:a] concat=n=3:v=1:a=1 [v] [a]" -map "[v]" -map "[a]" -y ' . DIRECTORY_VIDEO . $fileName . '.mp4';
 //        }
         $this->log->info($ffmpeg);
-        $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+        if (!is_null($nameVideoStart)) {
+            $errors = shell_exec($ffmpeg_start . ' -hide_banner -loglevel error 2>&1');
+        } else {
+            $errors = shell_exec($ffmpeg . ' -hide_banner -loglevel error 2>&1');
+        }
 
         if (!is_null($errors)) {
-            return ['status' => false, 'command' => $ffmpeg];
+            if (!is_null($nameVideoStart)) {
+                return ['status' => false, 'command' => $ffmpeg_start];
+            } else {
+                return ['status' => false, 'command' => $ffmpeg];
+            }
         }
 
 //        if (file_exists(DIRECTORY_ADDITIONAL_VIDEO . $dataEndVideo['fileName'] . '.ts')) {
