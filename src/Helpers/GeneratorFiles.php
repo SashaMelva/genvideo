@@ -385,6 +385,7 @@ class GeneratorFiles
         $identify = 'identify -format "%wx%h" ' . DIRECTORY_PREVIEW . $firstPreviewName;
         $widthAndHeight = shell_exec($identify);
         $widthPreview = explode('x', $widthAndHeight)[0];
+        $this->log->info("Разрешение", ['data' => $widthPreview]);
 
         if ($widthPreview >= 1200 && $widthPreview <= 1500) {
             $width = 200;
