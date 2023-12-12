@@ -492,13 +492,17 @@ class GeneratorFiles
     {
         $this->log->info('Видео для склейки ',[
             'nameVideoContent' => $nameVideoContent,
-            'format' => $format,
-            'nameVideoStart' => $nameVideoStart,
-            'nameVideoEnd' => $nameVideoEnd,
+            'format'           => $format,
+            'nameVideoStart'   => $nameVideoStart,
+            'nameVideoEnd'     => $nameVideoEnd,
         ]);
 
         $fileName = $this->contentId . '_result';
         $ffmpeg = 'ffmpeg -i "concat:';
+
+        // TODO временный фикс для генерации
+        // TODO видео без концовки, в будущем лучше отредактировать функцию
+        $ffmpeg_start = 'ffmpeg -i ';
         $countVideo = 1;
 
         if (!is_null($nameVideoStart)) {
@@ -512,7 +516,9 @@ class GeneratorFiles
                 $dataStartVideo = $this->generatorAdditionalVideoFormat($fileNameStart);
 
                 if ($dataStartVideo['status']) {
-                    $ffmpeg .= DIRECTORY_ADDITIONAL_VIDEO . $dataStartVideo['fileName'] . '.ts' . '|';
+
+                    $ffmpeg_start .= DIRECTORY_ADDITIONAL_VIDEO . $dataStartVideo['fileName'] . '.ts' . ' -i ';
+                  //  $ffmpeg .= DIRECTORY_ADDITIONAL_VIDEO . $dataStartVideo['fileName'] . '.ts' . '|';
                 } else {
                     return ['status' => false, 'command' => $ffmpeg];
                 }
@@ -521,7 +527,8 @@ class GeneratorFiles
                 $this->log->info('Преобразование начального видео в формат ts');
 
                 if ($this->mergeFiles($fileNameStart, DIRECTORY_ADDITIONAL_VIDEO)) {
-                    $ffmpeg .= DIRECTORY_ADDITIONAL_VIDEO . $fileNameStart . '.ts' . '|';
+                    $ffmpeg_start .= DIRECTORY_ADDITIONAL_VIDEO . $fileNameStart . '.ts' . ' -i ';
+                  //  $ffmpeg .= DIRECTORY_ADDITIONAL_VIDEO . $fileNameStart . '.ts' . '|';
                 } else {
                     return ['status' => false, 'command' => $ffmpeg];
                 }
@@ -561,7 +568,11 @@ class GeneratorFiles
         }
 
         $this->log->info('Количество видео для склейки ' . $countVideo);
-        $ffmpeg .= '" -vcodec  h264_nvenc -acodec copy -y ' . DIRECTORY_VIDEO . $fileName . '.mp4';
+        if (!is_null($nameVideoStart)) {
+            $ffmpeg .= ' -filter_complex "[0:v][1:v]concat=n=2:v=1:a=0[vout]; [0:a][1:a]concat=n=2:v=0:a=1[aout]" -map "[vout]" -map "[aout]" -c:v h264_nvenc -c:a aac -y ' . DIRECTORY_VIDEO . $fileName . '.mp4';
+        } else {
+            $ffmpeg .= '" -vcodec  h264_nvenc -acodec copy -y ' . DIRECTORY_VIDEO . $fileName . '.mp4';
+        }
 
 //        if ($countVideo == 2) {
 //            $ffmpeg .= ' -filter_complex "[0:v] [0:a] [1:v] [1:a] concat=n=2:v=1:a=1 [v] [a]" -map "[v]" -map "[a]" -y ' . DIRECTORY_VIDEO . $fileName . '.mp4';
