@@ -346,7 +346,7 @@ class GeneratorFiles
             $fontSize = 84;
         } elseif ($whidthPreview >= 1501 && $whidthPreview <= 2500) {
             $marginTop = 80;
-            $placeTop = 140;
+            $placeTop = 160;
             $marginLeft = 40;
             $fontSize = 126;
         } else {
