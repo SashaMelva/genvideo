@@ -326,6 +326,14 @@ class GeneratorFiles
         $magicCommand = 'convert /var/www/genvi-api/var/resources/preview/' . $firstPreviewName;
         $this->log->info('Перебираем текст ' . $whidthPreview . ' ' . $heightPreview);
 
+//        if ($widthPreview >= 1200 && $widthPreview <= 1500) {
+//            $width = 200;
+//        } elseif ($widthPreview >= 1501 && $widthPreview <= 2500) {
+//            $width = 300;
+//        } elseif ($widthPreview >= 2501 && $widthPreview <= 4200) {
+//            $width = 720;
+//        }
+
         if ($whidthPreview >= 600 && $whidthPreview <= 700) {
             $marginTop = 40;
             $placeTop = 40;
@@ -338,7 +346,7 @@ class GeneratorFiles
             $fontSize = 84;
         } elseif ($whidthPreview >= 1501 && $whidthPreview <= 2500) {
             $marginTop = 80;
-            $placeTop = 110;
+            $placeTop = 120;
             $marginLeft = 40;
             $fontSize = 126;
         } else {
