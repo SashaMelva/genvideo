@@ -208,11 +208,13 @@ class GeneratorVideoCommand extends Command
                     exec($cmd);
                     return 0;
                 }
+
             }
 
             if ($video['type_background'] == 'video' && !is_null($textData['time_voice'])) {
+                $this->log->info('Для отладки ', ['info' => $videoBackground, 'text' => DIRECTORY_ADDITIONAL_VIDEO . $videoBackground[0]]);
                 if (!empty($videoBackground) && file_exists(DIRECTORY_ADDITIONAL_VIDEO . $videoBackground[0])) {
-                    $this->log->info('Начало формирования новго видео');
+                    $this->log->info('Начало формирования нового видео');
 
                     $this->log->info('Видео для склейки ' . json_encode($videoBackground));
                     $additionalVideoName = $videoBackground;
