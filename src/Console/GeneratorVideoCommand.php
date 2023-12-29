@@ -157,6 +157,7 @@ class GeneratorVideoCommand extends Command
             $textData = TextVideo::findById($video['text_id'])[0];
 
             $this->log->info('Продолжительность файла ' . $textData['time_voice']);
+            $this->log->info('Информация по видео ', ['info' => $video, 'text' => $textData]);
 
             if ($video['type_background'] == 'slide_show' && !is_null($textData['time_voice'])) {
 
