@@ -209,7 +209,7 @@ class ImportExcelArticle extends Command
             $row['id сайта'],
             $row['рубрики'],
             $row['метки'],
-            $row['дата публикации видео'],
+            null,
         );
         return $article->id;
     }
