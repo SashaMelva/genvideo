@@ -49,7 +49,7 @@ class ImportDataForExcel extends UserController
                     }
 
                     $data['type'] = 2;
-                    $file = ImportExcel::addFile($filename, 1, $token->user_id, $data['type'] ?? 1);
+                    $file = ImportExcel::addFile($filename, 1, $token->user_id, $data['type']);
                     return $this->respondWithData(['file_name' => $file->file_name, 'id' => $file->id]);
 
                 } else {
