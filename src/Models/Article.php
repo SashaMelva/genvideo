@@ -17,7 +17,7 @@ class Article extends Model
         return self::query()->find($id)->getModel();
     }
 
-    public static function addContent(int $projectId, string $articleName, int $webSiteId, string $rubric, string $marking, ?int $date): Article
+    public static function addContent(int $projectId, string $articleName, int $webSiteId, string $rubric, string $marking, int|null $date): Article
     {
         $newContent = new Article();
         $newContent->setAttribute('project_id', $projectId);

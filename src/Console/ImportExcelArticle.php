@@ -197,13 +197,19 @@ class ImportExcelArticle extends Command
 
     public function addItemArticle(array $row): int
     {
+        if (trim($row['дата публикации видео']) == '') {
+            $row['дата публикации видео'] = null;
+        } else {
+            $row['дата публикации видео'] = strtotime($row['дата публикации видео']);
+        }
+
         $article = Article::addContent(
             $row['id проекта'],
             $row['название статьи'],
             $row['id сайта'],
             $row['рубрики'],
             $row['метки'],
-            $row['дата публикации видео'] ?? null,
+            $row['дата публикации видео'],
         );
         return $article->id;
     }
