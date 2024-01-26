@@ -108,20 +108,15 @@ class SendingArticleWordpress extends Command
                 'content' => $text,
             ];
 
-
             if (!is_null($article['rubric'])) {
-                $postData['categories'] = [3,4];
+                $postData['categories'] = explode(',', $article['rubric']);
             }
 
             if (!is_null($article['marking'])) {
-                $postData['tags'] = [32,29];
+                $postData['tags'] = explode(',', $article['marking']);
             }
 
             if (!is_null($article['date_publish'])) {
-//                $postData[] = [
-//                    'date' => date('Y-m-d H:i:s', $article['date_publish']),
-//                    'status' => 'publish',
-//                ];
                 $postData['date'] =  date('Y-m-d H:i:s', $article['date_publish']);
                 $postData['status'] = 'publish';
             } else {
