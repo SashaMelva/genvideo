@@ -45,7 +45,7 @@ class SendingArticleWordpress extends Command
             $this->log->info('Начало ' . date('Y-m-s H:i:s'));
         }
 
-        $articlesIds = DB::table('articles')->select('id')->where([['status_id', '=', 8]])->get()->toArray();
+        $articlesIds = DB::table('articles')->select('id')->where([['status_id', '=', 7]])->get()->toArray();
 
         if ($this->status_log) {
             $this->log->info('Статьи на отправку: ' . json_encode($articlesIds));
