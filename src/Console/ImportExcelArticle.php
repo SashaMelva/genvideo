@@ -203,7 +203,7 @@ class ImportExcelArticle extends Command
 //            $row['дата публикации видео'] = strtotime($row['дата публикации видео']);
 //        }
 
-        $row['дата публикации видео'] = strtotime($row['дата публикации видео']);
+      //  $row['дата публикации видео'] = strtotime($row['дата публикации видео']);
 
         $article = Article::addContent(
             $row['id проекта'],
@@ -211,7 +211,7 @@ class ImportExcelArticle extends Command
             $row['id сайта'],
             $row['рубрики'],
             $row['метки'],
-            null,
+            $row['дата публикации видео'],
         );
         return $article->id;
     }
