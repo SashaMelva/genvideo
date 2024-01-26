@@ -99,29 +99,31 @@ class SendingArticleWordpress extends Command
 
             $url = 'https://' . $article['domen'] . '/wp-json/wp/v2/posts';
            // https://LOCALHOST/wp-json/wp/v2/posts/POST_ID
-          //  print_r('Basic ' . base64_encode($article['user_name'] . ':' . $article['password_app']));
+            print_r('Basic ' . base64_encode('denis:kQ03lh7fAP0sIPeIkD0RClYy'));
           //  exit;
             $client = new Client();
 
             $postData = [
                 'title' => $article['name'],
-                'content' => 'Privet',
+                'content' => $text,
             ];
 
 
             if (!is_null($article['rubric'])) {
-                $postData[] = ['categories'=>$article['rubric']];
+                $postData['categories'] = [3,4];
             }
 
             if (!is_null($article['marking'])) {
-                $postData[] = ['tags' => $article['marking']];
+                $postData['tags'] = [32,29];
             }
 
             if (!is_null($article['date_publish'])) {
-                $postData[] = [
-                    'date' => date('Y-m-d H:i:s', $article['date_publish']),
-                    'status' => 'publish',
-                ];
+//                $postData[] = [
+//                    'date' => date('Y-m-d H:i:s', $article['date_publish']),
+//                    'status' => 'publish',
+//                ];
+                $postData['date'] =  date('Y-m-d H:i:s', $article['date_publish']);
+                $postData['status'] = 'publish';
             } else {
                 $postData[] = [
                     'status' => 'draft',
