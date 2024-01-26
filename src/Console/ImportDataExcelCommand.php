@@ -133,11 +133,11 @@ class ImportDataExcelCommand extends Command
             }
 
             if (count($rows[0]) != count($allHeadersList)) {
-                $msg = 'Не хватает заголовков';
-                $this->log->error($msg);
-                ImportExcel::changeStatus($exportItem->id, 6, $msg);
-                exec($cmd);
-                return 0;
+//                $msg = 'Не хватает заголовков';
+//                $this->log->error($msg);
+//                ImportExcel::changeStatus($exportItem->id, 6, $msg);
+//                exec($cmd);
+//                return 0;
             }
 
             /** проверка заполнения обязательных полей - исключение не подходящих*/
