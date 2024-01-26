@@ -5,6 +5,7 @@ namespace App\Console;
 use App\Models\Article;
 use Exception;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Database\Capsule\Manager as DB;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\StreamHandler;
@@ -92,48 +93,79 @@ class SendingArticleWordpress extends Command
 
     private function senTextJson(array $article, string $text): bool
     {
-        $url = 'https://' . $article['domen'] . '/wp-json/wp/v2/posts';
+        try {
 
-        $client = new Client();
 
-        $postData = [
-            'title' => $article['name'],
-            'content' => $text,
-        ];
 
-        if (!is_null($article['rubric'])) {
-            $postData[] = ['categories'=>$article['rubric']];
-        }
+            $url = 'https://' . $article['domen'] . '/wp-json/wp/v2/posts';
+           // https://LOCALHOST/wp-json/wp/v2/posts/POST_ID
+          //  print_r('Basic ' . base64_encode($article['user_name'] . ':' . $article['password_app']));
+          //  exit;
+            $client = new Client();
 
-        if (!is_null($article['marking'])) {
-            $postData[] = ['tags' => $article['marking']];
-        }
-
-        if (!is_null($article['date_publish'])) {
-            $postData[] = [
-                'date' => date('Y-m-dH:i:s', $article['date_publish']),
-                'status' => 'publish',
+            $postData = [
+                'title' => $article['name'],
+                'content' => 'Privet',
             ];
-        } else {
-            $postData[] = [
-                'status' => 'draft',
-            ];
+
+
+            if (!is_null($article['rubric'])) {
+                $postData[] = ['categories'=>$article['rubric']];
+            }
+
+            if (!is_null($article['marking'])) {
+                $postData[] = ['tags' => $article['marking']];
+            }
+
+            if (!is_null($article['date_publish'])) {
+                $postData[] = [
+                    'date' => date('Y-m-d H:i:s', $article['date_publish']),
+                    'status' => 'publish',
+                ];
+            } else {
+                $postData[] = [
+                    'status' => 'draft',
+                ];
+            }
+
+         //   print_r($postData);
+          //  exit;
+
+
+          //  var_dump( json_encode($postData));
+            $res = $client->post($url, [
+                'headers' => [
+                    'Authorization' => 'Basic ' . base64_encode($article['user_name'] . ':' . $article['password_app']),
+                    'Content-Type' => 'application/json',
+                ],
+                'body' => json_encode($postData),
+            ]);
+
+//            $response = $client->request('POST', $url, [
+//                'headers' => [
+//                    'Authorization' => 'Basic ' . base64_encode($article['user_name'] . ':' . $article['password_app']),
+//                    'Content-Type' => 'application/json',
+//                ],
+//                'body' => json_encode($postData),
+//            ]);
+//
+//            $data = $res->getBody();
+//            $data = json_decode($data->getContents(), true);
+//            print_r($data);
+
+            if ($res->getStatusCode() != 201 && $res->getStatusCode() != 200) {
+                $this->log->info('Ошибка отправки запроса');
+                return false;
+            }
+
+            return true;
+
+        } catch (Exception $e) {
+            $this->log->error($e->getMessage());
+
+        } catch (GuzzleException $e) {
+            $this->log->error($e->getMessage());
         }
-
-        var_dump( json_encode($postData));
-        $res = $client->post($url, [
-            'headers' => [
-                'Authorization' => 'Basic ' . base64_encode($article['user_name'] . ':' . $article['password_app']),
-                'Content-Type' => 'application/json',
-            ],
-            'body' => json_encode($postData),
-        ]);
-
-        if ($res->getStatusCode() != 201 && $res->getStatusCode() != 200) {
-            $this->log->info('Ошибка отправки запроса');
-            return false;
-        }
-
-        return true;
+        return false;
     }
 }
